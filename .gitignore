@@ -1,0 +1,26 @@
+# Environment variables
+.env
+
+# Node modules
+node_modules/
+npm-debug.log*
+
+# Uploaded files
+public/assets/uploads/*
+!public/assets/uploads/.gitkeep
+
+# Compiled assets
+public/assets/css/style.css
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

@@ -1,0 +1,16 @@
+{
+  "name": "ucsmtla-academic-hub",
+  "version": "1.0.0",
+  "description": "UCSMTLA Academic Hub - Custom PHP web application",
+  "main": "index.js",
+  "scripts": {
+    "build:css": "tailwindcss -i ./public/assets/css/input.css -o ./public/assets/css/style.css",
+    "watch:css": "tailwindcss -i ./public/assets/css/input.css -o ./public/assets/css/style.css --watch"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "tailwindcss": "^3.4.0"
+  }
+}
