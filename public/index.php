@@ -1,13 +1,21 @@
 <?php
 // Main entry point for the public website
-require_once '../config/config.php';
-require_once '../includes/db.php';
+require_once '../config/app.php';
+require_once '../includes/database.php';
 require_once '../includes/header.php';
 ?>
 
-<main class="container mx-auto mt-8 px-4">
-    <h1 class="text-4xl font-bold text-center text-blue-800">Welcome to UCSMTLA Academic Hub</h1>
-    <p class="mt-4 text-center text-gray-600">The central hub for all university information, news, and academic resources.</p>
+<main class="flex-1">
+    <?php include __DIR__ . '/../includes/sections/home-hero.php'; ?>
+    <?php include __DIR__ . '/../includes/sections/home-stats.php'; ?>
+    <?php include __DIR__ . '/../includes/sections/home-about.php'; ?>
+    <?php include __DIR__ . '/../includes/sections/home-programmes.php'; ?>
+    <?php include __DIR__ . '/../includes/sections/home-faculties.php'; ?>
+    <?php include __DIR__ . '/../includes/sections/home-announcements.php'; ?>
+    <?php include __DIR__ . '/../includes/sections/home-campus-life.php'; ?>
+    <?php include __DIR__ . '/../includes/sections/home-student-life.php'; ?>
+    <?php include __DIR__ . '/../includes/sections/home-admissions.php'; ?>
+    <?php include __DIR__ . '/../includes/sections/home-location-contact.php'; ?>
 </main>
 
 <?php

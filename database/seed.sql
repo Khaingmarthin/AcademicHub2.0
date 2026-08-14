@@ -1400,3 +1400,162 @@ VALUES
     2,
     TRUE
 );
+
+INSERT INTO admissions
+(
+    academic_year_id,
+    title,
+    description,
+    requirements,
+    important_dates,
+    application_info,
+    document_title,
+    document_path,
+    document_type,
+    status
+)
+VALUES
+(
+    1,
+    'Admission Information 2025-2026',
+
+    'Information regarding entrance admission and enrollment for the academic year 2025-2026.',
+
+    'Applicants must satisfy the university entrance requirements and provide the required documents.',
+
+    'Entrance information and important dates will be announced by the university.',
+
+    'Applicants should follow the official admission instructions provided by the university.',
+
+    'Admitted Students 2025-2026',
+
+    'admissions/admitted-students-2025-2026.pdf',
+
+    'PDF',
+
+    TRUE
+);
+
+INSERT INTO categories
+(name, description, status)
+VALUES
+(
+    'News',
+    'General university news and updates.',
+    TRUE
+),
+(
+    'Announcement',
+    'Important announcements for students and the university community.',
+    TRUE
+),
+(
+    'Event',
+    'University events and activities.',
+    TRUE
+),
+(
+    'Academic',
+    'Academic-related information and updates.',
+    TRUE
+),
+(
+    'Admission',
+    'Admission and entrance-related information.',
+    TRUE
+);
+
+INSERT INTO admins
+(
+    name,
+    email,
+    password,
+    status
+)
+VALUES
+(
+    'System Administrator',
+    'admin1@gmail.com',
+    'admin123',
+    TRUE
+);
+
+INSERT INTO news
+(
+    category_id,
+    admin_id,
+    title,
+    slug,
+    content,
+    cover_image,
+    published_at,
+    status
+)
+VALUES
+(
+    1,
+    1,
+    'Welcome to UCSMTLA Academic Hub',
+    'welcome-to-ucsmtla-academic-hub',
+    'Welcome to the UCSMTLA Academic Hub, providing university information, academic information, admission information, campus facilities and university news.',
+    'news/welcome.jpg',
+    NOW(),
+    'Published'
+),
+(
+    2,
+    1,
+    'Semester Examination Announcement',
+    'semester-examination-announcement',
+    'Important information regarding the upcoming semester examination will be announced here.',
+    'news/examination.jpg',
+    NOW(),
+    'Published'
+),
+(
+    3,
+    1,
+    'University Sports Event',
+    'university-sports-event',
+    'The university will organize a sports event for students.',
+    'news/sports-event.jpg',
+    NOW(),
+    'Published'
+),
+(
+    4,
+    1,
+    'Course Registration Information',
+    'course-registration-information',
+    'Information regarding course registration for students.',
+    'news/course-registration.jpg',
+    NOW(),
+    'Published'
+),
+(
+    2,
+    1,
+    'Third Year CS Timetable Announcement',
+    'third-year-cs-timetable-announcement',
+    'The timetable for Third Year Computer Science students has been published.',
+    'news/timetable.jpg',
+    NOW(),
+    'Published'
+);
+
+INSERT INTO news_targets
+(
+    news_id,
+    academic_year_id,
+    major_id,
+    year_level,
+    section
+)
+VALUES
+(
+    5,
+    1,
+    1,
+    'Third Year',
+   'A'
+);
