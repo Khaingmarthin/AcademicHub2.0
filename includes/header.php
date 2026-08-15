@@ -94,7 +94,7 @@ if (!defined('BASE_URL')) {
                                         <ul class="mt-1 space-y-1 border-l border-gray-200 pl-4">
                                             <?php foreach ($item['children'] as $child): ?>
                                                 <li>
-                                                    <a href="<?php echo htmlspecialchars($child['url']); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700"><?php echo htmlspecialchars($child['label']); ?></a>
+                                                    <a href="<?php echo htmlspecialchars($child['url']); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700" data-nav-sections="<?php echo htmlspecialchars(ucs_nav_section($child['url'])); ?>"><?php echo htmlspecialchars($child['label']); ?></a>
                                                 </li>
                                             <?php endforeach; ?>
                                         </ul>
@@ -104,7 +104,7 @@ if (!defined('BASE_URL')) {
                         <?php else: ?>
                             <?php $isActive = ucs_nav_is_active($item['url'], $relativePath); ?>
                             <li>
-                                <a href="<?php echo htmlspecialchars($item['url']); ?>" class="block rounded-lg px-3 py-3 text-base font-medium <?php echo $isActive ? 'bg-blue-50 text-blue-700' : 'text-gray-800 transition-colors hover:bg-blue-50 hover:text-blue-700'; ?>"><?php echo htmlspecialchars($item['label']); ?></a>
+                                <a href="<?php echo htmlspecialchars($item['url']); ?>" class="block rounded-lg px-3 py-3 text-base font-medium <?php echo $isActive ? 'bg-blue-50 text-blue-700' : 'text-gray-800 transition-colors hover:bg-blue-50 hover:text-blue-700'; ?>" data-nav-sections="<?php echo htmlspecialchars(ucs_nav_sections($item['url'])); ?>"><?php echo htmlspecialchars($item['label']); ?></a>
                             </li>
                         <?php endif; ?>
                     <?php endforeach; ?>
@@ -230,5 +230,62 @@ if (!defined('BASE_URL')) {
                 window.addEventListener('scroll', onScroll, { passive: true });
                 onScroll();
             }
+
+            // --- Close the mobile menu when a link inside it is selected ---
+            if (mobileMenu) {
+                mobileMenu.querySelectorAll('a').forEach(function (link) {
+                    link.addEventListener('click', function () {
+                        closeMobileMenu();
+                    });
+                });
+            }
+
+            // --- Close an open desktop dropdown when one of its links is selected ---
+            document.querySelectorAll('.nav-dropdown-link').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    var group = link.closest('.group');
+                    if (group) {
+                        group.classList.remove('open');
+                        var btn = group.querySelector('[data-dropdown-toggle]');
+                        if (btn) btn.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            });
+
+            // --- Highlight the nav item matching the current homepage section ---
+            var navActiveUnderline = ['text-blue-700', 'after:absolute', 'after:inset-x-3', 'after:bottom-1', 'after:h-0.5', 'after:rounded-full', 'after:bg-blue-600'];
+
+            function setNavActiveState(el, active) {
+                var childLike = el.classList.contains('nav-dropdown-link') || !!el.closest('#mobile-menu');
+                el.classList.toggle('text-blue-700', active);
+                if (childLike) {
+                    el.classList.toggle('bg-blue-50', active);
+                } else {
+                    navActiveUnderline.forEach(function (cls) {
+                        el.classList.toggle(cls, active);
+                    });
+                }
+            }
+
+            function syncNavActiveState() {
+                var hash = window.location.hash.replace(/^#/, '');
+                var pageFile = (window.location.pathname.split('/').pop() || '').split('?')[0];
+                var isHomePage = pageFile === '' || pageFile === 'index.php' || pageFile === 'index';
+                document.querySelectorAll('[data-nav-sections]').forEach(function (el) {
+                    var sections = (el.getAttribute('data-nav-sections') || '').split(/\s+/).filter(Boolean);
+                    if (hash === '') {
+                        // No section selected: only manage the Home sentinel and leave
+                        // any server-rendered page-level active state untouched.
+                        if (sections.indexOf('home') !== -1) {
+                            setNavActiveState(el, isHomePage);
+                        }
+                        return;
+                    }
+                    setNavActiveState(el, sections.indexOf(hash) !== -1);
+                });
+            }
+
+            window.addEventListener('hashchange', syncNavActiveState);
+            syncNavActiveState();
         })();
     </script>

@@ -52,7 +52,7 @@ $ucsStudentLifeItems = [
     ],
 ];
 ?>
-<section class="bg-slate-50 py-16 sm:py-20" aria-labelledby="student-life-heading">
+<section class="bg-white py-16 sm:py-20" aria-labelledby="student-life-heading">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-2xl text-center">
             <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Beyond the Classroom</p>

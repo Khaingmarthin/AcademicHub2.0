@@ -45,14 +45,13 @@ if (!preg_match('~^https?://~i', $ucsAboutMedia)) {
     $ucsAboutMedia = BASE_URL . '/assets/' . ltrim($ucsAboutMedia, '/');
 }
 ?>
-<section class="bg-white py-16 sm:py-20" aria-labelledby="about-heading">
+<section class="bg-slate-50 py-16 sm:py-20" aria-labelledby="about-heading">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
 
             <!-- Campus image -->
             <div class="relative">
-                <div class="absolute -inset-4 rounded-[2rem] bg-gradient-to-tr from-blue-600/10 via-transparent to-indigo-500/10" aria-hidden="true"></div>
-                <img src="<?php echo htmlspecialchars($ucsAboutMedia); ?>" alt="<?php echo htmlspecialchars($ucsShortName); ?> main campus" class="relative aspect-[4/3] w-full rounded-2xl object-cover shadow-xl shadow-gray-900/10 ring-1 ring-gray-900/5">
+                <img src="<?php echo htmlspecialchars($ucsAboutMedia); ?>" alt="<?php echo htmlspecialchars($ucsShortName); ?> main campus" class="aspect-[4/3] w-full rounded-2xl object-cover shadow-xl shadow-gray-900/10 ring-1 ring-gray-900/5">
                 <?php if ($ucsAddress !== ''): ?>
                     <div class="absolute bottom-4 left-4 rounded-xl bg-white/95 px-4 py-3 shadow-lg shadow-gray-900/10 ring-1 ring-gray-900/5 backdrop-blur">
                         <p class="text-xs font-semibold uppercase tracking-wide text-gray-500">Main Campus</p>
@@ -76,9 +75,9 @@ if (!preg_match('~^https?://~i', $ucsAboutMedia)) {
                     ready for the digital future.
                 </p>
 
-                <a href="<?php echo htmlspecialchars(BASE_URL . '/about.php'); ?>" class="group mt-8 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                <a href="<?php echo htmlspecialchars(BASE_URL . '/about.php'); ?>" class="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/25 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                     Learn More
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M5 12h14M12 5l7 7-7 7"></path>
                     </svg>
                 </a>

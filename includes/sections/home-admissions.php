@@ -39,13 +39,7 @@ if (isset($pdo)) {
     }
 }
 ?>
-<section class="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-indigo-700 py-16 sm:py-20 lg:py-24" aria-labelledby="admissions-heading">
-    <div class="pointer-events-none absolute inset-0" aria-hidden="true">
-        <div class="absolute -top-24 -right-24 h-72 w-72 rounded-full bg-blue-400/20 blur-3xl"></div>
-        <div class="absolute -bottom-28 -left-24 h-80 w-80 rounded-full bg-indigo-400/20 blur-3xl"></div>
-        <div class="absolute top-1/2 left-1/2 h-40 w-40 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white/5 blur-2xl"></div>
-    </div>
-
+<section class="relative overflow-hidden bg-blue-700 py-16 sm:py-20 lg:py-24" aria-labelledby="admissions-heading">
     <div class="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-3xl text-center">
             <?php if ($ucsAdmissionTitle !== ''): ?>

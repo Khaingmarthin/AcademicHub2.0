@@ -63,7 +63,7 @@ if (function_exists('mb_strlen')) {
 $ucsFeatured = $ucsAnnouncements[0] ?? null;
 $ucsSupporting = array_slice($ucsAnnouncements, 1, 3);
 ?>
-<section class="bg-slate-50 py-16 sm:py-20" aria-labelledby="announcements-heading">
+<section class="bg-white py-16 sm:py-20" aria-labelledby="announcements-heading">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-2xl text-center">
             <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">News &amp; Updates</p>
@@ -75,7 +75,7 @@ $ucsSupporting = array_slice($ucsAnnouncements, 1, 3);
 
                 <!-- Featured announcement -->
                 <article class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-900/5 lg:col-span-3">
-                    <div class="h-1.5 w-full bg-gradient-to-r from-blue-600 to-indigo-500" aria-hidden="true"></div>
+                    <div class="h-1.5 w-full bg-blue-600" aria-hidden="true"></div>
                     <div class="flex flex-1 flex-col p-6 sm:p-8">
                         <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
                             <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">

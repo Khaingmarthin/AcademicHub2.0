@@ -63,8 +63,16 @@ $ucsStats = [
     'Faculties'   => ($ucsFacultiesCount !== null) ? number_format($ucsFacultiesCount) : null,
     'Graduates'   => null, // No graduate data exists in the database yet.
 ];
+
+$ucsStatIcons = [
+    'Established' => '<path d="M3 22h18M6 18v-7M10 18v-7M14 18v-7M18 18v-7M12 3l9 5H3l9-5z"></path>',
+    'Years'       => '<path d="M8 2v4M16 2v4M3 10h18"></path><rect x="3" y="4" width="18" height="18" rx="2"></rect>',
+    'Students'    => '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"></path>',
+    'Faculties'   => '<rect x="4" y="2" width="16" height="20" rx="2"></rect><path d="M9 22v-4h6v4"></path><path d="M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"></path>',
+    'Graduates'   => '<circle cx="12" cy="8" r="6"></circle><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path>',
+];
 ?>
-<section class="bg-slate-50 py-16 sm:py-20" aria-labelledby="stats-heading">
+<section class="bg-white py-16 sm:py-20" aria-labelledby="stats-heading">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-2xl text-center">
             <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">University Statistics</p>
@@ -75,10 +83,15 @@ $ucsStats = [
         <dl class="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-5 lg:gap-8">
             <?php foreach ($ucsStats as $ucsLabel => $ucsValue): ?>
                 <div class="flex flex-col items-center rounded-2xl bg-white p-6 text-center shadow-sm ring-1 ring-gray-100 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-900/5">
-                    <dt class="order-2 mt-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600 ring-1 ring-blue-100" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <?php echo $ucsStatIcons[$ucsLabel] ?? ''; ?>
+                        </svg>
+                    </span>
+                    <dt class="order-3 mt-3 text-sm font-semibold uppercase tracking-wide text-gray-500">
                         <?php echo htmlspecialchars($ucsLabel); ?>
                     </dt>
-                    <dd class="order-1 text-3xl font-extrabold tracking-tight text-blue-600 sm:text-4xl"<?php echo $ucsValue === null ? ' title="Information unavailable"' : ''; ?>>
+                    <dd class="order-2 mt-4 text-3xl font-extrabold tracking-tight text-blue-600 sm:text-4xl"<?php echo $ucsValue === null ? ' title="Information unavailable"' : ''; ?>>
                         <?php echo $ucsValue === null ? '—' : htmlspecialchars($ucsValue); ?>
                     </dd>
                 </div>
