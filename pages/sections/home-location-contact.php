@@ -12,7 +12,7 @@ if (!defined('BASE_URL')) {
 }
 
 if (!isset($pdo)) {
-    $ucsDbFile = __DIR__ . '/../database.php';
+    $ucsDbFile = __DIR__ . '/../../includes/database.php';
     if (file_exists($ucsDbFile)) {
         require_once $ucsDbFile;
     }

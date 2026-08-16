@@ -85,7 +85,7 @@ require_once '../includes/header.php';
                         $ucsHasImage = false;
                         $ucsImageUrl = '';
                         if (!empty($ucsFacility['image'])) {
-                            $ucsImageFile = __DIR__ . '/../public/assets/' . ltrim($ucsFacility['image'], '/');
+                            $ucsImageFile = __DIR__ . '/assets/' . ltrim($ucsFacility['image'], '/');
                             $ucsHasImage  = is_file($ucsImageFile);
                             if ($ucsHasImage) {
                                 $ucsImageUrl = BASE_URL . '/assets/' . ltrim($ucsFacility['image'], '/');

@@ -121,7 +121,7 @@ require_once '../includes/header.php';
                         $ucsHasCover = false;
                         $ucsCoverUrl = '';
                         if (!empty($ucsNewsItem['cover_image'])) {
-                            $ucsCoverFile = __DIR__ . '/../public/assets/' . ltrim($ucsNewsItem['cover_image'], '/');
+                            $ucsCoverFile = __DIR__ . '/assets/' . ltrim($ucsNewsItem['cover_image'], '/');
                             $ucsHasCover  = is_file($ucsCoverFile);
                             if ($ucsHasCover) {
                                 $ucsCoverUrl = BASE_URL . '/assets/' . ltrim($ucsNewsItem['cover_image'], '/');

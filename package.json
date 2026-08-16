@@ -4,8 +4,8 @@
   "description": "UCSMTLA Academic Hub - Custom PHP web application",
   "main": "index.js",
   "scripts": {
-    "build:css": "tailwind -i ./public/assets/css/input.css -o ./public/assets/css/style.css",
-    "watch:css": "tailwind -i ./public/assets/css/input.css -o ./public/assets/css/style.css --watch"
+    "build:css": "tailwind -i ./pages/assets/css/input.css -o ./pages/assets/css/style.css",
+    "watch:css": "tailwind -i ./pages/assets/css/input.css -o ./pages/assets/css/style.css --watch"
   },
   "keywords": [],
   "author": "",

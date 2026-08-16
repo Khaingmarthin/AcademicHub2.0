@@ -16,7 +16,7 @@ A university information and academic hub website for UCSMTLA that provides univ
 ## Setup
 
 1. Make sure you have a web server with PHP and MySQL running (e.g. WAMP, XAMPP).
-2. Point your virtual host or web server document root to the `public/` directory, or access it via `http://localhost/ucsmtlaAcademichub/public` (depending on your configuration).
+2. Point your virtual host or web server document root to the `pages/` directory, or access it via `http://localhost/ucsmtlaAcademichub/pages` (depending on your configuration).
 3. Ensure you have Node.js installed for frontend tooling.
 4. Run `npm install` to install Tailwind CSS and dependencies.
 5. Run `npm run watch:css` during development to compile Tailwind CSS automatically.

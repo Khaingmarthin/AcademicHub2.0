@@ -5,7 +5,7 @@
  * The mobile menu is rendered in includes/header.php using the same $navItems data.
  *
  * All homepage content is organised as sections on the single public
- * landing page (public/index.php), so navigation items point at the existing
+ * landing page (pages/index.php), so navigation items point at the existing
  * homepage section headings (index.php#...) which already provide the correct
  * scroll offset below the sticky navbar via scroll-mt-24.
  */

@@ -62,7 +62,7 @@ try {
 
         // Verify the PDF exists on disk.
         if (!empty($ucsAdmission['document_path'])) {
-            $ucsPdfFile = __DIR__ . '/../public/assets/uploads/' . ltrim($ucsAdmission['document_path'], '/');
+            $ucsPdfFile = __DIR__ . '/assets/uploads/' . ltrim($ucsAdmission['document_path'], '/');
             $ucsHasPdf  = is_file($ucsPdfFile);
             if ($ucsHasPdf) {
                 $ucsPdfUrl = BASE_URL . '/assets/uploads/' . ltrim($ucsAdmission['document_path'], '/');

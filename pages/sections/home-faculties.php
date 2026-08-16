@@ -23,7 +23,7 @@ if (!defined('BASE_URL')) {
 
 // Reuse the existing database connection if the page already connected.
 if (!isset($pdo)) {
-    $ucsDbFile = __DIR__ . '/../database.php';
+    $ucsDbFile = __DIR__ . '/../../includes/database.php';
     if (file_exists($ucsDbFile)) {
         require_once $ucsDbFile;
     }
@@ -39,6 +39,6 @@ if (!isset($pdo)) {
             </p>
         </div>
 
-        <?php include __DIR__ . '/../ucs-faculties-directory.php'; ?>
+        <?php include __DIR__ . '/../../includes/ucs-faculties-directory.php'; ?>
     </div>
 </section>

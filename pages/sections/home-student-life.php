@@ -68,7 +68,7 @@ $ucsStudentLifeItems = [
                 $ucsHasImage = false;
                 $ucsImageUrl = '';
                 if (!empty($ucsItem['image'])) {
-                    $ucsImageFile = __DIR__ . '/../../public/assets/' . ltrim($ucsItem['image'], '/');
+                    $ucsImageFile = __DIR__ . '/../assets/' . ltrim($ucsItem['image'], '/');
                     $ucsHasImage = is_file($ucsImageFile);
                     if ($ucsHasImage) {
                         $ucsImageUrl = BASE_URL . '/assets/' . ltrim($ucsItem['image'], '/');

@@ -3,8 +3,8 @@
  * Shared Faculties & Departments directory.
  *
  * The single source of truth for the Faculties & Departments tabbed module.
- * It is reused by the homepage Faculties section (includes/sections/
- * home-faculties.php) and the Navbar → Faculties module (public/faculties.php)
+ * It is reused by the homepage Faculties section (pages/sections/
+ * home-faculties.php) and the Navbar → Faculties module (pages/faculties.php)
  * so there is exactly one consistent design across the website.
  *
  * Layout: tabs at the top, then the selected content below.

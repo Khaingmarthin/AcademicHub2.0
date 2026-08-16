@@ -18,13 +18,22 @@ if (session_status() === PHP_SESSION_NONE) {
 /**
  * Whether a student is currently authenticated.
  *
+ * The authenticated state is determined solely by the server-side session.
+ * A valid session must contain the authenticated student id (a positive
+ * integer) together with the paired name/email fields written at login.
+ * Partial or stale sessions are therefore never treated as authenticated,
+ * so the public header renders the logged-out state for them.
+ *
  * @return bool
  */
 function student_is_logged_in()
 {
-    return isset($_SESSION['student_id'])
-        && $_SESSION['student_id'] !== ''
-        && is_numeric($_SESSION['student_id']);
+    $studentId = filter_var($_SESSION['student_id'] ?? null, FILTER_VALIDATE_INT);
+
+    return $studentId !== false
+        && $studentId > 0
+        && isset($_SESSION['student_name'])
+        && isset($_SESSION['student_email']);
 }
 
 /**
@@ -65,6 +74,14 @@ function student_require_login()
  */
 function student_logout()
 {
+    unset(
+        $_SESSION['student_id'],
+        $_SESSION['student_name'],
+        $_SESSION['student_email'],
+        $_SESSION['student_login_email'],
+        $_SESSION['student_login_errors']
+    );
+
     $_SESSION = [];
 
     if (ini_get('session.use_cookies')) {

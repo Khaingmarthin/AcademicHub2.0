@@ -3,7 +3,7 @@
  * Public Departments route.
  *
  * Departments are part of the unified Faculties & Departments module
- * (public/faculties.php). This route redirects to that module and opens the
+ * (pages/faculties.php). This route redirects to that module and opens the
  * Departments tab directly, so there is a single public directory page and
  * no duplicated content.
  */
