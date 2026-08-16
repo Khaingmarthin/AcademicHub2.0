@@ -85,10 +85,15 @@ $navItems = [
         ],
     ],
     ['label' => 'Faculties', 'url' => BASE_URL . '/faculties.php'],
-    ['label' => 'Campus Life', 'url' => BASE_URL . '/index.php#campus-life-heading'],
-    ['label' => 'News', 'url' => BASE_URL . '/index.php#announcements-heading'],
-    ['label' => 'Announcements', 'url' => BASE_URL . '/index.php#announcements-heading'],
-    ['label' => 'Admissions', 'url' => BASE_URL . '/index.php#admissions-heading'],
+    ['label' => 'Campus Life', 'url' => BASE_URL . '/campus-life.php'],
+    ['label' => 'News', 'url' => BASE_URL . '/news.php'],
+    [
+        'label'    => 'Admissions',
+        'children' => [
+            ['label' => 'Entrance Information', 'url' => BASE_URL . '/entrance-information.php'],
+            ['label' => 'Admitted Student List', 'url' => BASE_URL . '/admitted-students.php'],
+        ],
+    ],
     ['label' => 'Contact', 'url' => BASE_URL . '/index.php#location-contact-heading'],
 ];
 

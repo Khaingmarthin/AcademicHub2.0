@@ -41,7 +41,7 @@ To send qualified candidates abroad for advanced university studies.',
     'Welcome to the University of Computer Studies, Meiktila. Our university is committed to providing quality education and developing future professionals in computing and technology.',
     2007,
     'images/logo.png',
-    'images/front_view.jpg',
+    'images/ucsmtla.jpg',
     'Meiktila, Myanmar',
     '09-123 456 789',
     'info@ucsmta.edu.mm'

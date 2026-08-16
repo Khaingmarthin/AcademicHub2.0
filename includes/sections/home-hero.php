@@ -38,11 +38,7 @@ if (isset($pdo)) {
 
 $ucsShortName = $ucsHero['short_name'] ?? 'UCSMTLA';
 $ucsFullName  = $ucsHero['name'] ?? 'University of Computer Studies, Meiktila';
-$ucsHeroMedia = $ucsHero['hero_media'] ?? 'images/front_view.jpg';
-
-if (!preg_match('~^https?://~i', $ucsHeroMedia)) {
-    $ucsHeroMedia = BASE_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
-}
+$ucsHeroMedia = BASE_URL . '/assets/images/ucsmtla.jpg';
 ?>
 <section class="relative flex min-h-[calc(100vh-4rem)] items-center overflow-hidden bg-gray-900" aria-labelledby="hero-heading">
     <!-- Full background image -->

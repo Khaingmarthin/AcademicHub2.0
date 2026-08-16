@@ -67,7 +67,7 @@ $ucsSupporting = array_slice($ucsAnnouncements, 1, 3);
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-2xl text-center">
             <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">News &amp; Updates</p>
-            <h2 id="announcements-heading" class="mt-3 scroll-mt-24 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">Latest Announcements</h2>
+            <h2 id="announcements-heading" class="mt-3 scroll-mt-24 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">Latest News</h2>
         </div>
 
         <?php if ($ucsFeatured !== null): ?>

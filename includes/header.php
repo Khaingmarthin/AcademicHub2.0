@@ -2,6 +2,20 @@
 if (!defined('BASE_URL')) {
     require_once __DIR__ . '/../config/app.php';
 }
+
+// Student authentication state drives the header login button / student menu.
+require_once __DIR__ . '/student-auth.php';
+$ucsStudentUser = student_current_user();
+
+// Avatar initial without relying on the mbstring extension.
+function ucs_avatar_initial($name)
+{
+    $name = trim((string) $name);
+    if ($name === '') {
+        return 'S';
+    }
+    return strtoupper(substr($name, 0, 1));
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -35,6 +49,37 @@ if (!defined('BASE_URL')) {
                             <path d="m21 21-4.35-4.35"></path>
                         </svg>
                     </button>
+
+                    <?php if ($ucsStudentUser === null): ?>
+                        <!-- Student Login (all screens) -->
+                        <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="inline-flex items-center gap-2 rounded-lg border border-blue-600 bg-white px-3 py-2 text-sm font-semibold text-blue-700 transition-colors duration-150 hover:bg-blue-600 hover:text-white focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            Student Login
+                        </a>
+                    <?php else: ?>
+                        <!-- Student menu (desktop) -->
+                        <div class="group relative hidden lg:block">
+                            <button type="button" class="inline-flex h-10 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-100 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" data-dropdown-toggle aria-expanded="false" aria-haspopup="true">
+                                <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white" aria-hidden="true">
+                                    <?php echo htmlspecialchars(ucs_avatar_initial($ucsStudentUser['name'])); ?>
+                                </span>
+                                <span class="max-w-[9rem] truncate"><?php echo htmlspecialchars($ucsStudentUser['name']); ?></span>
+                                <svg class="nav-chevron h-3.5 w-3.5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 0 1 1.414 0L10 10.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 0 1 0-1.414Z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <div class="nav-dropdown nav-dropdown-right" role="menu" aria-label="Student account menu">
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/student-dashboard.php'); ?>" class="nav-dropdown-link" role="menuitem">Dashboard</a>
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/student-profile.php'); ?>" class="nav-dropdown-link" role="menuitem">My Profile</a>
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/student-timetable.php'); ?>" class="nav-dropdown-link" role="menuitem">My Timetable</a>
+                                <a href="<?php echo htmlspecialchars(ROOT_URL . '/actions/student/logout.php'); ?>" class="nav-dropdown-link nav-dropdown-link-danger" role="menuitem">Logout</a>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
                     <button type="button" id="mobile-menu-toggle" class="inline-flex h-10 w-10 items-center justify-center rounded-lg text-gray-700 transition-colors duration-150 hover:bg-gray-100 lg:hidden focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" aria-label="Open main menu" aria-expanded="false" aria-controls="mobile-menu">
                         <svg id="menu-icon-open" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
                             <path d="M3 6h18M3 12h18M3 18h18"></path>
@@ -108,6 +153,28 @@ if (!defined('BASE_URL')) {
                             </li>
                         <?php endif; ?>
                     <?php endforeach; ?>
+
+                    <?php if ($ucsStudentUser === null): ?>
+                        <!-- Student Login (mobile) -->
+                        <li class="mt-2 border-t border-gray-100 pt-2">
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="flex items-center gap-2 rounded-lg px-3 py-3 text-base font-medium text-blue-700 transition-colors hover:bg-blue-50">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="12" cy="7" r="4"></circle>
+                                </svg>
+                                Student Login
+                            </a>
+                        </li>
+                    <?php else: ?>
+                        <!-- Student account (mobile) -->
+                        <li class="mt-2 border-t border-gray-100 pt-2">
+                            <p class="px-3 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Student Account</p>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-dashboard.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700">Dashboard</a>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-profile.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700">My Profile</a>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-timetable.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700">My Timetable</a>
+                            <a href="<?php echo htmlspecialchars(ROOT_URL . '/actions/student/logout.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50">Logout</a>
+                        </li>
+                    <?php endif; ?>
                 </ul>
             </nav>
         </div>
