@@ -8,7 +8,7 @@
  * intentionally generic to avoid revealing account details.
  */
 require_once __DIR__ . '/../../config/app.php';
-require_once __DIR__ . '/../../includes/database.php';
+require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../includes/student-auth.php';
 
 // Already authenticated students are sent straight to the dashboard.
@@ -56,6 +56,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['student_id']    = (int) $ucsStudent['id'];
                 $_SESSION['student_name']  = (string) $ucsStudent['name'];
                 $_SESSION['student_email'] = (string) $ucsStudent['email'];
+                $_SESSION['student_last_activity'] = time();
 
                 header('Location: ' . BASE_URL . '/student-dashboard.php');
                 exit;

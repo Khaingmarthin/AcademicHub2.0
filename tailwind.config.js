@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     "./pages/**/*.php",
+    "./admin/**/*.php",
     "./includes/**/*.php",
     "./actions/**/*.php"
   ],

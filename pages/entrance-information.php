@@ -8,7 +8,7 @@
  * nothing is hard-coded.
  */
 require_once '../config/app.php';
-require_once '../includes/database.php';
+require_once '../config/database.php';
 
 $pageTitle = 'Entrance Information';
 
@@ -65,7 +65,7 @@ try {
 }
 
 if (!preg_match('~^https?://~i', $ucsHeroMedia)) {
-    $ucsHeroMedia = BASE_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
+    $ucsHeroMedia = ROOT_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
 }
 
 require_once '../includes/header.php';

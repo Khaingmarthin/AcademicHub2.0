@@ -9,8 +9,8 @@
  * untouched in the database.
  */
 require_once '../config/app.php';
-require_once '../includes/database.php';
-require_once __DIR__ . '/../includes/ucs-listing-helpers.php';
+require_once '../config/database.php';
+require_once __DIR__ . '/../includes/helpers/ucs-listing-helpers.php';
 
 $pageTitle = 'Campus Life';
 
@@ -32,7 +32,7 @@ $ucsShortName = $ucsProfile['short_name'] ?? 'UCSMTLA';
 $ucsHeroMedia = $ucsProfile['hero_media'] ?? 'images/front_view.jpg';
 
 if (!preg_match('~^https?://~i', $ucsHeroMedia)) {
-    $ucsHeroMedia = BASE_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
+    $ucsHeroMedia = ROOT_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
 }
 
 $ucsFacilities = [];
@@ -85,10 +85,10 @@ require_once '../includes/header.php';
                         $ucsHasImage = false;
                         $ucsImageUrl = '';
                         if (!empty($ucsFacility['image'])) {
-                            $ucsImageFile = __DIR__ . '/assets/' . ltrim($ucsFacility['image'], '/');
+                            $ucsImageFile = dirname(__DIR__) . '/assets/' . ltrim($ucsFacility['image'], '/');
                             $ucsHasImage  = is_file($ucsImageFile);
                             if ($ucsHasImage) {
-                                $ucsImageUrl = BASE_URL . '/assets/' . ltrim($ucsFacility['image'], '/');
+                                $ucsImageUrl = ROOT_URL . '/assets/' . ltrim($ucsFacility['image'], '/');
                             }
                         }
 

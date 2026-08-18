@@ -7,7 +7,7 @@
  * hard-coded — everything is read from the database.
  */
 require_once '../config/app.php';
-require_once '../includes/database.php';
+require_once '../config/database.php';
 
 $pageTitle = 'About Us';
 
@@ -39,11 +39,11 @@ $ucsAboutMedia    = $ucsAbout['hero_media'] ?? 'images/front_view.jpg';
 $ucsLogo          = $ucsAbout['logo'] ?? 'images/logo.png';
 
 if (!preg_match('~^https?://~i', $ucsAboutMedia)) {
-    $ucsAboutMedia = BASE_URL . '/assets/' . ltrim($ucsAboutMedia, '/');
+    $ucsAboutMedia = ROOT_URL . '/assets/' . ltrim($ucsAboutMedia, '/');
 }
 
 if (!preg_match('~^https?://~i', $ucsLogo)) {
-    $ucsLogo = BASE_URL . '/assets/' . ltrim($ucsLogo, '/');
+    $ucsLogo = ROOT_URL . '/assets/' . ltrim($ucsLogo, '/');
 }
 
 $ucsVisionStatements = array_values(array_filter(array_map('trim', preg_split('/\R\s*\R/', $ucsVisionRaw))));

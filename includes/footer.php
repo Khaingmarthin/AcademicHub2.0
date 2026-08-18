@@ -5,7 +5,7 @@ if (!defined('BASE_URL')) {
 
 // Reuse the existing database connection if the page already connected.
 if (!isset($pdo)) {
-    $ucsDbFile = __DIR__ . '/database.php';
+    $ucsDbFile = __DIR__ . '/../config/database.php';
     if (file_exists($ucsDbFile)) {
         require_once $ucsDbFile;
     }
@@ -35,7 +35,7 @@ $ucsPhone     = $ucsUniversity['phone']      ?? '';
 $ucsEmail     = $ucsUniversity['email']      ?? '';
 
 if (!preg_match('~^https?://~i', $ucsLogo)) {
-    $ucsLogo = BASE_URL . '/assets/' . ltrim($ucsLogo, '/');
+    $ucsLogo = ROOT_URL . '/assets/' . ltrim($ucsLogo, '/');
 }
 
 $ucsPhoneHref = $ucsPhone !== '' ? 'tel:+' . preg_replace('/\D/', '', $ucsPhone) : '';

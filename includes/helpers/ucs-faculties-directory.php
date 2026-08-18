@@ -19,12 +19,12 @@
  * kept independent from faculties.
  */
 if (!defined('BASE_URL')) {
-    require_once __DIR__ . '/../config/app.php';
+    require_once __DIR__ . '/../../config/app.php';
 }
 
 // Reuse the existing database connection if the caller already connected.
 if (!isset($pdo)) {
-    $ucsDbFile = __DIR__ . '/database.php';
+    $ucsDbFile = __DIR__ . '/../../config/database.php';
     if (file_exists($ucsDbFile)) {
         require_once $ucsDbFile;
     }

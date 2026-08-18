@@ -7,7 +7,7 @@
  * validation errors carried back in the session.
  */
 require_once '../config/app.php';
-require_once '../includes/database.php';
+require_once '../config/database.php';
 require_once '../includes/student-auth.php';
 
 // Students who are already authenticated go straight to the dashboard.
@@ -36,7 +36,7 @@ try {
 }
 
 if (!preg_match('~^https?://~i', $ucsLoginLogo)) {
-    $ucsLoginLogo = BASE_URL . '/assets/' . ltrim($ucsLoginLogo, '/');
+    $ucsLoginLogo = ROOT_URL . '/assets/' . ltrim($ucsLoginLogo, '/');
 }
 
 require_once '../includes/header.php';

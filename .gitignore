@@ -6,11 +6,11 @@ node_modules/
 npm-debug.log*
 
 # Uploaded files
-pages/assets/uploads/*
-!pages/assets/uploads/.gitkeep
+assets/uploads/*
+!assets/uploads/.gitkeep
 
 # Compiled assets
-pages/assets/css/style.css
+assets/css/style.css
 
 # OS generated files
 .DS_Store

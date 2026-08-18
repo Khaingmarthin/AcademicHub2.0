@@ -11,8 +11,27 @@ if (!defined('BASE_URL')) {
     require_once __DIR__ . '/../config/app.php';
 }
 
+// The student session is always a browser-session cookie (lifetime 0) so it
+// expires when the browser is closed, and it is restricted to HTTP-only,
+// same-site delivery so a stale cookie from a previous student cannot be
+// replayed from cross-site or script contexts.
 if (session_status() === PHP_SESSION_NONE) {
+    session_set_cookie_params([
+        'lifetime' => 0,
+        'path'     => (string) (ini_get('session.cookie_path') ?: '/'),
+        'domain'   => (string) (ini_get('session.cookie_domain') ?: ''),
+        'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
     session_start();
+}
+
+// A student session is invalidated after this many seconds of inactivity so a
+// session left behind by a previous student (for example one restored by the
+// browser after a restart) can never present that student as authenticated.
+if (!defined('UCS_STUDENT_SESSION_TIMEOUT')) {
+    define('UCS_STUDENT_SESSION_TIMEOUT', 1800);
 }
 
 /**
@@ -28,12 +47,37 @@ if (session_status() === PHP_SESSION_NONE) {
  */
 function student_is_logged_in()
 {
+    // A student session must carry a fresh activity marker written by the
+    // login handler. Sessions without one (e.g. a previous student whose
+    // session predates this marker) or sessions idle beyond the inactivity
+    // window are treated as logged out and their identity is cleared, so a
+    // stale session can never be presented as the current student on the
+    // public site again.
+    if (isset($_SESSION['student_id']) || isset($_SESSION['student_name'])) {
+        $lastActivity = (int) ($_SESSION['student_last_activity'] ?? 0);
+        if ($lastActivity <= 0 || (time() - $lastActivity) > UCS_STUDENT_SESSION_TIMEOUT) {
+            unset(
+                $_SESSION['student_id'],
+                $_SESSION['student_name'],
+                $_SESSION['student_email'],
+                $_SESSION['student_last_activity']
+            );
+            return false;
+        }
+    }
+
     $studentId = filter_var($_SESSION['student_id'] ?? null, FILTER_VALIDATE_INT);
 
-    return $studentId !== false
+    if ($studentId !== false
         && $studentId > 0
         && isset($_SESSION['student_name'])
-        && isset($_SESSION['student_email']);
+        && isset($_SESSION['student_email'])) {
+        // Refresh the activity marker on every valid authenticated request.
+        $_SESSION['student_last_activity'] = time();
+        return true;
+    }
+
+    return false;
 }
 
 /**

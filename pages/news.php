@@ -10,8 +10,8 @@
  * never shown in full — only a short preview built from the stored text.
  */
 require_once '../config/app.php';
-require_once '../includes/database.php';
-require_once __DIR__ . '/../includes/ucs-listing-helpers.php';
+require_once '../config/database.php';
+require_once __DIR__ . '/../includes/helpers/ucs-listing-helpers.php';
 
 $pageTitle = 'News & Updates';
 
@@ -65,7 +65,7 @@ try {
 }
 
 if (!preg_match('~^https?://~i', $ucsHeroMedia)) {
-    $ucsHeroMedia = BASE_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
+    $ucsHeroMedia = ROOT_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
 }
 
 require_once '../includes/header.php';
@@ -121,10 +121,10 @@ require_once '../includes/header.php';
                         $ucsHasCover = false;
                         $ucsCoverUrl = '';
                         if (!empty($ucsNewsItem['cover_image'])) {
-                            $ucsCoverFile = __DIR__ . '/assets/' . ltrim($ucsNewsItem['cover_image'], '/');
+                            $ucsCoverFile = dirname(__DIR__) . '/assets/' . ltrim($ucsNewsItem['cover_image'], '/');
                             $ucsHasCover  = is_file($ucsCoverFile);
                             if ($ucsHasCover) {
-                                $ucsCoverUrl = BASE_URL . '/assets/' . ltrim($ucsNewsItem['cover_image'], '/');
+                                $ucsCoverUrl = ROOT_URL . '/assets/' . ltrim($ucsNewsItem['cover_image'], '/');
                             }
                         }
 

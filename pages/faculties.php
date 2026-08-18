@@ -4,7 +4,7 @@
  *
  * The single unified academic directory, reused by the Navbar → Faculties
  * link and the homepage Faculties section. Both use the same shared component
- * (includes/ucs-faculties-directory.php) so the design is consistent across
+ * (includes/helpers/ucs-faculties-directory.php) so the design is consistent across
  * the website.
  *
  * Layout: page heading in the hero, then the shared tabbed directory —
@@ -19,7 +19,7 @@
  * descriptions remain available on the existing detail pages.
  */
 require_once '../config/app.php';
-require_once '../includes/database.php';
+require_once '../config/database.php';
 
 $pageTitle = 'Faculties & Departments';
 
@@ -41,7 +41,7 @@ try {
 }
 
 if (!preg_match('~^https?://~i', $ucsHeroMedia)) {
-    $ucsHeroMedia = BASE_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
+    $ucsHeroMedia = ROOT_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
 }
 
 require_once '../includes/header.php';
@@ -64,7 +64,7 @@ require_once '../includes/header.php';
     <section class="bg-slate-50 py-16 sm:py-20" aria-labelledby="directory-heading">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <h2 id="directory-heading" class="sr-only">Academic directory</h2>
-            <?php include __DIR__ . '/../includes/ucs-faculties-directory.php'; ?>
+            <?php include __DIR__ . '/../includes/helpers/ucs-faculties-directory.php'; ?>
         </div>
     </section>
 </main>

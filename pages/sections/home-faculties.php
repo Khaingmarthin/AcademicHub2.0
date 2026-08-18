@@ -4,7 +4,7 @@
  *
  * Surfaces the unified Faculties & Departments module on the homepage using
  * the exact same shared component as the Navbar → Faculties page
- * (includes/ucs-faculties-directory.php), so the design and content are
+ * (includes/helpers/ucs-faculties-directory.php), so the design and content are
  * consistent everywhere. The section header is followed directly by the
  * shared tabbed directory:
  *
@@ -23,7 +23,7 @@ if (!defined('BASE_URL')) {
 
 // Reuse the existing database connection if the page already connected.
 if (!isset($pdo)) {
-    $ucsDbFile = __DIR__ . '/../../includes/database.php';
+    $ucsDbFile = __DIR__ . '/../../config/database.php';
     if (file_exists($ucsDbFile)) {
         require_once $ucsDbFile;
     }
@@ -39,6 +39,6 @@ if (!isset($pdo)) {
             </p>
         </div>
 
-        <?php include __DIR__ . '/../../includes/ucs-faculties-directory.php'; ?>
+        <?php include __DIR__ . '/../../includes/helpers/ucs-faculties-directory.php'; ?>
     </div>
 </section>

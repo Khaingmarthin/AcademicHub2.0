@@ -23,5 +23,7 @@ try {
     );
 
 } catch (PDOException $e) {
-    die("Database connection failed: " . $e->getMessage());
+    // Generic message — never expose connection details to the user.
+    http_response_code(500);
+    die("Database connection failed. Please try again later.");
 }

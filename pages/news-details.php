@@ -7,7 +7,7 @@
  * is invented or hard-coded.
  */
 require_once '../config/app.php';
-require_once '../includes/database.php';
+require_once '../config/database.php';
 
 $pageTitle = 'News Details';
 
@@ -48,7 +48,7 @@ if ($ucsArticle !== null) {
 }
 
 if (!preg_match('~^https?://~i', $ucsHeroMedia)) {
-    $ucsHeroMedia = BASE_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
+    $ucsHeroMedia = ROOT_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
 }
 
 require_once '../includes/header.php';
@@ -59,10 +59,10 @@ require_once '../includes/header.php';
         $ucsHasCover = false;
         $ucsCoverUrl = '';
         if (!empty($ucsArticle['cover_image'])) {
-            $ucsCoverFile = __DIR__ . '/assets/' . ltrim($ucsArticle['cover_image'], '/');
+            $ucsCoverFile = dirname(__DIR__) . '/assets/' . ltrim($ucsArticle['cover_image'], '/');
             $ucsHasCover  = is_file($ucsCoverFile);
             if ($ucsHasCover) {
-                $ucsCoverUrl = BASE_URL . '/assets/' . ltrim($ucsArticle['cover_image'], '/');
+                $ucsCoverUrl = ROOT_URL . '/assets/' . ltrim($ucsArticle['cover_image'], '/');
             }
         }
 

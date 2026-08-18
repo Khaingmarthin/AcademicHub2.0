@@ -7,6 +7,18 @@ if (!defined('BASE_URL')) {
 require_once __DIR__ . '/student-auth.php';
 $ucsStudentUser = student_current_user();
 
+// The public header always shows the "Student Login" button. The student
+// account menu (name, avatar, dashboard links) is rendered only on the
+// authenticated student pages, never on public pages — a live student
+// session alone must not expose the student's information publicly. The
+// session itself is left untouched so authenticated pages keep working.
+$ucsStudentAreaPage = in_array(
+    basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')),
+    ['student-dashboard.php', 'student-profile.php', 'student-timetable.php'],
+    true
+);
+$ucsShowStudentMenu = ($ucsStudentUser !== null) && $ucsStudentAreaPage;
+
 // Avatar initial without relying on the mbstring extension.
 function ucs_avatar_initial($name)
 {
@@ -24,7 +36,7 @@ function ucs_avatar_initial($name)
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo isset($pageTitle) ? htmlspecialchars($pageTitle) . " - " . APP_NAME : APP_NAME; ?></title>
     <meta name="description" content="UCSMTLA Academic Hub - University information, academic programmes, admissions, news, and campus life.">
-    <link rel="stylesheet" href="<?php echo htmlspecialchars(BASE_URL); ?>/assets/css/style.css">
+    <link rel="stylesheet" href="<?php echo htmlspecialchars(ROOT_URL); ?>/assets/css/style.css">
 </head>
 <body class="flex min-h-screen flex-col bg-gray-50 font-sans text-gray-900 antialiased">
     <header id="site-header" class="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur-sm transition-shadow duration-200">
@@ -32,7 +44,7 @@ function ucs_avatar_initial($name)
             <div class="flex h-16 items-center justify-between gap-4">
                 <!-- University logo -->
                 <a href="<?php echo htmlspecialchars(BASE_URL . '/index.php'); ?>" class="flex shrink-0 items-center gap-3" aria-label="UCSMTLA Academic Hub - Home">
-                    <img src="<?php echo htmlspecialchars(BASE_URL . '/assets/images/logo.png'); ?>" alt="UCSMTLA Academic Hub logo" class="h-11 w-11 object-contain">
+                    <img src="<?php echo htmlspecialchars(ROOT_URL . '/assets/images/logo.png'); ?>" alt="UCSMTLA Academic Hub logo" class="h-11 w-11 object-contain">
                     <span class="hidden leading-tight sm:block">
                         <span class="block text-lg font-bold tracking-tight text-gray-900">UCSMTLA</span>
                         <span class="block text-[10px] font-semibold uppercase tracking-[0.22em] text-blue-700">Academic Hub</span>
@@ -50,7 +62,7 @@ function ucs_avatar_initial($name)
                         </svg>
                     </button>
 
-                    <?php if ($ucsStudentUser === null): ?>
+                    <?php if (!$ucsShowStudentMenu): ?>
                         <!-- Student Login (all screens) -->
                         <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="inline-flex items-center gap-2 rounded-lg border border-blue-600 bg-white px-3 py-2 text-sm font-semibold text-blue-700 transition-colors duration-150 hover:bg-blue-600 hover:text-white focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -154,7 +166,7 @@ function ucs_avatar_initial($name)
                         <?php endif; ?>
                     <?php endforeach; ?>
 
-                    <?php if ($ucsStudentUser === null): ?>
+                    <?php if (!$ucsShowStudentMenu): ?>
                         <!-- Student Login (mobile) -->
                         <li class="mt-2 border-t border-gray-100 pt-2">
                             <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="flex items-center gap-2 rounded-lg px-3 py-3 text-base font-medium text-blue-700 transition-colors hover:bg-blue-50">

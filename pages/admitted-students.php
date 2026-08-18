@@ -8,7 +8,7 @@
  * otherwise a professional empty state is shown.
  */
 require_once '../config/app.php';
-require_once '../includes/database.php';
+require_once '../config/database.php';
 
 $pageTitle = 'Admitted Student List';
 
@@ -62,10 +62,10 @@ try {
 
         // Verify the PDF exists on disk.
         if (!empty($ucsAdmission['document_path'])) {
-            $ucsPdfFile = __DIR__ . '/assets/uploads/' . ltrim($ucsAdmission['document_path'], '/');
+            $ucsPdfFile = dirname(__DIR__) . '/assets/uploads/' . ltrim($ucsAdmission['document_path'], '/');
             $ucsHasPdf  = is_file($ucsPdfFile);
             if ($ucsHasPdf) {
-                $ucsPdfUrl = BASE_URL . '/assets/uploads/' . ltrim($ucsAdmission['document_path'], '/');
+                $ucsPdfUrl = ROOT_URL . '/assets/uploads/' . ltrim($ucsAdmission['document_path'], '/');
             }
         }
     }
@@ -74,7 +74,7 @@ try {
 }
 
 if (!preg_match('~^https?://~i', $ucsHeroMedia)) {
-    $ucsHeroMedia = BASE_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
+    $ucsHeroMedia = ROOT_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
 }
 
 require_once '../includes/header.php';

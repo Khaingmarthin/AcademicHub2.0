@@ -6,7 +6,7 @@
  * students table joined with their classroom, major and academic year.
  */
 require_once __DIR__ . '/../config/app.php';
-require_once __DIR__ . '/../includes/database.php';
+require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/student-auth.php';
 
 student_require_login();

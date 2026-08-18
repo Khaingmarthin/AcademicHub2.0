@@ -1,7 +1,7 @@
 <?php
 // Main entry point for the public website
 require_once '../config/app.php';
-require_once '../includes/database.php';
+require_once '../config/database.php';
 require_once '../includes/header.php';
 ?>
 

@@ -12,5 +12,5 @@ define('BASE_URL', 'http://localhost/ucsmtlaAcademichub/pages'); // Adjust based
 define('ROOT_URL', rtrim(dirname(BASE_URL), '/'));
 
 // Upload Paths
-define('UPLOAD_DIR', __DIR__ . '/../pages/assets/uploads/');
+define('UPLOAD_DIR', __DIR__ . '/../assets/uploads/');
 ?>

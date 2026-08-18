@@ -14,7 +14,7 @@ if (!defined('BASE_URL')) {
 
 // Reuse the existing database connection if the page already connected.
 if (!isset($pdo)) {
-    $ucsDbFile = __DIR__ . '/../../includes/database.php';
+    $ucsDbFile = __DIR__ . '/../../config/database.php';
     if (file_exists($ucsDbFile)) {
         require_once $ucsDbFile;
     }
@@ -38,7 +38,7 @@ if (isset($pdo)) {
 
 $ucsShortName = $ucsHero['short_name'] ?? 'UCSMTLA';
 $ucsFullName  = $ucsHero['name'] ?? 'University of Computer Studies, Meiktila';
-$ucsHeroMedia = BASE_URL . '/assets/images/ucsmtla.jpg';
+$ucsHeroMedia = ROOT_URL . '/assets/images/ucsmtla.jpg';
 ?>
 <section class="relative flex min-h-[calc(100vh-4rem)] items-center overflow-hidden bg-gray-900" aria-labelledby="hero-heading">
     <!-- Full background image -->

@@ -14,7 +14,7 @@ if (!defined('BASE_URL')) {
 
 // Reuse the existing database connection if the page already connected.
 if (!isset($pdo)) {
-    $ucsDbFile = __DIR__ . '/../../includes/database.php';
+    $ucsDbFile = __DIR__ . '/../../config/database.php';
     if (file_exists($ucsDbFile)) {
         require_once $ucsDbFile;
     }
@@ -42,7 +42,7 @@ $ucsAddress   = $ucsProfile['address'] ?? '';
 $ucsAboutMedia = $ucsProfile['hero_media'] ?? 'images/front_view.jpg';
 
 if (!preg_match('~^https?://~i', $ucsAboutMedia)) {
-    $ucsAboutMedia = BASE_URL . '/assets/' . ltrim($ucsAboutMedia, '/');
+    $ucsAboutMedia = ROOT_URL . '/assets/' . ltrim($ucsAboutMedia, '/');
 }
 ?>
 <section class="bg-slate-50 py-16 sm:py-20" aria-labelledby="about-heading">

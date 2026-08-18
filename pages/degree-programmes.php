@@ -8,7 +8,7 @@
  * university campus image from university_profile.
  */
 require_once '../config/app.php';
-require_once '../includes/database.php';
+require_once '../config/database.php';
 
 $pageTitle = 'Degree Programmes';
 
@@ -45,7 +45,7 @@ $ucsProgrammes = array_values(array_filter($ucsProgrammes, function ($ucsProgram
 }));
 
 if (!preg_match('~^https?://~i', $ucsHeroMedia)) {
-    $ucsHeroMedia = BASE_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
+    $ucsHeroMedia = ROOT_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
 }
 
 require_once '../includes/header.php';

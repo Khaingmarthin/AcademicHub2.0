@@ -15,7 +15,7 @@ if (!defined('BASE_URL')) {
 
 // Reuse the existing database connection if the page already connected.
 if (!isset($pdo)) {
-    $ucsDbFile = __DIR__ . '/../../includes/database.php';
+    $ucsDbFile = __DIR__ . '/../../config/database.php';
     if (file_exists($ucsDbFile)) {
         require_once $ucsDbFile;
     }
@@ -41,7 +41,7 @@ if (isset($pdo)) {
 $ucsFeaturedId = null;
 foreach ($ucsFacilities as $ucsFacility) {
     $ucsImageFile = !empty($ucsFacility['image'])
-        ? __DIR__ . '/../assets/' . ltrim($ucsFacility['image'], '/')
+        ? __DIR__ . '/../../assets/' . ltrim($ucsFacility['image'], '/')
         : '';
     if ($ucsImageFile !== '' && is_file($ucsImageFile)) {
         $ucsFeaturedId = $ucsFacility['id'];
@@ -68,10 +68,10 @@ foreach ($ucsFacilities as $ucsFacility) {
                     $ucsHasImage = false;
                     $ucsImageUrl = '';
                     if (!empty($ucsFacility['image'])) {
-                        $ucsImageFile = __DIR__ . '/../assets/' . ltrim($ucsFacility['image'], '/');
+                        $ucsImageFile = __DIR__ . '/../../assets/' . ltrim($ucsFacility['image'], '/');
                         $ucsHasImage = is_file($ucsImageFile);
                         if ($ucsHasImage) {
-                            $ucsImageUrl = BASE_URL . '/assets/' . ltrim($ucsFacility['image'], '/');
+                            $ucsImageUrl = ROOT_URL . '/assets/' . ltrim($ucsFacility['image'], '/');
                         }
                     }
 

@@ -7,7 +7,7 @@
  * the student is authenticated and shows their classroom for context.
  */
 require_once __DIR__ . '/../config/app.php';
-require_once __DIR__ . '/../includes/database.php';
+require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/student-auth.php';
 
 student_require_login();

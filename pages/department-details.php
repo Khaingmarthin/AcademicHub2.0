@@ -6,8 +6,8 @@
  * The record is read from the departments table only — no values are hard-coded.
  */
 require_once '../config/app.php';
-require_once '../includes/database.php';
-require_once '../includes/ucs-listing-helpers.php';
+require_once '../config/database.php';
+require_once '../includes/helpers/ucs-listing-helpers.php';
 
 $pageTitle = 'Department Details';
 
@@ -46,7 +46,7 @@ if ($ucsDepartment !== null) {
 }
 
 if (!preg_match('~^https?://~i', $ucsHeroMedia)) {
-    $ucsHeroMedia = BASE_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
+    $ucsHeroMedia = ROOT_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
 }
 
 require_once '../includes/header.php';

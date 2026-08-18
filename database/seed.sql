@@ -1374,6 +1374,9 @@ VALUES
     TRUE
 );
 
+-- Default student credentials: student1@gmail.com / student123 and
+-- student2@gmail.com / student123. Passwords are stored as bcrypt hashes
+-- (never plaintext) via PHP's password_hash() / password_verify() pair.
 INSERT INTO students
 (
     student_id,
@@ -1388,7 +1391,7 @@ VALUES
     '1',
     'Wai Mar Aung',
     'student1@gmail.com',
-    'student123',
+    '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi',
     1,
     TRUE
 ),
@@ -1396,7 +1399,7 @@ VALUES
     '2',
     'Htoo Lwin',
     'student2@gmail.com',
-    'student123',
+    '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi',
     2,
     TRUE
 );
@@ -1465,6 +1468,9 @@ VALUES
     TRUE
 );
 
+-- Default admin credentials: admin1@gmail.com / admin123
+-- Password is stored as a bcrypt hash (never plaintext) via PHP's
+-- password_hash() / password_verify() pair.
 INSERT INTO admins
 (
     name,
@@ -1476,7 +1482,7 @@ VALUES
 (
     'System Administrator',
     'admin1@gmail.com',
-    'admin123',
+    '$2y$10$XI2ymgRBFawQDRsTu/EEv.NW8Y/nFMw/akwARvUnrAs6JAXHFSklK',
     TRUE
 );
 
