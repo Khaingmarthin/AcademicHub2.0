@@ -17,24 +17,25 @@ if (!defined('BASE_URL')) {
 require_once __DIR__ . '/auth.php';
 require_once __DIR__ . '/admin-nav.php';
 
-$ucsAdminNavGroups = $ucsAdminNavGroups ?? [];
+$ucsAdminNavItems = $ucsAdminNavItems ?? [];
 $ucsActiveNav      = $activeNav ?? '';
 $pageTitle         = (string) ($pageTitle ?? 'Admin');
 
-// Build the breadcrumb ("Admin / <Group>") from the active nav item.
-$adminBreadcrumb    = 'Admin';
+// Build the breadcrumb ("Admin / <Item>") from the active nav item.
+$adminBreadcrumb      = 'Admin';
 $ucsAdminCurrentLabel = '';
-foreach ($ucsAdminNavGroups as $ucsNavGroup) {
-    foreach ($ucsNavGroup['items'] as $ucsNavItem) {
-        if ($ucsNavItem['key'] === $ucsActiveNav) {
-            $adminBreadcrumb = 'Admin / ' . $ucsNavGroup['label'];
-            $ucsAdminCurrentLabel = $ucsNavItem['label'];
-            break 2;
-        }
+foreach ($ucsAdminNavItems as $ucsNavItem) {
+    if ($ucsNavItem['key'] === $ucsActiveNav) {
+        $ucsAdminCurrentLabel = $ucsNavItem['label'];
+        break;
     }
+}
+if ($ucsAdminCurrentLabel !== '') {
+    $adminBreadcrumb = 'Admin / ' . $ucsAdminCurrentLabel;
 }
 
 $pageSubtitle = (string) ($pageSubtitle ?? '');
+$hidePageHeader = (bool) ($hidePageHeader ?? false);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -44,7 +45,7 @@ $pageSubtitle = (string) ($pageSubtitle ?? '');
     <title><?php echo htmlspecialchars($pageTitle); ?> - <?php echo htmlspecialchars(APP_NAME); ?></title>
     <link rel="stylesheet" href="<?php echo htmlspecialchars(ROOT_URL); ?>/assets/css/style.css">
 </head>
-<body class="min-h-screen bg-gray-100 font-sans text-gray-900 antialiased">
+<body class="min-h-screen bg-slate-50 font-sans text-gray-900 antialiased">
     <!-- Mobile drawer backdrop -->
     <div id="admin-sidebar-backdrop" class="fixed inset-0 z-30 hidden bg-gray-900/50 backdrop-blur-sm lg:hidden" aria-hidden="true"></div>
 
@@ -56,12 +57,15 @@ $pageSubtitle = (string) ($pageSubtitle ?? '');
 
             <main class="flex-1 p-4 sm:p-6 lg:p-8">
                 <div class="mx-auto w-full max-w-7xl">
+                    <?php if (!$hidePageHeader): ?>
                     <!-- Page header -->
                     <header class="mb-6">
-                        <h1 class="text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+                        <p class="text-sm font-medium text-gray-500"><?php echo htmlspecialchars($adminBreadcrumb); ?></p>
+                        <h1 class="mt-1 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
                             <?php echo htmlspecialchars($pageTitle); ?>
                         </h1>
                         <?php if ($pageSubtitle !== ''): ?>
                             <p class="mt-1 text-sm text-gray-500"><?php echo htmlspecialchars($pageSubtitle); ?></p>
                         <?php endif; ?>
                     </header>
+                    <?php endif; ?>

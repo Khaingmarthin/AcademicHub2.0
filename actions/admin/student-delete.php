@@ -36,6 +36,33 @@ if ($ucsStudent === null || $ucsId === false || $ucsId < 1) {
 }
 
 try {
+    $ucsGuardStmt = $pdo->prepare(
+        "SELECT
+            (SELECT COUNT(*) FROM alumni_profiles WHERE student_id = :sid) AS profile_count,
+            (SELECT COUNT(*) FROM discussions WHERE author_student_id = :sid2) AS discussion_count,
+            (SELECT COUNT(*) FROM career_opportunities WHERE posted_by_student_id = :sid3) AS opportunity_count"
+    );
+    $ucsGuardStmt->execute([
+        ':sid'  => $ucsId,
+        ':sid2' => $ucsId,
+        ':sid3' => $ucsId,
+    ]);
+    $ucsGuard = $ucsGuardStmt->fetch() ?: [];
+} catch (PDOException $e) {
+    $ucsGuard = [];
+}
+
+$ucsHasAlumniHistory = ((int) ($ucsGuard['profile_count'] ?? 0)) > 0
+    || ((int) ($ucsGuard['discussion_count'] ?? 0)) > 0
+    || ((int) ($ucsGuard['opportunity_count'] ?? 0)) > 0;
+
+if ($ucsHasAlumniHistory) {
+    student_flash('error', 'This student has alumni history (profile, discussions or career postings) and cannot be deleted.');
+    header('Location: ' . $ucsReturnUrl);
+    exit;
+}
+
+try {
     $pdo->prepare("DELETE FROM students WHERE id = :id")->execute([':id' => $ucsId]);
     student_flash('success', 'Student "' . $ucsStudent['name'] . '" deleted successfully.');
 } catch (Throwable $e) {

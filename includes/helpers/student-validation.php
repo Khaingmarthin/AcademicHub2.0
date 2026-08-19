@@ -24,6 +24,7 @@ function student_validate_input($input, $pdo, $excludeId = null)
     $errors = [];
 
     $studentId    = trim((string) ($input['student_id'] ?? ''));
+    $rollNumber   = trim((string) ($input['roll_number'] ?? ''));
     $name         = trim((string) ($input['name'] ?? ''));
     $email        = strtolower(trim((string) ($input['email'] ?? '')));
     $password     = (string) ($input['password'] ?? '');
@@ -45,6 +46,24 @@ function student_validate_input($input, $pdo, $excludeId = null)
             }
         } catch (PDOException $e) {
             $errors[] = 'Unable to check the Student ID. Please try again.';
+        }
+    }
+
+    // ---- Roll Number -----------------------------------------------------
+    if ($rollNumber === '') {
+        $errors[] = 'Roll Number is required.';
+    } elseif (mb_strlen($rollNumber) > 50) {
+        $errors[] = 'Roll Number must be 50 characters or fewer.';
+    } else {
+        try {
+            $ucsStmt = $pdo->prepare("SELECT id FROM students WHERE roll_number = :roll LIMIT 1");
+            $ucsStmt->execute([':roll' => $rollNumber]);
+            $ucsExistingId = $ucsStmt->fetchColumn();
+            if ($ucsExistingId !== false && (int) $ucsExistingId !== (int) $excludeId) {
+                $errors[] = 'This Roll Number is already in use.';
+            }
+        } catch (PDOException $e) {
+            $errors[] = 'Unable to check the Roll Number. Please try again.';
         }
     }
 
@@ -108,6 +127,7 @@ function student_validate_input($input, $pdo, $excludeId = null)
     return [
         'clean' => [
             'student_id'   => $studentId,
+            'roll_number'  => $rollNumber,
             'name'         => $name,
             'email'        => $email,
             'password'     => $password,
@@ -130,5 +150,70 @@ function student_flash($type, $message)
     $_SESSION['student_flash'] = [
         'type'    => $type === 'success' ? 'success' : 'error',
         'message' => (string) $message,
+    ];
+}
+
+/**
+ * Validate a graduation confirmation for an active student.
+ *
+ * Graduation is an admin-only academic decision, never automatic from a
+ * student's year level or exam results. Only an existing student with an
+ * active account who is not already graduated can be marked as graduated.
+ *
+ * @param array $input Raw form values (e.g. $_POST).
+ * @param PDO   $pdo   Database connection.
+ * @return array{clean:array, errors:array}
+ */
+function student_graduation_validate_input($input, $pdo)
+{
+    $errors = [];
+
+    $studentId          = filter_var($input['student_id'] ?? null, FILTER_VALIDATE_INT);
+    $graduationYearRaw  = trim((string) ($input['graduation_year'] ?? ''));
+    $graduationYear     = 0;
+
+    if ($studentId === false || $studentId < 1) {
+        $errors[] = 'Invalid student selected.';
+    } else {
+        try {
+            $ucsStmt = $pdo->prepare(
+                "SELECT id, name, status, student_status
+                 FROM students
+                 WHERE id = :id
+                 LIMIT 1"
+            );
+            $ucsStmt->execute([':id' => $studentId]);
+            $ucsStudent = $ucsStmt->fetch() ?: null;
+
+            if ($ucsStudent === null) {
+                $errors[] = 'Student not found.';
+            } elseif ((int) $ucsStudent['status'] !== 1) {
+                $errors[] = 'Only active student accounts can be marked as graduated.';
+            } elseif ($ucsStudent['student_status'] === 'graduated') {
+                $errors[] = 'This student is already marked as graduated.';
+            }
+        } catch (PDOException $e) {
+            $errors[] = 'Unable to validate the student. Please try again.';
+        }
+    }
+
+    if ($graduationYearRaw === '') {
+        $errors[] = 'Graduation year is required.';
+    } elseif (!preg_match('/^\d{4}$/', $graduationYearRaw)) {
+        $errors[] = 'Please enter a valid graduation year (e.g. 2026).';
+    } else {
+        $graduationYear = (int) $graduationYearRaw;
+        $ucsCurrentYear = (int) date('Y');
+        if ($graduationYear < 1950 || $graduationYear > $ucsCurrentYear + 5) {
+            $errors[] = 'Graduation year must be between 1950 and ' . ($ucsCurrentYear + 5) . '.';
+        }
+    }
+
+    return [
+        'clean' => [
+            'student_id'      => $studentId,
+            'graduation_year' => $graduationYear,
+        ],
+        'errors' => $errors,
     ];
 }

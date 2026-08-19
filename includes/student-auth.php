@@ -112,6 +112,35 @@ function student_require_login()
 }
 
 /**
+ * Return the CSRF token for the student area, generating one on first use.
+ *
+ * Used to protect state-changing student forms (e.g. alumni self-management)
+ * from cross-site request forgery. The token lives in the session.
+ *
+ * @return string
+ */
+function student_csrf_token()
+{
+    if (empty($_SESSION['student_csrf_token']) || !is_string($_SESSION['student_csrf_token'])) {
+        $_SESSION['student_csrf_token'] = bin2hex(random_bytes(32));
+    }
+
+    return $_SESSION['student_csrf_token'];
+}
+
+/**
+ * Verify a submitted CSRF token against the student session token.
+ *
+ * @param mixed $token
+ * @return bool
+ */
+function student_csrf_verify($token)
+{
+    $stored = (string) ($_SESSION['student_csrf_token'] ?? '');
+    return $stored !== '' && is_string($token) && $token !== '' && hash_equals($stored, $token);
+}
+
+/**
  * Destroy the student session and return to the Student Login page.
  *
  * @return void

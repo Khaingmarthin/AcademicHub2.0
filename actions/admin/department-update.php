@@ -49,12 +49,14 @@ if (!empty($ucsErrors)) {
 try {
     $ucsStmt = $pdo->prepare(
         "UPDATE departments
-         SET name = :name,
+         SET faculty_id = :faculty_id,
+             name = :name,
              description = :description,
              status = :status
          WHERE id = :id"
     );
     $ucsStmt->execute([
+        ':faculty_id'  => $ucsClean['faculty_id'],
         ':name'        => $ucsClean['name'],
         ':description' => $ucsClean['description'],
         ':status'      => $ucsClean['status'],

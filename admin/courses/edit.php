@@ -18,10 +18,12 @@ $ucsId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
 
 try {
     $ucsStmt = $pdo->prepare(
-        "SELECT id, academic_year_id, major_id, course_code, course_name,
-                year_level, semester, credit_hours, description, status
-         FROM courses
-         WHERE id = :id
+        "SELECT c.id, c.academic_year_id, c.major_id, c.course_code, c.course_name,
+                c.year_level, c.semester, c.credit_hours, c.description, c.status,
+                ay.year_name AS academic_year_name
+         FROM courses c
+         JOIN academic_years ay ON ay.id = c.academic_year_id
+         WHERE c.id = :id
          LIMIT 1"
     );
     $ucsStmt->execute([':id' => $ucsId]);
@@ -54,8 +56,7 @@ $ucsForm = [
     'status'           => $ucsOld['status'] ?? (int) $ucsCourse['status'],
 ];
 
-$ucsAcademicYears = ucs_admin_academic_years($pdo);
-$ucsMajors        = ucs_admin_majors($pdo);
+$ucsMajors = ucs_admin_majors($pdo);
 
 require_once __DIR__ . '/../../includes/admin-layout-top.php';
 ?>
@@ -74,7 +75,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
     <div class="rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
         <div class="border-b border-gray-100 px-6 py-5">
             <h2 class="text-base font-semibold text-gray-900">Edit Course</h2>
-            <p class="mt-1 text-sm text-gray-500">Update the course details.</p>
+            <p class="mt-1 text-sm text-gray-500">Update the course details. The academic year is managed globally.</p>
         </div>
 
         <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/course-update.php'); ?>" novalidate>
@@ -84,15 +85,18 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             <div class="space-y-6 px-6 py-6">
                 <div class="grid gap-6 sm:grid-cols-2">
                     <div>
-                        <label for="academic_year_id" class="block text-sm font-medium text-gray-700">Academic Year <span class="text-red-500">*</span></label>
-                        <select id="academic_year_id" name="academic_year_id" required
-                                class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                            <?php foreach ($ucsAcademicYears as $ucsYear): ?>
-                                <option value="<?php echo (int) $ucsYear['id']; ?>" <?php echo (int) $ucsForm['academic_year_id'] === (int) $ucsYear['id'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($ucsYear['year_name']); ?><?php echo $ucsYear['status'] === 'Active' ? ' (Active)' : ''; ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <label class="block text-sm font-medium text-gray-700">Academic Year</label>
+                        <div class="mt-2 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <span class="truncate font-medium"><?php echo htmlspecialchars((string) ($ucsCourse['academic_year_name'] ?: $ucsForm['academic_year_id'])); ?></span>
+                        </div>
+                        <p class="mt-1.5 text-xs text-gray-500">Academic year is managed globally and cannot be changed here.</p>
+                        <input type="hidden" name="academic_year_id" value="<?php echo (int) $ucsForm['academic_year_id']; ?>">
                     </div>
                     <div>
                         <label for="major_id" class="block text-sm font-medium text-gray-700">Major <span class="text-red-500">*</span></label>

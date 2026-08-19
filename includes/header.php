@@ -5,6 +5,7 @@ if (!defined('BASE_URL')) {
 
 // Student authentication state drives the header login button / student menu.
 require_once __DIR__ . '/student-auth.php';
+require_once __DIR__ . '/../config/database.php';
 $ucsStudentUser = student_current_user();
 
 // The public header always shows the "Student Login" button. The student
@@ -14,10 +15,26 @@ $ucsStudentUser = student_current_user();
 // session itself is left untouched so authenticated pages keep working.
 $ucsStudentAreaPage = in_array(
     basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')),
-    ['student-dashboard.php', 'student-profile.php', 'student-timetable.php'],
+    ['student-dashboard.php', 'student-profile.php', 'student-timetable.php', 'alumni-edit.php', 'alumni-join.php', 'my-mentorship.php', 'mentorship-inbox.php', 'mentorship-request.php', 'alumni-dashboard.php', 'my-opportunities.php', 'opportunity-create.php', 'opportunity-edit.php'],
     true
 );
 $ucsShowStudentMenu = ($ucsStudentUser !== null) && $ucsStudentAreaPage;
+
+// Verified alumni get an extra "Alumni Dashboard" entry in the student menu.
+$ucsVerifiedAlumnus = false;
+if ($ucsShowStudentMenu && isset($pdo)) {
+    try {
+        $ucsStmt = $pdo->prepare(
+            "SELECT id FROM alumni_profiles
+             WHERE student_id = :student_id AND verification_status = 'verified'
+             LIMIT 1"
+        );
+        $ucsStmt->execute([':student_id' => $ucsStudentUser['id']]);
+        $ucsVerifiedAlumnus = $ucsStmt->fetchColumn() !== false;
+    } catch (PDOException $e) {
+        $ucsVerifiedAlumnus = false;
+    }
+}
 
 // Avatar initial without relying on the mbstring extension.
 function ucs_avatar_initial($name)
@@ -87,6 +104,9 @@ function ucs_avatar_initial($name)
                                 <a href="<?php echo htmlspecialchars(BASE_URL . '/student-dashboard.php'); ?>" class="nav-dropdown-link" role="menuitem">Dashboard</a>
                                 <a href="<?php echo htmlspecialchars(BASE_URL . '/student-profile.php'); ?>" class="nav-dropdown-link" role="menuitem">My Profile</a>
                                 <a href="<?php echo htmlspecialchars(BASE_URL . '/student-timetable.php'); ?>" class="nav-dropdown-link" role="menuitem">My Timetable</a>
+                                <?php if ($ucsVerifiedAlumnus): ?>
+                                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="nav-dropdown-link" role="menuitem">Alumni Dashboard</a>
+                                <?php endif; ?>
                                 <a href="<?php echo htmlspecialchars(ROOT_URL . '/actions/student/logout.php'); ?>" class="nav-dropdown-link nav-dropdown-link-danger" role="menuitem">Logout</a>
                             </div>
                         </div>
@@ -184,6 +204,9 @@ function ucs_avatar_initial($name)
                             <a href="<?php echo htmlspecialchars(BASE_URL . '/student-dashboard.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700">Dashboard</a>
                             <a href="<?php echo htmlspecialchars(BASE_URL . '/student-profile.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700">My Profile</a>
                             <a href="<?php echo htmlspecialchars(BASE_URL . '/student-timetable.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700">My Timetable</a>
+                            <?php if ($ucsVerifiedAlumnus): ?>
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700">Alumni Dashboard</a>
+                            <?php endif; ?>
                             <a href="<?php echo htmlspecialchars(ROOT_URL . '/actions/student/logout.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50">Logout</a>
                         </li>
                     <?php endif; ?>

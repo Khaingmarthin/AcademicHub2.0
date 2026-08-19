@@ -72,41 +72,48 @@ VALUES
 );
 
 INSERT INTO departments
-(name, description, status)
+(faculty_id, name, description, status)
 VALUES
 (
-    'Finance Department',
-    'The Finance Department is responsible for managing the university''s financial resources efficiently and transparently. It oversees budgeting, accounting, procurement, and financial administration to ensure the smooth operation of academic and administrative activities. The department supports students, faculty, and staff by maintaining sound financial practices and contributing to the sustainable development of the university.',
-    TRUE
-),
-(
-    'Student Affairs Department',
-    'The Student Affairs Department is committed to supporting students throughout their academic journey by promoting their personal, academic, and social development. The department manages student registration, welfare services, extracurricular activities, scholarships, and campus events while fostering a safe, inclusive, and disciplined learning environment. It serves as a bridge between students and the university administration to enhance the overall student experience.',
-    TRUE
-),
-(
-    'Library',
-    'The University Library provides students, faculty members, and researchers with access to quality academic resources and learning facilities. It offers a wide collection of books, journals, reference materials, and digital resources to support teaching, learning, and research. The library encourages lifelong learning, independent study, and academic excellence by creating a quiet, resourceful, and welcoming environment for the university community.',
-    TRUE
-),
-(
-    'Administration Department',
-    'The Administration Department is responsible for ensuring the efficient operation and effective management of the university''s administrative services. It supports teaching, research, and student affairs by providing quality administrative assistance, maintaining transparent policies, and coordinating essential university operations. Through a service-oriented approach, the department works closely with students, faculty, staff, parents, and other stakeholders to create a well-organized, supportive, and productive academic environment.',
-    TRUE
-),
-(
+    1,
     'Information Technology and Systems Management (ITSM) Department',
     'The Information Technology and Systems Management Department is committed to providing quality and innovative education that promotes positive change, peace, and sustainable progress. It strives to build a knowledgeable, forward-thinking, and globally competitive community while empowering students to reach their full potential. Through a holistic education system, the department prepares graduates to contribute responsibly to national development and create a peaceful and sustainable society.',
     TRUE
 ),
 (
+    1,
+    'Department of Natural Language (Myanmar and English)',
+    'The Department of Natural Language (Myanmar and English) is committed to developing students'' communication skills in both Myanmar and English while preparing them for academic and professional success. The department emphasizes English language proficiency through IELTS-based learning, helping students strengthen their reading, writing, listening, and speaking skills. It also enhances students'' academic vocabulary and language accuracy, enabling them to pursue higher education, especially in IT and computing, and communicate effectively in a global environment.',
+    TRUE
+),
+(
+    2,
+    'Library',
+    'The University Library provides students, faculty members, and researchers with access to quality academic resources and learning facilities. It offers a wide collection of books, journals, reference materials, and digital resources to support teaching, learning, and research. The library encourages lifelong learning, independent study, and academic excellence by creating a quiet, resourceful, and welcoming environment for the university community.',
+    TRUE
+),
+(
+    2,
+    'Finance Department',
+    'The Finance Department is responsible for managing the university''s financial resources efficiently and transparently. It oversees budgeting, accounting, procurement, and financial administration to ensure the smooth operation of academic and administrative activities. The department supports students, faculty, and staff by maintaining sound financial practices and contributing to the sustainable development of the university.',
+    TRUE
+),
+(
+    3,
     'Department of Natural Science (Physics)',
     'The Department of Natural Science (Physics) is dedicated to providing quality education that connects theoretical knowledge with practical applications. It emphasizes hands-on learning through experiments, tutorials, and project-based activities to strengthen students'' scientific understanding and problem-solving skills. The department aims to develop competent graduates with strong analytical abilities, practical experience, and the knowledge needed to contribute effectively to science, engineering, and technological advancement.',
     TRUE
 ),
 (
-    'Department of Natural Language (Myanmar and English)',
-    'The Department of Natural Language (Myanmar and English) is committed to developing students'' communication skills in both Myanmar and English while preparing them for academic and professional success. The department emphasizes English language proficiency through IELTS-based learning, helping students strengthen their reading, writing, listening, and speaking skills. It also enhances students'' academic vocabulary and language accuracy, enabling them to pursue higher education, especially in IT and computing, and communicate effectively in a global environment.',
+    4,
+    'Administration Department',
+    'The Administration Department is responsible for ensuring the efficient operation and effective management of the university''s administrative services. It supports teaching, research, and student affairs by providing quality administrative assistance, maintaining transparent policies, and coordinating essential university operations. Through a service-oriented approach, the department works closely with students, faculty, staff, parents, and other stakeholders to create a well-organized, supportive, and productive academic environment.',
+    TRUE
+),
+(
+    4,
+    'Student Affairs Department',
+    'The Student Affairs Department is committed to supporting students throughout their academic journey by promoting their personal, academic, and social development. The department manages student registration, welfare services, extracurricular activities, scholarships, and campus events while fostering a safe, inclusive, and disciplined learning environment. It serves as a bridge between students and the university administration to enhance the overall student experience.',
     TRUE
 );
 
@@ -1380,6 +1387,7 @@ VALUES
 INSERT INTO students
 (
     student_id,
+    roll_number,
     name,
     email,
     password,
@@ -1389,6 +1397,7 @@ INSERT INTO students
 VALUES
 (
     '1',
+    'R-1001',
     'Wai Mar Aung',
     'student1@gmail.com',
     '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi',
@@ -1397,6 +1406,7 @@ VALUES
 ),
 (
     '2',
+    'R-1002',
     'Htoo Lwin',
     'student2@gmail.com',
     '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi',

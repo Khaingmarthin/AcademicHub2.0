@@ -10,7 +10,7 @@ admin_require_login();
 
 $pageTitle    = 'Edit Faculty';
 $pageSubtitle = 'Update a faculty record.';
-$activeNav    = 'faculties';
+$activeNav    = 'faculties-departments';
 
 $ucsId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
 
@@ -91,7 +91,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             </div>
 
             <div class="flex flex-col-reverse gap-3 border-t border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-                <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/faculties/index.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/faculties-departments/index.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
                     Cancel
                 </a>
                 <button type="submit"

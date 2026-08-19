@@ -51,6 +51,7 @@ try {
         $ucsStmt = $pdo->prepare(
             "UPDATE students
              SET student_id = :student_id,
+                 roll_number = :roll_number,
                  name = :name,
                  email = :email,
                  password = :password,
@@ -60,6 +61,7 @@ try {
         );
         $ucsStmt->execute([
             ':student_id'   => $ucsClean['student_id'],
+            ':roll_number'  => $ucsClean['roll_number'],
             ':name'         => $ucsClean['name'],
             ':email'        => $ucsClean['email'],
             ':password'     => password_hash($ucsClean['password'], PASSWORD_DEFAULT),
@@ -71,6 +73,7 @@ try {
         $ucsStmt = $pdo->prepare(
             "UPDATE students
              SET student_id = :student_id,
+                 roll_number = :roll_number,
                  name = :name,
                  email = :email,
                  classroom_id = :classroom_id,
@@ -79,6 +82,7 @@ try {
         );
         $ucsStmt->execute([
             ':student_id'   => $ucsClean['student_id'],
+            ':roll_number'  => $ucsClean['roll_number'],
             ':name'         => $ucsClean['name'],
             ':email'        => $ucsClean['email'],
             ':classroom_id' => $ucsClean['classroom_id'],
@@ -90,7 +94,7 @@ try {
     student_flash('success', 'Student "' . $ucsClean['name'] . '" updated successfully.');
 } catch (PDOException $e) {
     if ((string) $e->getCode() === '23000') {
-        student_flash('error', 'A student with this Student ID or email address already exists.');
+        student_flash('error', 'A student with this Student ID, Roll Number or email address already exists.');
     } else {
         student_flash('error', 'Unable to update the student. Please try again.');
     }

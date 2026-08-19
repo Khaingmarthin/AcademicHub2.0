@@ -18,7 +18,7 @@ $ucsId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
 
 try {
     $ucsStmt = $pdo->prepare(
-        "SELECT id, student_id, name, email, classroom_id, status
+        "SELECT id, student_id, roll_number, name, email, classroom_id, status
          FROM students
          WHERE id = :id
          LIMIT 1"
@@ -43,13 +43,45 @@ unset($_SESSION['student_old']);
 
 $ucsForm = [
     'student_id'   => $ucsOld['student_id'] ?? $ucsStudent['student_id'],
+    'roll_number'  => $ucsOld['roll_number'] ?? $ucsStudent['roll_number'],
     'name'         => $ucsOld['name'] ?? $ucsStudent['name'],
     'email'        => $ucsOld['email'] ?? $ucsStudent['email'],
     'classroom_id' => $ucsOld['classroom_id'] ?? (int) $ucsStudent['classroom_id'],
     'status'       => $ucsOld['status'] ?? (int) $ucsStudent['status'],
 ];
 
-$ucsClassrooms = ucs_admin_classrooms($pdo);
+// Students are scoped to the active academic year. Classroom options come
+// from that year only; the student's own classroom is kept in the list even
+// when it belongs to another (e.g. archived) year so the record stays
+// editable, preserving historical student records.
+$ucsActiveYear     = ucs_admin_active_academic_year($pdo);
+$ucsActiveYearId   = $ucsActiveYear !== null ? (int) $ucsActiveYear['id'] : 0;
+$ucsActiveYearName = $ucsActiveYear !== null ? (string) $ucsActiveYear['year_name'] : '';
+
+$ucsClassrooms = ucs_admin_active_year_classrooms($pdo);
+
+$ucsCurrentClassroomId = (int) $ucsStudent['classroom_id'];
+$ucsInActiveYearList   = in_array($ucsCurrentClassroomId, array_map('intval', array_column($ucsClassrooms, 'id')), true);
+if (!$ucsInActiveYearList) {
+    try {
+        $ucsStmt = $pdo->prepare(
+            "SELECT cl.id, cl.classroom_name, cl.year_level, cl.section,
+                    m.name AS major_name, ay.year_name AS academic_year
+             FROM classrooms cl
+             JOIN majors m ON m.id = cl.major_id
+             JOIN academic_years ay ON ay.id = cl.academic_year_id
+             WHERE cl.id = :id
+             LIMIT 1"
+        );
+        $ucsStmt->execute([':id' => $ucsCurrentClassroomId]);
+        $ucsCurrentClassroom = $ucsStmt->fetch() ?: null;
+        if ($ucsCurrentClassroom !== null) {
+            array_unshift($ucsClassrooms, $ucsCurrentClassroom);
+        }
+    } catch (PDOException $e) {
+        $ucsCurrentClassroom = null;
+    }
+}
 
 require_once __DIR__ . '/../../includes/admin-layout-top.php';
 ?>
@@ -76,6 +108,23 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             <input type="hidden" name="id" value="<?php echo (int) $ucsStudent['id']; ?>">
 
             <div class="space-y-6 px-6 py-6">
+                <?php if ($ucsActiveYear !== null): ?>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Academic Year</label>
+                    <div class="mt-2 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span class="truncate font-medium"><?php echo htmlspecialchars($ucsActiveYearName); ?></span>
+                        <span class="inline-flex shrink-0 items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-700 ring-1 ring-blue-100">Active</span>
+                    </div>
+                    <p class="mt-1.5 text-xs text-gray-500">Automatically inherited from the active academic year.</p>
+                </div>
+                <?php endif; ?>
+
                 <div class="grid gap-6 sm:grid-cols-2">
                     <div>
                         <label for="student_id" class="block text-sm font-medium text-gray-700">Student ID <span class="text-red-500">*</span></label>
@@ -83,10 +132,16 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                                class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                     </div>
                     <div>
-                        <label for="name" class="block text-sm font-medium text-gray-700">Full Name <span class="text-red-500">*</span></label>
-                        <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($ucsForm['name']); ?>" required maxlength="255"
+                        <label for="roll_number" class="block text-sm font-medium text-gray-700">Roll Number <span class="text-red-500">*</span></label>
+                        <input type="text" id="roll_number" name="roll_number" value="<?php echo htmlspecialchars($ucsForm['roll_number']); ?>" required maxlength="50"
                                class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                     </div>
+                </div>
+
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-700">Full Name <span class="text-red-500">*</span></label>
+                    <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($ucsForm['name']); ?>" required maxlength="255"
+                           class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                 </div>
 
                 <div>
@@ -102,28 +157,15 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                                class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                     </div>
                     <div>
-                        <label for="classroom_id" class="block text-sm font-medium text-gray-700">Classroom <span class="text-red-500">*</span></label>
+                        <label for="classroom_id" class="block text-sm font-medium text-gray-700">Classroom / Section <span class="text-red-500">*</span></label>
                         <select id="classroom_id" name="classroom_id" required
                                 class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                             <option value="">Select a classroom…</option>
-                            <?php
-                            $ucsYearLabel = null;
-                            foreach ($ucsClassrooms as $ucsClassroom):
-                                $ucsGroupLabel = $ucsClassroom['academic_year'] . ($ucsClassroom['academic_year_status'] === 'Active' ? ' (Active)' : '');
-                                if ($ucsGroupLabel !== $ucsYearLabel):
-                                    if ($ucsYearLabel !== null): ?>
-                                        </optgroup>
-                                    <?php endif; ?>
-                                    <optgroup label="<?php echo htmlspecialchars($ucsGroupLabel); ?>">
-                                    <?php $ucsYearLabel = $ucsGroupLabel;
-                                endif; ?>
+                            <?php foreach ($ucsClassrooms as $ucsClassroom): ?>
                                 <option value="<?php echo (int) $ucsClassroom['id']; ?>" <?php echo (int) $ucsForm['classroom_id'] === (int) $ucsClassroom['id'] ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($ucsClassroom['classroom_name'] . ' — ' . $ucsClassroom['major_name']); ?>
                                 </option>
-                            <?php endforeach;
-                            if ($ucsYearLabel !== null): ?>
-                                </optgroup>
-                            <?php endif; ?>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                 </div>

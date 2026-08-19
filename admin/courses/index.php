@@ -1,51 +1,162 @@
 <?php
 /**
  * Admin Courses module - list.
+ *
+ * Courses are managed per academic year. The page defaults to the Active
+ * academic year but lets the admin switch years via a dropdown, supports
+ * combined search + semester + year level + major filtering, and displays a
+ * small summary computed from the real database.
  */
 require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../includes/helpers/course-validation.php';
+require_once __DIR__ . '/../../includes/helpers/ucs-admin-lists.php';
 
 admin_require_login();
 
 $pageTitle    = 'Courses';
-$pageSubtitle = 'Manage courses per academic year and major.';
+$pageSubtitle = 'Manage courses across academic years.';
 $activeNav    = 'courses';
 
 $ucsFlash = $_SESSION['course_flash'] ?? null;
 unset($_SESSION['course_flash']);
 
-$ucsQuery = trim((string) ($_GET['q'] ?? ''));
+// ---------------------------------------------------------------------
+// Academic year context: the module defaults to the Active year, but the
+// admin can switch to any other year via the "Academic Year" filter.
+// ---------------------------------------------------------------------
+$ucsActiveYear     = ucs_admin_active_academic_year($pdo);
+$ucsActiveYearId   = $ucsActiveYear !== null ? (int) $ucsActiveYear['id'] : 0;
+$ucsActiveYearName = $ucsActiveYear !== null ? (string) $ucsActiveYear['year_name'] : '';
 
+$ucsAcademicYears  = ucs_admin_academic_years($pdo);
+$ucsYearIds        = array_map('intval', array_column($ucsAcademicYears, 'id'));
+
+$ucsYearId = filter_var($_GET['year'] ?? '', FILTER_VALIDATE_INT);
+if ($ucsYearId === false || ($ucsYearId !== 0 && !in_array($ucsYearId, $ucsYearIds, true))) {
+    $ucsYearId = 0; // 0 = All Years
+}
+
+$ucsSelectedYear = null;
+foreach ($ucsAcademicYears as $ucsYearRow) {
+    if ((int) $ucsYearRow['id'] === $ucsYearId) {
+        $ucsSelectedYear = $ucsYearRow;
+        break;
+    }
+}
+$ucsSelectedYearName   = $ucsSelectedYear !== null ? (string) $ucsSelectedYear['year_name'] : '';
+$ucsSelectedYearStatus = $ucsSelectedYear !== null ? (string) $ucsSelectedYear['status'] : '';
+
+// ---------------------------------------------------------------------
+// Filters
+// ---------------------------------------------------------------------
+$ucsQuery     = trim((string) ($_GET['q'] ?? ''));
+$ucsSemester  = trim((string) ($_GET['semester'] ?? ''));
+$ucsYearLevel = trim((string) ($_GET['year_level'] ?? ''));
+$ucsMajorId   = filter_var($_GET['major'] ?? '', FILTER_VALIDATE_INT);
+
+// Reject values that are not part of the allowed option lists.
+if (!in_array($ucsSemester, COURSE_SEMESTERS, true)) {
+    $ucsSemester = '';
+}
+if (!in_array($ucsYearLevel, COURSE_YEAR_LEVELS, true)) {
+    $ucsYearLevel = '';
+}
+
+// Majors are loaded from the database so future majors appear automatically.
+$ucsMajors = ucs_admin_majors($pdo);
+$ucsMajorIds = array_map('intval', array_column($ucsMajors, 'id'));
+if ($ucsMajorId === false || !in_array($ucsMajorId, $ucsMajorIds, true)) {
+    $ucsMajorId = 0;
+}
+
+$ucsHasFilters = $ucsQuery !== '' || $ucsSemester !== '' || $ucsYearLevel !== '' || $ucsMajorId > 0;
+
+// ---------------------------------------------------------------------
+// Data: summary + filtered listing for the active academic year.
+// ---------------------------------------------------------------------
 $ucsCourses = [];
+$ucsSummary = ['total' => 0, 'first' => 0, 'second' => 0];
+
 try {
+    $ucsSummaryWhere  = $ucsYearId > 0 ? ' WHERE c.academic_year_id = :ay' : '';
+    $ucsSummaryParams = $ucsYearId > 0 ? [':ay' => $ucsYearId] : [];
+    $ucsStmt = $pdo->prepare(
+        "SELECT COUNT(*) AS total,
+                COALESCE(SUM(c.semester = 'First Semester'), 0) AS first,
+                COALESCE(SUM(c.semester = 'Second Semester'), 0) AS second
+         FROM courses c" . $ucsSummaryWhere
+    );
+    $ucsStmt->execute($ucsSummaryParams);
+    $ucsSummaryRow = $ucsStmt->fetch() ?: [];
+    $ucsSummary = [
+        'total'  => (int) ($ucsSummaryRow['total'] ?? 0),
+        'first'  => (int) ($ucsSummaryRow['first'] ?? 0),
+        'second' => (int) ($ucsSummaryRow['second'] ?? 0),
+    ];
+} catch (PDOException $e) {
+    // Keep zeroed summary when the database is unavailable.
+}
+
+try {
+    $ucsConditions = [];
+    $ucsParams     = [];
+    if ($ucsYearId > 0) {
+        $ucsConditions[] = 'c.academic_year_id = :ay';
+        $ucsParams[':ay'] = $ucsYearId;
+    }
+
     if ($ucsQuery !== '') {
         $ucsEscaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $ucsQuery);
-        $ucsStmt = $pdo->prepare(
-            "SELECT c.id, c.course_code, c.course_name, c.year_level, c.semester,
-                    c.credit_hours, c.status, c.created_at,
-                    ay.year_name AS academic_year, m.name AS major_name
-             FROM courses c
-             JOIN academic_years ay ON ay.id = c.academic_year_id
-             JOIN majors m ON m.id = c.major_id
-             WHERE c.course_code LIKE :query OR c.course_name LIKE :query OR m.name LIKE :query
-             ORDER BY c.year_level ASC, c.course_code ASC"
-        );
-        $ucsStmt->execute([':query' => '%' . $ucsEscaped . '%']);
-    } else {
-        $ucsStmt = $pdo->query(
-            "SELECT c.id, c.course_code, c.course_name, c.year_level, c.semester,
-                    c.credit_hours, c.status, c.created_at,
-                    ay.year_name AS academic_year, m.name AS major_name
-             FROM courses c
-             JOIN academic_years ay ON ay.id = c.academic_year_id
-             JOIN majors m ON m.id = c.major_id
-             ORDER BY c.year_level ASC, c.course_code ASC"
-        );
+        $ucsConditions[] = '(c.course_code LIKE :q_code OR c.course_name LIKE :q_name)';
+        $ucsParams[':q_code'] = '%' . $ucsEscaped . '%';
+        $ucsParams[':q_name'] = '%' . $ucsEscaped . '%';
     }
+
+    if ($ucsSemester !== '') {
+        $ucsConditions[] = 'c.semester = :semester';
+        $ucsParams[':semester'] = $ucsSemester;
+    }
+
+    if ($ucsYearLevel !== '') {
+        $ucsConditions[] = 'c.year_level = :year_level';
+        $ucsParams[':year_level'] = $ucsYearLevel;
+    }
+
+    if ($ucsMajorId > 0) {
+        $ucsConditions[] = 'c.major_id = :major_id';
+        $ucsParams[':major_id'] = $ucsMajorId;
+    }
+
+    $ucsWhereSql = count($ucsConditions) > 0 ? ' WHERE ' . implode(' AND ', $ucsConditions) : '';
+    $ucsStmt = $pdo->prepare(
+        "SELECT c.id, c.course_code, c.course_name, c.year_level, c.semester,
+                c.credit_hours, c.status, c.created_at,
+                m.name AS major_name
+         FROM courses c
+         JOIN majors m ON m.id = c.major_id"
+        . $ucsWhereSql . "
+         ORDER BY c.year_level ASC, c.course_code ASC"
+    );
+    $ucsStmt->execute($ucsParams);
     $ucsCourses = $ucsStmt->fetchAll();
 } catch (PDOException $e) {
     $ucsCourses = [];
+}
+
+$ucsCourseCount = count($ucsCourses);
+$ucsResultLabel = $ucsCourseCount . ' course' . ($ucsCourseCount === 1 ? '' : 's');
+if ($ucsHasFilters) {
+    $ucsResultLabel .= ' matching your filters';
+}
+if ($ucsYearId === 0) {
+    $ucsResultLabel .= ' &middot; All Years';
+} elseif ($ucsSelectedYearName !== '') {
+    $ucsResultLabel .= ' &middot; ' . $ucsSelectedYearName;
+    if ($ucsSelectedYearStatus !== '' && $ucsSelectedYearStatus !== 'Active') {
+        $ucsResultLabel .= ' (' . $ucsSelectedYearStatus . ')';
+    }
 }
 
 require_once __DIR__ . '/../../includes/admin-layout-top.php';
@@ -70,22 +181,36 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
     </div>
 <?php endif; ?>
 
-<div class="rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
-    <div class="flex flex-col gap-4 border-b border-gray-100 p-6 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-            <h2 class="text-base font-semibold text-gray-900">Course List</h2>
-            <p class="mt-1 text-sm text-gray-500">Each course belongs to an academic year and major.</p>
-        </div>
+<?php if ($ucsActiveYear === null): ?>
+    <div class="rounded-2xl bg-white p-10 text-center shadow-sm ring-1 ring-gray-100">
+        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+            <line x1="16" y1="2" x2="16" y2="6"></line>
+            <line x1="8" y1="2" x2="8" y2="6"></line>
+            <line x1="3" y1="10" x2="21" y2="10"></line>
+        </svg>
+        <h2 class="mt-4 text-lg font-semibold text-gray-800">No active academic year</h2>
+        <p class="mt-2 text-sm text-gray-500">Courses are managed under the active academic year. Activate an academic year to get started.</p>
+        <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/academic-years/index.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+            Manage Academic Years
+        </a>
+    </div>
+    <?php require_once __DIR__ . '/../../includes/admin-layout-bottom.php'; ?>
+    <?php exit; ?>
+<?php endif; ?>
 
-        <div class="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <form method="get" action="<?php echo htmlspecialchars(ROOT_URL . '/admin/courses/index.php'); ?>" class="relative" role="search">
+<!-- Search + Filters toolbar -->
+<div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
+    <form method="get" action="<?php echo htmlspecialchars(ROOT_URL . '/admin/courses/index.php'); ?>" role="search">
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div class="relative w-full lg:max-w-md">
                 <svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <circle cx="11" cy="11" r="8"></circle>
                     <path d="m21 21-4.35-4.35"></path>
                 </svg>
-                <input type="search" name="q" value="<?php echo htmlspecialchars($ucsQuery); ?>" placeholder="Search courses…" aria-label="Search courses"
-                       class="block w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100 sm:w-64">
-            </form>
+                <input type="search" name="q" value="<?php echo htmlspecialchars($ucsQuery); ?>" placeholder="Search courses by code or name..." aria-label="Search courses by code or name"
+                       class="block w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+            </div>
 
             <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/courses/create.php'); ?>" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -95,23 +220,146 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                 Add Course
             </a>
         </div>
+
+        <div class="mt-5 grid gap-4 border-t border-gray-100 pt-5 sm:grid-cols-2 lg:grid-cols-5">
+            <div>
+                <label for="year-filter" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">Academic Year</label>
+                <select id="year-filter" name="year" onchange="this.form.submit()" aria-label="Filter by academic year"
+                        class="mt-1.5 block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                    <option value="">All Years</option>
+                    <?php foreach ($ucsAcademicYears as $ucsYearOption): ?>
+                        <?php
+                        $ucsYearOptionStatus = (string) $ucsYearOption['status'];
+                        $ucsYearOptionLabel  = (string) $ucsYearOption['year_name'];
+                        if ($ucsYearOptionStatus !== '') {
+                            $ucsYearOptionLabel .= ' (' . $ucsYearOptionStatus . ')';
+                        }
+                        ?>
+                        <option value="<?php echo (int) $ucsYearOption['id']; ?>" <?php echo $ucsYearId === (int) $ucsYearOption['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($ucsYearOptionLabel); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div>
+                <label for="semester-filter" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">Semester</label>
+                <select id="semester-filter" name="semester" onchange="this.form.submit()" aria-label="Filter by semester"
+                        class="mt-1.5 block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                    <option value="">All Semesters</option>
+                    <?php foreach (COURSE_SEMESTERS as $ucsSemesterOption): ?>
+                        <option value="<?php echo htmlspecialchars($ucsSemesterOption); ?>" <?php echo $ucsSemester === $ucsSemesterOption ? 'selected' : ''; ?>><?php echo htmlspecialchars($ucsSemesterOption); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div>
+                <label for="year-level-filter" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">Year Level</label>
+                <select id="year-level-filter" name="year_level" onchange="this.form.submit()" aria-label="Filter by year level"
+                        class="mt-1.5 block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                    <option value="">All Year Levels</option>
+                    <?php foreach (COURSE_YEAR_LEVELS as $ucsYearLevelOption): ?>
+                        <option value="<?php echo htmlspecialchars($ucsYearLevelOption); ?>" <?php echo $ucsYearLevel === $ucsYearLevelOption ? 'selected' : ''; ?>><?php echo htmlspecialchars($ucsYearLevelOption); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div>
+                <label for="major-filter" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">Major</label>
+                <select id="major-filter" name="major" onchange="this.form.submit()" aria-label="Filter by major"
+                        class="mt-1.5 block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                    <option value="">All Majors</option>
+                    <?php foreach ($ucsMajors as $ucsMajorOption): ?>
+                        <option value="<?php echo (int) $ucsMajorOption['id']; ?>" <?php echo (int) $ucsMajorId === (int) $ucsMajorOption['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($ucsMajorOption['name']); ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
+
+            <div class="flex items-end">
+                <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/courses/index.php'); ?>" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400 sm:w-auto">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+                        <path d="M3 3v5h5"></path>
+                    </svg>
+                    Clear Filters
+                </a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- Course summary -->
+<div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
+    <div class="flex items-center gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
+        <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-sm shadow-blue-600/20" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+            </svg>
+        </span>
+        <div class="min-w-0">
+            <p class="text-2xl font-extrabold tracking-tight text-gray-900"><?php echo htmlspecialchars(number_format($ucsSummary['total'])); ?></p>
+            <p class="truncate text-sm font-medium text-gray-500">Total Courses</p>
+        </div>
+    </div>
+    <div class="flex items-center gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
+        <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 ring-1 ring-blue-100" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+                <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"></path>
+            </svg>
+        </span>
+        <div class="min-w-0">
+            <p class="text-2xl font-extrabold tracking-tight text-gray-900"><?php echo htmlspecialchars(number_format($ucsSummary['first'])); ?></p>
+            <p class="truncate text-sm font-medium text-gray-500">First Semester Courses</p>
+        </div>
+    </div>
+    <div class="flex items-center gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
+        <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 ring-1 ring-blue-100" aria-hidden="true">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                <line x1="16" y1="2" x2="16" y2="6"></line>
+                <line x1="8" y1="2" x2="8" y2="6"></line>
+                <line x1="3" y1="10" x2="21" y2="10"></line>
+                <path d="m9 16 2 2 4-4"></path>
+            </svg>
+        </span>
+        <div class="min-w-0">
+            <p class="text-2xl font-extrabold tracking-tight text-gray-900"><?php echo htmlspecialchars(number_format($ucsSummary['second'])); ?></p>
+            <p class="truncate text-sm font-medium text-gray-500">Second Semester Courses</p>
+        </div>
+    </div>
+</div>
+
+<!-- Course table -->
+<div class="mt-6 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
+    <div class="flex flex-col gap-1 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+            <h2 class="text-base font-semibold text-gray-900">Course List</h2>
+            <p class="mt-1 text-sm text-gray-500"><?php echo $ucsResultLabel; ?></p>
+        </div>
     </div>
 
     <?php if (empty($ucsCourses)): ?>
         <div class="p-10 text-center">
             <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
             </svg>
-            <h3 class="mt-4 text-lg font-semibold text-gray-800">
-                <?php echo $ucsQuery !== '' ? 'No matching courses' : 'No courses yet'; ?>
-            </h3>
+            <h3 class="mt-4 text-lg font-semibold text-gray-800">No courses found</h3>
             <p class="mt-2 text-sm text-gray-500">
-                <?php echo $ucsQuery !== '' ? 'Try a different search term.' : 'Add your first course to get started.'; ?>
+                <?php if ($ucsHasFilters): ?>
+                    Try changing your search or filter criteria.
+                <?php elseif ($ucsSelectedYearStatus !== '' && $ucsSelectedYearStatus !== 'Active'): ?>
+                    No courses were added for this academic year.
+                <?php else: ?>
+                    Add your first course to get started.
+                <?php endif; ?>
             </p>
-            <?php if ($ucsQuery !== ''): ?>
+            <?php if ($ucsHasFilters): ?>
                 <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/courses/index.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                    Clear search
+                    Clear Filters
                 </a>
             <?php else: ?>
                 <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/courses/create.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
@@ -124,12 +372,11 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             <table class="w-full min-w-full text-sm">
                 <thead>
                     <tr class="bg-gray-50">
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Course</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Academic Year</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Course Code</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Course Name</th>
                         <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Major</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Year / Semester</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Credits</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Year Level</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Semester</th>
                         <th scope="col" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
                     </tr>
                 </thead>
@@ -142,33 +389,16 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                         ?>
                         <tr class="transition-colors hover:bg-gray-50/60">
                             <td class="whitespace-nowrap px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 ring-1 ring-blue-100" aria-hidden="true">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
-                                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
-                                        </svg>
-                                    </span>
-                                    <div class="min-w-0">
-                                        <p class="font-semibold text-gray-900"><?php echo htmlspecialchars($ucsCourseCode . ' - ' . $ucsCourseName); ?></p>
-                                        <p class="text-xs text-gray-500">Added <?php echo date('j M Y', strtotime((string) $ucsCourse['created_at'])); ?></p>
-                                    </div>
-                                </div>
+                                <span class="inline-flex rounded-lg bg-gray-100 px-2.5 py-1 font-mono text-xs font-semibold text-gray-800 ring-1 ring-gray-200"><?php echo htmlspecialchars($ucsCourseCode); ?></span>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-gray-600"><?php echo htmlspecialchars((string) $ucsCourse['academic_year']); ?></td>
+                            <td class="whitespace-nowrap px-6 py-4 font-medium text-gray-800"><?php echo htmlspecialchars($ucsCourseName); ?></td>
                             <td class="whitespace-nowrap px-6 py-4 text-gray-600"><?php echo htmlspecialchars((string) $ucsCourse['major_name']); ?></td>
+                            <td class="whitespace-nowrap px-6 py-4 text-gray-600"><?php echo htmlspecialchars((string) $ucsCourse['year_level']); ?></td>
                             <td class="whitespace-nowrap px-6 py-4 text-gray-600">
-                                <span class="block"><?php echo htmlspecialchars((string) $ucsCourse['year_level']); ?></span>
-                                <span class="block text-xs text-gray-400"><?php echo htmlspecialchars((string) ($ucsCourse['semester'] ?: '—')); ?></span>
-                            </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-gray-600">
-                                <?php echo $ucsCourse['credit_hours'] !== null && $ucsCourse['credit_hours'] !== '' ? (int) $ucsCourse['credit_hours'] : '<span class="text-gray-400">—</span>'; ?>
-                            </td>
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <?php if ((int) $ucsCourse['status'] === 1): ?>
-                                    <span class="inline-flex items-center rounded-full bg-blue-600 px-2.5 py-0.5 text-xs font-semibold text-white">Active</span>
+                                <?php if (!empty($ucsCourse['semester'])): ?>
+                                    <?php echo htmlspecialchars((string) $ucsCourse['semester']); ?>
                                 <?php else: ?>
-                                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-500">Inactive</span>
+                                    <span class="text-gray-400">—</span>
                                 <?php endif; ?>
                             </td>
                             <td class="whitespace-nowrap px-6 py-4">

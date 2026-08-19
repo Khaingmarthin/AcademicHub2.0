@@ -28,7 +28,7 @@ try {
     $ucsHeroMedia  = $ucsProfileRow['hero_media'] ?? 'images/front_view.jpg';
 
     $ucsStmt = $pdo->query(
-        "SELECT name, short_name, degree_name, description
+        "SELECT id, name, short_name, degree_name, description
          FROM majors
          WHERE status = 1
          ORDER BY id ASC"
@@ -104,6 +104,18 @@ require_once '../includes/header.php';
                                 <p class="mt-3 flex-1 break-words text-sm leading-6 text-gray-600">
                                     <?php echo htmlspecialchars($ucsProgramme['description']); ?>
                                 </p>
+                            <?php endif; ?>
+
+                            <?php if (!empty($ucsProgramme['id'])): ?>
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni.php?major=' . (int) $ucsProgramme['id']); ?>" class="mt-3 inline-flex items-center gap-1.5 self-start text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                        <circle cx="9" cy="7" r="4"></circle>
+                                        <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                    </svg>
+                                    Related Alumni
+                                </a>
                             <?php endif; ?>
 
                             <a href="<?php echo htmlspecialchars(BASE_URL . '/degree-programmes.php'); ?>" class="mt-6 inline-flex w-full items-center justify-center gap-2 self-start rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-md hover:shadow-blue-600/25 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 sm:w-auto">

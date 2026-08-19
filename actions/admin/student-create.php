@@ -32,12 +32,13 @@ if (!empty($ucsErrors)) {
 try {
     $ucsStmt = $pdo->prepare(
         "INSERT INTO students
-            (student_id, name, email, password, classroom_id, status)
+            (student_id, roll_number, name, email, password, classroom_id, status)
          VALUES
-            (:student_id, :name, :email, :password, :classroom_id, :status)"
+            (:student_id, :roll_number, :name, :email, :password, :classroom_id, :status)"
     );
     $ucsStmt->execute([
         ':student_id'   => $ucsClean['student_id'],
+        ':roll_number'  => $ucsClean['roll_number'],
         ':name'         => $ucsClean['name'],
         ':email'        => $ucsClean['email'],
         ':password'     => password_hash($ucsClean['password'], PASSWORD_DEFAULT),
@@ -48,7 +49,7 @@ try {
     student_flash('success', 'Student "' . $ucsClean['name'] . '" created successfully.');
 } catch (PDOException $e) {
     if ((string) $e->getCode() === '23000') {
-        student_flash('error', 'A student with this Student ID or email address already exists.');
+        student_flash('error', 'A student with this Student ID, Roll Number or email address already exists.');
     } else {
         student_flash('error', 'Unable to create the student. Please try again.');
     }

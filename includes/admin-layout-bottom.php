@@ -3,7 +3,8 @@
  * Admin layout - bottom shell.
  *
  * Closes the main content column opened by includes/admin-layout-top.php,
- * renders the admin footer and the mobile sidebar behaviour script.
+ * renders the admin footer, the mobile sidebar behaviour script and the
+ * admin profile dropdown script.
  */
 ?>
                 </div>
@@ -54,6 +55,44 @@
                     }
                 });
             });
+
+            // Admin profile dropdown
+            var profileRoot = document.querySelector('[data-admin-profile]');
+            if (profileRoot) {
+                var profileToggle = profileRoot.querySelector('[data-admin-profile-toggle]');
+                var profileMenu = profileRoot.querySelector('[data-admin-profile-menu]');
+                var profileChevron = profileRoot.querySelector('[data-admin-profile-chevron]');
+
+                function setProfileOpen(open) {
+                    if (!profileMenu) return;
+                    profileMenu.classList.toggle('invisible', !open);
+                    profileMenu.classList.toggle('opacity-0', !open);
+                    profileMenu.classList.toggle('opacity-100', open);
+                    if (profileToggle) {
+                        profileToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+                    }
+                    if (profileChevron) {
+                        profileChevron.classList.toggle('rotate-180', open);
+                    }
+                }
+
+                if (profileToggle) {
+                    profileToggle.addEventListener('click', function (e) {
+                        e.stopPropagation();
+                        setProfileOpen(profileMenu.classList.contains('invisible'));
+                    });
+                }
+
+                document.addEventListener('click', function (e) {
+                    if (!profileRoot.contains(e.target)) {
+                        setProfileOpen(false);
+                    }
+                });
+
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape') setProfileOpen(false);
+                });
+            }
         })();
     </script>
 </body>

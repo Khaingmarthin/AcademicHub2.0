@@ -20,14 +20,16 @@ unset($_SESSION['classroom_errors']);
 $ucsOld = $_SESSION['classroom_old'] ?? null;
 unset($_SESSION['classroom_old']);
 
-$ucsAcademicYears = ucs_admin_academic_years($pdo);
-$ucsMajors        = ucs_admin_majors($pdo);
+$ucsMajors = ucs_admin_majors($pdo);
 
-$ucsActiveYear    = ucs_admin_active_academic_year($pdo);
-$ucsDefaultYearId = $ucsActiveYear !== null ? (int) $ucsActiveYear['id'] : null;
+// The academic year is always inherited from the global active academic
+// year; the administrator never selects it manually.
+$ucsActiveYear     = ucs_admin_active_academic_year($pdo);
+$ucsActiveYearId   = $ucsActiveYear !== null ? (int) $ucsActiveYear['id'] : 0;
+$ucsActiveYearName = $ucsActiveYear !== null ? (string) $ucsActiveYear['year_name'] : '';
 
 $ucsForm = [
-    'academic_year_id' => $ucsOld['academic_year_id'] ?? $ucsDefaultYearId,
+    'academic_year_id' => $ucsActiveYearId,
     'major_id'         => $ucsOld['major_id'] ?? '',
     'year_level'       => $ucsOld['year_level'] ?? 'First Year',
     'section'          => $ucsOld['section'] ?? '',
@@ -52,24 +54,43 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
     <div class="rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
         <div class="border-b border-gray-100 px-6 py-5">
             <h2 class="text-base font-semibold text-gray-900">New Classroom</h2>
-            <p class="mt-1 text-sm text-gray-500">Classroom names look like <span class="font-medium text-gray-700">First Year (A)</span>.</p>
+            <p class="mt-1 text-sm text-gray-500">Classroom names look like <span class="font-medium text-gray-700">First Year (A)</span>. The classroom is automatically assigned to the active academic year.</p>
         </div>
 
+        <?php if ($ucsActiveYear === null): ?>
+            <div class="px-6 py-10 text-center">
+                <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                    <line x1="16" y1="2" x2="16" y2="6"></line>
+                    <line x1="8" y1="2" x2="8" y2="6"></line>
+                    <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                <h3 class="mt-4 text-lg font-semibold text-gray-800">No active academic year</h3>
+                <p class="mt-2 text-sm text-gray-500">Classrooms are created under the active academic year. Activate an academic year first.</p>
+                <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/academic-years/index.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                    Manage Academic Years
+                </a>
+            </div>
+        <?php else: ?>
         <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/classroom-create.php'); ?>" novalidate>
             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
+            <input type="hidden" name="academic_year_id" value="<?php echo (int) $ucsActiveYearId; ?>">
 
             <div class="space-y-6 px-6 py-6">
                 <div class="grid gap-6 sm:grid-cols-2">
                     <div>
-                        <label for="academic_year_id" class="block text-sm font-medium text-gray-700">Academic Year <span class="text-red-500">*</span></label>
-                        <select id="academic_year_id" name="academic_year_id" required
-                                class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                            <?php foreach ($ucsAcademicYears as $ucsYear): ?>
-                                <option value="<?php echo (int) $ucsYear['id']; ?>" <?php echo (int) $ucsForm['academic_year_id'] === (int) $ucsYear['id'] ? 'selected' : ''; ?>>
-                                    <?php echo htmlspecialchars($ucsYear['year_name']); ?><?php echo $ucsYear['status'] === 'Active' ? ' (Active)' : ''; ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
+                        <label class="block text-sm font-medium text-gray-700">Academic Year</label>
+                        <div class="mt-2 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <span class="truncate font-medium"><?php echo htmlspecialchars($ucsActiveYearName); ?></span>
+                            <span class="inline-flex shrink-0 items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-700 ring-1 ring-blue-100">Active</span>
+                        </div>
+                        <p class="mt-1.5 text-xs text-gray-500">Automatically inherited from the active academic year.</p>
                     </div>
                     <div>
                         <label for="major_id" class="block text-sm font-medium text-gray-700">Major <span class="text-red-500">*</span></label>
@@ -127,6 +148,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                 </button>
             </div>
         </form>
+        <?php endif; ?>
     </div>
 </div>
 <?php require_once __DIR__ . '/../../includes/admin-layout-bottom.php'; ?>

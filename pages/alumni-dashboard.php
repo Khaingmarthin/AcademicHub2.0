@@ -1,0 +1,611 @@
+<?php
+/**
+ * Alumni Dashboard (protected).
+ *
+ * A personalised landing page for verified alumni of the Alumni & Career
+ * Community. Uses the existing student session (no separate authentication).
+ * For users without a verified profile the page resolves their alumni
+ * community state: active (not graduated) students are sent to the public
+ * overview, graduates without a profile see the "join the community" flow,
+ * and graduates with a pending or rejected profile see the matching state
+ * view.
+ *
+ * The verified-alumni dashboard brings together the alumnus's own content:
+ * their alumni profile, career opportunities they shared, discussions they
+ * started, their mentorship state, upcoming alumni events and the latest
+ * alumni stories.
+ */
+require_once __DIR__ . '/../config/app.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/student-auth.php';
+require_once __DIR__ . '/../includes/helpers/alumni-validation.php';
+require_once __DIR__ . '/../includes/helpers/opportunity-validation.php';
+require_once __DIR__ . '/../includes/helpers/alumni-event-validation.php';
+
+student_require_login();
+
+$ucsStudent = student_current_user();
+
+$ucsProfile = alumni_current_profile($pdo);
+
+if ($ucsProfile === null) {
+    // -----------------------------------------------------------------
+    // Alumni-community state machine for users without a verified profile.
+    //   - active (not graduated)  -> public overview (not an alumnus yet)
+    //   - graduated, no profile   -> "Join the alumni community" flow
+    //   - graduated, pending      -> "profile under review" view
+    //   - graduated, rejected     -> "resubmit application" view
+    // -----------------------------------------------------------------
+    $ucsAcademicStatus = 'active';
+    $ucsProfileStatus  = null;
+    try {
+        $ucsStmt = $pdo->prepare(
+            "SELECT s.student_status, ap.verification_status AS profile_status
+             FROM students s
+             LEFT JOIN alumni_profiles ap ON ap.student_id = s.id
+             WHERE s.id = :id
+             LIMIT 1"
+        );
+        $ucsStmt->execute([':id' => (int) $ucsStudent['id']]);
+        $ucsState = $ucsStmt->fetch() ?: null;
+        if ($ucsState !== null) {
+            $ucsAcademicStatus = (string) ($ucsState['student_status'] ?? 'active');
+            $ucsProfileStatus  = $ucsState['profile_status'] ?? null;
+        }
+    } catch (PDOException $e) {
+        $ucsAcademicStatus = 'active';
+        $ucsProfileStatus  = null;
+    }
+
+    $pageTitle = 'Alumni Dashboard';
+
+    if ($ucsAcademicStatus !== 'graduated') {
+        header('Location: ' . BASE_URL . '/alumni-overview.php');
+        exit;
+    }
+
+    $ucsDisplayName = (string) $ucsStudent['name'];
+
+    require_once __DIR__ . '/../includes/header.php';
+    ?>
+    <main class="flex-1 bg-blue-50">
+        <section class="py-12 sm:py-16" aria-labelledby="alumni-dashboard-heading">
+            <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+                <div class="relative overflow-hidden rounded-2xl border border-blue-100 bg-white px-6 py-8 shadow-sm sm:px-8">
+                    <span class="absolute inset-y-0 left-0 w-1 bg-blue-600" aria-hidden="true"></span>
+                    <span class="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-blue-50" aria-hidden="true"></span>
+                    <p class="relative text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">Alumni &amp; Career Community</p>
+                    <h1 id="alumni-dashboard-heading" class="relative mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+                        <?php echo htmlspecialchars($ucsDisplayName); ?>
+                    </h1>
+
+                    <?php if ($ucsProfileStatus === null): ?>
+                        <div class="relative mt-6">
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                    <path d="m9 11 3 3L22 4"></path>
+                                </svg>
+                                Graduated
+                            </span>
+                            <p class="mt-3 text-sm leading-6 text-slate-600">
+                                Congratulations on your graduation from UCSMTLA! Your alumni profile is the key to the Alumni &amp; Career Community
+                                &mdash; connect with fellow graduates, share career opportunities, join discussions and mentor current students.
+                            </p>
+                            <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-join.php'); ?>"
+                                   class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                    Create Your Alumni Profile
+                                </a>
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-overview.php'); ?>"
+                                   class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                    Learn About the Community
+                                </a>
+                            </div>
+                        </div>
+
+                    <?php elseif ($ucsProfileStatus === 'pending'): ?>
+                        <div class="relative mt-6">
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <path d="M12 8v4"></path>
+                                    <path d="M12 16h.01"></path>
+                                </svg>
+                                Profile Under Review
+                            </span>
+                            <p class="mt-3 text-sm leading-6 text-slate-600">
+                                Your alumni profile has been submitted and is awaiting verification by the university office.
+                                You will get full access to the alumni community once it is approved.
+                            </p>
+                            <div class="mt-6 flex flex-wrap gap-3">
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-overview.php'); ?>"
+                                   class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                    Explore the Community
+                                </a>
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>"
+                                   class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                    Browse Career Discussions
+                                </a>
+                            </div>
+                        </div>
+
+                    <?php else: ?>
+                        <div class="relative mt-6">
+                            <span class="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-3 py-1 text-xs font-semibold text-red-700 ring-1 ring-red-100">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                                </svg>
+                                Profile Not Approved
+                            </span>
+                            <p class="mt-3 text-sm leading-6 text-slate-600">
+                                Your alumni profile application was not approved. You can review your details and resubmit for another review.
+                            </p>
+                            <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-join.php'); ?>"
+                                   class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                    Resubmit Application
+                                </a>
+                            </div>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </section>
+    </main>
+    <?php
+    require_once __DIR__ . '/../includes/footer.php';
+    exit;
+}
+
+$pageTitle  = 'Alumni Dashboard';
+
+// ---------------------------------------------------------------------
+// Identity + academic context.
+// ---------------------------------------------------------------------
+$ucsMajorName      = '';
+$ucsGraduationYear = '';
+try {
+    $ucsStmt = $pdo->prepare(
+        "SELECT s.name AS student_name, s.graduation_year,
+                m.name AS major_name
+         FROM students s
+         JOIN classrooms cl ON cl.id = s.classroom_id
+         JOIN majors m ON m.id = cl.major_id
+         WHERE s.id = :id
+         LIMIT 1"
+    );
+    $ucsStmt->execute([':id' => (int) $ucsStudent['id']]);
+    $ucsIdentity = $ucsStmt->fetch() ?: null;
+
+    if ($ucsIdentity !== null) {
+        $ucsMajorName      = (string) ($ucsIdentity['major_name'] ?? '');
+        $ucsGraduationYear = (string) ($ucsIdentity['graduation_year'] ?? '');
+    }
+} catch (PDOException $e) {
+    $ucsMajorName      = '';
+    $ucsGraduationYear = '';
+}
+
+// ---------------------------------------------------------------------
+// Stats.
+// ---------------------------------------------------------------------
+$ucsOpportunityCount = 0;
+$ucsDiscussionCount  = 0;
+try {
+    $ucsStmt = $pdo->prepare(
+        "SELECT COUNT(*) FROM career_opportunities
+         WHERE posted_by_student_id = :student_id"
+    );
+    $ucsStmt->execute([':student_id' => (int) $ucsStudent['id']]);
+    $ucsOpportunityCount = (int) $ucsStmt->fetchColumn();
+
+    $ucsStmt = $pdo->prepare(
+        "SELECT COUNT(*) FROM discussions
+         WHERE author_student_id = :student_id AND status <> 'hidden'"
+    );
+    $ucsStmt->execute([':student_id' => (int) $ucsStudent['id']]);
+    $ucsDiscussionCount = (int) $ucsStmt->fetchColumn();
+} catch (PDOException $e) {
+    $ucsOpportunityCount = 0;
+    $ucsDiscussionCount  = 0;
+}
+
+// Profile completion (10 tracked fields, excluding identity/academic data).
+$ucsProfileFields = [
+    'current_job',
+    'company',
+    'professional_field',
+    'skills',
+    'bio',
+    'career_journey',
+    'profile_photo',
+    'linkedin_url',
+    'github_url',
+    'website_url',
+];
+$ucsProfileFilled = 0;
+foreach ($ucsProfileFields as $ucsField) {
+    if (trim((string) ($ucsProfile[$ucsField] ?? '')) !== '') {
+        $ucsProfileFilled++;
+    }
+}
+$ucsProfileCompletion = (int) round(($ucsProfileFilled / count($ucsProfileFields)) * 100);
+
+$ucsMentorshipStatus = 'Not available for mentorship';
+if ((int) ($ucsProfile['mentorship_suspended'] ?? 0) === 1) {
+    $ucsMentorshipStatus = 'Mentorship suspended';
+} elseif ((int) ($ucsProfile['mentorship_available'] ?? 0) === 1) {
+    $ucsMentorshipStatus = 'Available for mentorship';
+}
+
+// ---------------------------------------------------------------------
+// Section content.
+// ---------------------------------------------------------------------
+$ucsOwnOpportunities = opportunity_load_recent_own($pdo, (int) $ucsStudent['id'], 5);
+$ucsUpcomingEvents   = alumni_event_load_upcoming($pdo, 3);
+
+$ucsLatestStories = [];
+try {
+    $ucsStmt = $pdo->prepare(
+        "SELECT st.id, st.title, st.summary, st.career_field, st.publication_date
+         FROM alumni_stories st
+         WHERE st.status = 'published'
+           AND (st.publication_date IS NULL OR st.publication_date <= CURDATE())
+         ORDER BY st.publication_date DESC, st.id DESC
+         LIMIT 3"
+    );
+    $ucsStmt->execute();
+    $ucsLatestStories = $ucsStmt->fetchAll() ?: [];
+} catch (PDOException $e) {
+    $ucsLatestStories = [];
+}
+
+$ucsFlash = $_SESSION['opportunity_flash'] ?? null;
+unset($_SESSION['opportunity_flash']);
+
+$ucsDisplayName = $ucsStudent['name'] !== '' ? $ucsStudent['name'] : 'Alumnus';
+
+require_once __DIR__ . '/../includes/header.php';
+?>
+<main class="flex-1 bg-blue-50">
+    <section class="py-12 sm:py-16" aria-labelledby="alumni-dashboard-heading">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <?php if ($ucsFlash !== null): ?>
+                <div class="mb-6 rounded-xl px-4 py-3 ring-1 <?php echo $ucsFlash['type'] === 'error' ? 'bg-red-50 ring-red-100' : 'bg-emerald-50 ring-emerald-100'; ?>" role="alert">
+                    <p class="text-sm font-medium <?php echo $ucsFlash['type'] === 'error' ? 'text-red-800' : 'text-emerald-800'; ?>">
+                        <?php echo htmlspecialchars((string) $ucsFlash['message']); ?>
+                    </p>
+                </div>
+            <?php endif; ?>
+
+            <!-- Welcome -->
+            <div class="relative overflow-hidden rounded-2xl border border-blue-100 bg-white px-6 py-6 shadow-sm sm:px-8">
+                <span class="absolute inset-y-0 left-0 w-1 bg-blue-600" aria-hidden="true"></span>
+                <span class="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-blue-50" aria-hidden="true"></span>
+                <p class="relative text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">Alumni &amp; Career Community</p>
+                <h1 id="alumni-dashboard-heading" class="relative mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">
+                    <?php echo htmlspecialchars($ucsDisplayName); ?>
+                </h1>
+                <div class="relative mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+                    <span class="inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <path d="m9 11 3 3L22 4"></path>
+                        </svg>
+                        Verified Alumni
+                    </span>
+                    <?php if ($ucsMajorName !== ''): ?>
+                        <span class="text-sm font-medium text-slate-600"><?php echo htmlspecialchars($ucsMajorName); ?></span>
+                    <?php endif; ?>
+                    <?php if ($ucsGraduationYear !== ''): ?>
+                        <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700 ring-1 ring-gray-200">Class of <?php echo htmlspecialchars($ucsGraduationYear); ?></span>
+                    <?php endif; ?>
+                </div>
+                <p class="relative mt-3 text-sm leading-6 text-slate-500">
+                    Welcome back. Here&rsquo;s what&rsquo;s happening across your alumni community.
+                </p>
+            </div>
+
+            <!-- Quick actions -->
+            <section class="mt-10" aria-labelledby="quick-actions-heading">
+                <div class="flex items-center gap-3">
+                    <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600 ring-4 ring-blue-100" aria-hidden="true"></span>
+                    <h2 id="quick-actions-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-900">Quick Actions</h2>
+                    <span class="h-px flex-1 bg-blue-100" aria-hidden="true"></span>
+                </div>
+
+                <div class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-edit.php'); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 ring-1 ring-blue-100 transition-colors duration-150 group-hover:bg-blue-600 group-hover:text-white" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path><path d="M22 10v6"></path><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path></svg>
+                        </span>
+                        <span class="mt-3 block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Edit Profile</span>
+                        <span class="mt-0.5 block text-sm text-slate-500">Update your alumni profile details</span>
+                    </a>
+
+                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-details.php?id=' . (int) $ucsProfile['id']); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 transition-colors duration-150 group-hover:bg-emerald-600 group-hover:text-white" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                        </span>
+                        <span class="mt-3 block text-sm font-semibold text-slate-900 group-hover:text-blue-700">View Public Profile</span>
+                        <span class="mt-0.5 block text-sm text-slate-500">See how others see you</span>
+                    </a>
+
+                    <a href="<?php echo htmlspecialchars(BASE_URL . '/opportunity-create.php'); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 ring-1 ring-amber-100 transition-colors duration-150 group-hover:bg-amber-500 group-hover:text-white" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                        </span>
+                        <span class="mt-3 block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Share Career Opportunity</span>
+                        <span class="mt-0.5 block text-sm text-slate-500">Post a job, internship or freelance role</span>
+                    </a>
+
+                    <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-600 ring-1 ring-violet-100 transition-colors duration-150 group-hover:bg-violet-600 group-hover:text-white" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                        </span>
+                        <span class="mt-3 block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Ask / Join Career Discussion</span>
+                        <span class="mt-0.5 block text-sm text-slate-500">Share advice with students and alumni</span>
+                    </a>
+
+                    <a href="<?php echo htmlspecialchars(BASE_URL . '/mentorship-inbox.php'); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-pink-50 text-pink-600 ring-1 ring-pink-100 transition-colors duration-150 group-hover:bg-pink-600 group-hover:text-white" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+                        </span>
+                        <span class="mt-3 block text-sm font-semibold text-slate-900 group-hover:text-blue-700">View Mentorship Requests</span>
+                        <span class="mt-0.5 block text-sm text-slate-500">Review and respond to student requests</span>
+                    </a>
+
+                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-events.php'); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 ring-1 ring-cyan-100 transition-colors duration-150 group-hover:bg-cyan-600 group-hover:text-white" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18"></path><rect x="3" y="4" width="18" height="18" rx="2"></rect></svg>
+                        </span>
+                        <span class="mt-3 block text-sm font-semibold text-slate-900 group-hover:text-blue-700">View Alumni Events</span>
+                        <span class="mt-0.5 block text-sm text-slate-500">Webinars, workshops and networking</span>
+                    </a>
+                </div>
+            </section>
+
+            <!-- Stats -->
+            <section class="mt-10" aria-labelledby="community-stats-heading">
+                <div class="flex items-center gap-3">
+                    <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600 ring-4 ring-blue-100" aria-hidden="true"></span>
+                    <h2 id="community-stats-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-900">Community Overview</h2>
+                    <span class="h-px flex-1 bg-blue-100" aria-hidden="true"></span>
+                </div>
+
+                <dl class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                    <div class="rounded-2xl border border-blue-100 bg-white px-5 py-5 shadow-sm">
+                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Opportunities Shared</dt>
+                        <dd class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900"><?php echo $ucsOpportunityCount; ?></dd>
+                    </div>
+                    <div class="rounded-2xl border border-blue-100 bg-white px-5 py-5 shadow-sm">
+                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Discussions Started</dt>
+                        <dd class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900"><?php echo $ucsDiscussionCount; ?></dd>
+                    </div>
+                    <div class="rounded-2xl border border-blue-100 bg-white px-5 py-5 shadow-sm">
+                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Mentorship</dt>
+                        <dd class="mt-1 text-base font-bold leading-6 text-slate-900"><?php echo htmlspecialchars($ucsMentorshipStatus); ?></dd>
+                    </div>
+                    <div class="rounded-2xl border border-blue-100 bg-white px-5 py-5 shadow-sm">
+                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Profile Completion</dt>
+                        <dd class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900"><?php echo $ucsProfileCompletion; ?>%</dd>
+                    </div>
+                </dl>
+            </section>
+
+            <!-- Content columns -->
+            <div class="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-2">
+                <!-- Left column -->
+                <div class="space-y-10">
+                    <!-- My Alumni Profile -->
+                    <section aria-labelledby="my-alumni-profile-heading">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600 ring-4 ring-blue-100" aria-hidden="true"></span>
+                            <h2 id="my-alumni-profile-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-900">My Alumni Profile</h2>
+                            <span class="h-px flex-1 bg-blue-100" aria-hidden="true"></span>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-edit.php'); ?>" class="shrink-0 text-xs font-semibold text-blue-700 transition-colors duration-150 hover:text-blue-800">Edit</a>
+                        </div>
+
+                        <div class="mt-4 overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm">
+                            <?php $ucsHasProfileContent = false; ?>
+                            <?php if (!empty($ucsProfile['current_job']) || !empty($ucsProfile['company'])): ?>
+                                <?php $ucsHasProfileContent = true; ?>
+                                <div class="flex items-center justify-between gap-4 border-b border-blue-100 px-6 py-4">
+                                    <span class="text-sm text-slate-500">Current role</span>
+                                    <span class="text-right text-sm font-semibold text-slate-900">
+                                        <?php echo htmlspecialchars((string) $ucsProfile['current_job']); ?>
+                                        <?php if (!empty($ucsProfile['current_job']) && !empty($ucsProfile['company'])): ?><span class="font-normal text-slate-400"> at </span><?php endif; ?>
+                                        <?php if (!empty($ucsProfile['company'])): ?><?php echo htmlspecialchars((string) $ucsProfile['company']); ?><?php endif; ?>
+                                    </span>
+                                </div>
+                            <?php endif; ?>
+                            <div class="flex items-center justify-between gap-4 px-6 py-4 <?php echo $ucsHasProfileContent ? 'border-b border-blue-100' : ''; ?>">
+                                <span class="text-sm text-slate-500">Visibility</span>
+                                <span class="text-sm font-semibold text-slate-900"><?php echo (string) $ucsProfile['visibility'] === 'public' ? 'Public directory' : 'Private only'; ?></span>
+                            </div>
+                            <div class="flex items-center justify-between gap-4 px-6 py-4">
+                                <span class="text-sm text-slate-500">Mentorship</span>
+                                <span class="text-sm font-semibold text-slate-900"><?php echo htmlspecialchars($ucsMentorshipStatus); ?></span>
+                            </div>
+                            <div class="border-t border-blue-100 px-6 py-4">
+                                <p class="text-sm leading-6 text-slate-500">
+                                    Your profile is
+                                    <span class="font-semibold text-blue-700"><?php echo $ucsProfileCompletion; ?>%</span>
+                                    complete. Complete your job, skills and links to help fellow alumni and students find you.
+                                </p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- My Career Opportunities -->
+                    <section aria-labelledby="my-opportunities-heading">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600 ring-4 ring-blue-100" aria-hidden="true"></span>
+                            <h2 id="my-opportunities-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-900">My Career Opportunities</h2>
+                            <span class="h-px flex-1 bg-blue-100" aria-hidden="true"></span>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/my-opportunities.php'); ?>" class="shrink-0 text-xs font-semibold text-blue-700 transition-colors duration-150 hover:text-blue-800">View all</a>
+                        </div>
+
+                        <?php if (empty($ucsOwnOpportunities)): ?>
+                            <div class="mt-4 rounded-2xl border border-blue-100 bg-white px-6 py-8 text-center shadow-sm">
+                                <p class="text-sm leading-6 text-slate-500">You haven&rsquo;t shared any career opportunities yet.</p>
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/opportunity-create.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700">Share an opportunity</a>
+                            </div>
+                        <?php else: ?>
+                            <div class="mt-4 overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm">
+                                <ul class="divide-y divide-blue-100">
+                                    <?php foreach ($ucsOwnOpportunities as $ucsOpportunity): ?>
+                                        <li class="flex items-center gap-4 px-6 py-4">
+                                            <span class="min-w-0 flex-1">
+                                                <span class="block truncate text-sm font-semibold text-slate-900"><?php echo htmlspecialchars((string) $ucsOpportunity['title']); ?></span>
+                                                <span class="mt-0.5 block truncate text-sm text-slate-500">
+                                                    <?php echo htmlspecialchars((string) $ucsOpportunity['company']); ?>
+                                                    <span class="text-slate-400">&middot;</span>
+                                                    <?php echo htmlspecialchars(opportunity_employment_label((string) $ucsOpportunity['employment_type'])); ?>
+                                                </span>
+                                            </span>
+                                            <span class="shrink-0">
+                                                <?php if (opportunity_is_public($ucsOpportunity)): ?>
+                                                    <span class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700 ring-1 ring-green-100">Public</span>
+                                                <?php else: ?>
+                                                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-500 ring-1 ring-gray-200">
+                                                        <?php echo (string) $ucsOpportunity['status'] === 'hidden' ? 'Hidden' : 'Expired'; ?>
+                                                    </span>
+                                                <?php endif; ?>
+                                            </span>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        <?php endif; ?>
+                    </section>
+
+                    <!-- My Mentorship -->
+                    <section aria-labelledby="my-mentorship-heading">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600 ring-4 ring-blue-100" aria-hidden="true"></span>
+                            <h2 id="my-mentorship-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-900">My Mentorship</h2>
+                            <span class="h-px flex-1 bg-blue-100" aria-hidden="true"></span>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/mentorship-inbox.php'); ?>" class="shrink-0 text-xs font-semibold text-blue-700 transition-colors duration-150 hover:text-blue-800">Open inbox</a>
+                        </div>
+
+                        <div class="mt-4 rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
+                            <p class="text-sm leading-6 text-slate-600">
+                                Mentorship requests from students appear in your inbox. You can accept or decline each request, and your contact channels are only revealed to students you accept.
+                            </p>
+                            <span class="mt-4 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
+                                <?php echo htmlspecialchars($ucsMentorshipStatus); ?>
+                            </span>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Right column -->
+                <div class="space-y-10">
+                    <!-- My Discussions -->
+                    <section aria-labelledby="my-discussions-heading">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600 ring-4 ring-blue-100" aria-hidden="true"></span>
+                            <h2 id="my-discussions-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-900">My Discussions</h2>
+                            <span class="h-px flex-1 bg-blue-100" aria-hidden="true"></span>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="shrink-0 text-xs font-semibold text-blue-700 transition-colors duration-150 hover:text-blue-800">Browse</a>
+                        </div>
+
+                        <div class="mt-4 rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
+                            <p class="text-sm leading-6 text-slate-600">
+                                You have started
+                                <span class="font-bold text-slate-900"><?php echo $ucsDiscussionCount; ?></span>
+                                career discussion<?php echo $ucsDiscussionCount === 1 ? '' : 's'; ?>.
+                                Share your industry experience with students and fellow alumni.
+                            </p>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussion-create.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                                Start a discussion
+                            </a>
+                        </div>
+                    </section>
+
+                    <!-- Upcoming Alumni Events -->
+                    <section aria-labelledby="upcoming-events-heading">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600 ring-4 ring-blue-100" aria-hidden="true"></span>
+                            <h2 id="upcoming-events-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-900">Upcoming Alumni Events</h2>
+                            <span class="h-px flex-1 bg-blue-100" aria-hidden="true"></span>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-events.php'); ?>" class="shrink-0 text-xs font-semibold text-blue-700 transition-colors duration-150 hover:text-blue-800">All events</a>
+                        </div>
+
+                        <?php if (empty($ucsUpcomingEvents)): ?>
+                            <div class="mt-4 rounded-2xl border border-blue-100 bg-white px-6 py-8 text-center shadow-sm">
+                                <p class="text-sm leading-6 text-slate-500">No upcoming events are scheduled right now.</p>
+                            </div>
+                        <?php else: ?>
+                            <div class="mt-4 space-y-4">
+                                <?php foreach ($ucsUpcomingEvents as $ucsEvent): ?>
+                                    <div class="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
+                                        <div class="flex items-start justify-between gap-3">
+                                            <h3 class="text-sm font-bold leading-snug text-slate-900"><?php echo htmlspecialchars((string) $ucsEvent['title']); ?></h3>
+                                            <span class="inline-flex shrink-0 items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
+                                                <?php echo htmlspecialchars(alumni_event_label((string) $ucsEvent['event_type'])); ?>
+                                            </span>
+                                        </div>
+                                        <p class="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4M16 2v4M3 10h18"></path><rect x="3" y="4" width="18" height="18" rx="2"></rect></svg>
+                                            <?php echo htmlspecialchars(date('M j, Y g:i A', strtotime((string) $ucsEvent['starts_at']))); ?>
+                                        </p>
+                                        <?php if (!empty($ucsEvent['venue'])): ?>
+                                            <p class="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                                                <?php echo htmlspecialchars((string) $ucsEvent['venue']); ?>
+                                            </p>
+                                        <?php endif; ?>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
+                    </section>
+
+                    <!-- Latest Alumni Stories -->
+                    <section aria-labelledby="latest-stories-heading">
+                        <div class="flex items-center gap-3">
+                            <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600 ring-4 ring-blue-100" aria-hidden="true"></span>
+                            <h2 id="latest-stories-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-900">Latest Alumni Stories</h2>
+                            <span class="h-px flex-1 bg-blue-100" aria-hidden="true"></span>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-stories.php'); ?>" class="shrink-0 text-xs font-semibold text-blue-700 transition-colors duration-150 hover:text-blue-800">All stories</a>
+                        </div>
+
+                        <?php if (empty($ucsLatestStories)): ?>
+                            <div class="mt-4 rounded-2xl border border-blue-100 bg-white px-6 py-8 text-center shadow-sm">
+                                <p class="text-sm leading-6 text-slate-500">No alumni stories have been published yet.</p>
+                            </div>
+                        <?php else: ?>
+                            <div class="mt-4 overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm">
+                                <ul class="divide-y divide-blue-100">
+                                    <?php foreach ($ucsLatestStories as $ucsStory): ?>
+                                        <li>
+                                            <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-story-details.php?id=' . (int) $ucsStory['id']); ?>" class="group flex items-center gap-4 px-6 py-4 transition-colors duration-150 hover:bg-blue-50/60 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                                <span class="min-w-0 flex-1">
+                                                    <span class="block truncate text-sm font-semibold text-slate-900 group-hover:text-blue-700"><?php echo htmlspecialchars((string) $ucsStory['title']); ?></span>
+                                                    <?php if (!empty($ucsStory['career_field'])): ?>
+                                                        <span class="mt-0.5 block truncate text-sm text-slate-500"><?php echo htmlspecialchars((string) $ucsStory['career_field']); ?></span>
+                                                    <?php endif; ?>
+                                                </span>
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-blue-200 transition-all duration-150 group-hover:translate-x-1 group-hover:text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6"></path></svg>
+                                            </a>
+                                        </li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </div>
+                        <?php endif; ?>
+                    </section>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<?php
+require_once __DIR__ . '/../includes/footer.php';
+?>

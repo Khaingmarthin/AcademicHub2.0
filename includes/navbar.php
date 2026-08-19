@@ -86,6 +86,18 @@ $navItems = [
     ],
     ['label' => 'Faculties', 'url' => BASE_URL . '/faculties.php'],
     ['label' => 'Campus Life', 'url' => BASE_URL . '/campus-life.php'],
+    [
+        'label'    => 'Alumni',
+        'children' => [
+            ['label' => 'Alumni Overview', 'url' => BASE_URL . '/alumni-overview.php', 'match' => ['alumni-overview.php', 'alumni-dashboard.php']],
+            ['label' => 'Alumni Directory', 'url' => BASE_URL . '/alumni.php', 'match' => ['alumni.php', 'alumni-details.php']],
+            ['label' => 'Alumni Stories', 'url' => BASE_URL . '/alumni-stories.php', 'match' => ['alumni-stories.php', 'alumni-story-details.php']],
+            ['label' => 'Career Opportunities', 'url' => BASE_URL . '/career-opportunities.php', 'match' => ['career-opportunities.php', 'career-opportunity-details.php', 'my-opportunities.php', 'opportunity-create.php', 'opportunity-edit.php']],
+            ['label' => 'Career Discussions', 'url' => BASE_URL . '/career-discussions.php', 'match' => ['career-discussions.php', 'career-discussion-details.php', 'career-discussion-create.php']],
+            ['label' => 'Mentorship', 'url' => BASE_URL . '/alumni-mentorship.php', 'match' => ['alumni-mentorship.php', 'my-mentorship.php', 'mentorship-inbox.php', 'mentorship-request.php']],
+            ['label' => 'Alumni Events', 'url' => BASE_URL . '/alumni-events.php', 'match' => ['alumni-events.php']],
+        ],
+    ],
     ['label' => 'News', 'url' => BASE_URL . '/news.php'],
     [
         'label'    => 'Admissions',

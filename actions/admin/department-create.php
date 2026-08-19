@@ -31,10 +31,11 @@ if (!empty($ucsErrors)) {
 
 try {
     $ucsStmt = $pdo->prepare(
-        "INSERT INTO departments (name, description, status)
-         VALUES (:name, :description, :status)"
+        "INSERT INTO departments (faculty_id, name, description, status)
+         VALUES (:faculty_id, :name, :description, :status)"
     );
     $ucsStmt->execute([
+        ':faculty_id'  => $ucsClean['faculty_id'],
         ':name'        => $ucsClean['name'],
         ':description' => $ucsClean['description'],
         ':status'      => $ucsClean['status'],
