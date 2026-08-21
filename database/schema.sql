@@ -577,7 +577,8 @@ CREATE TABLE alumni_stories (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 
     alumni_profile_id BIGINT UNSIGNED NOT NULL,
-    admin_id BIGINT UNSIGNED NOT NULL,
+    admin_id BIGINT UNSIGNED NULL,
+    alumni_student_id BIGINT UNSIGNED NULL,
 
     title VARCHAR(255) NOT NULL,
     summary TEXT NULL,
@@ -588,7 +589,9 @@ CREATE TABLE alumni_stories (
 
     status ENUM(
         'draft',
+        'pending',
         'published',
+        'rejected',
         'unpublished'
     ) NOT NULL DEFAULT 'draft',
 
@@ -605,6 +608,12 @@ CREATE TABLE alumni_stories (
     CONSTRAINT fk_alumni_stories_admin
         FOREIGN KEY (admin_id)
         REFERENCES admins(id)
+        ON UPDATE CASCADE
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_alumni_stories_student
+        FOREIGN KEY (alumni_student_id)
+        REFERENCES students(id)
         ON UPDATE CASCADE
         ON DELETE CASCADE
 );
@@ -776,294 +785,6 @@ INSERT INTO discussion_categories (name, slug, description, sort_order) VALUES
 
 
 -- =========================================================
--- 18. ALUMNI MENTORSHIP
--- =========================================================
---
--- Peer-to-peer career guidance between current students and verified alumni
--- who are willing to mentor. This is NOT a chat system: there is no private
--- messaging and no real-time conversation. A student requests mentorship,
--- the alumnus accepts or declines it, and only after acceptance are the
--- alumnus's chosen contact channels revealed to that student (privacy:
--- contact information is never shown publicly and only the alumni's
--- self-configured mentorship contact email / professional links are shared).
---
--- alumni_profiles.mentorship_available  - the alumnus's own availability flag
--- alumni_profiles.mentorship_contact_email - optional email the alumnus opts
---     to share with accepted students (never shown publicly)
--- alumni_profiles.mentorship_suspended   - set by an admin to disable an
---     account's mentorship access; pending requests are auto-declined and no
---     new requests can be created while suspended
---
--- mentorship_areas lists the fixed guidance areas an alumnus can select
--- (admin-seeded). alumni_mentorship_areas is the many-to-many selection.
--- mentorship_requests tracks the lifecycle:
---   - 'pending'   -> submitted, awaiting the alumnus's response
---   - 'accepted'  -> alumnus agreed; contact channels become visible
---   - 'declined'  -> alumnus declined; the student may request again
---   - 'completed' -> mentorship finished (marked by student or alumnus)
--- mentorship_reports lets a student report a mentorship request for
--- moderation; admins resolve or dismiss them and can suspend the alumnus.
---
--- FKs (documented only; tables run on MyISAM which ignores them):
---   alumni_mentorship_areas.alumni_profile_id -> alumni_profiles(id) ON DELETE CASCADE
---   alumni_mentorship_areas.mentorship_area_id -> mentorship_areas(id) ON DELETE CASCADE
---   mentorship_requests.student_id           -> students(id)
---   mentorship_requests.alumni_profile_id    -> alumni_profiles(id)
---   mentorship_reports.request_id            -> mentorship_requests(id) ON DELETE CASCADE
---   mentorship_reports.reporter_student_id   -> students(id)
---   mentorship_reports.resolved_by_admin_id  -> admins(id)
-
-CREATE TABLE mentorship_areas (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-
-    name VARCHAR(191) NOT NULL,
-    slug VARCHAR(191) NOT NULL,
-    description TEXT NULL,
-    sort_order INT NOT NULL DEFAULT 0,
-    status ENUM(
-        'active',
-        'inactive'
-    ) NOT NULL DEFAULT 'active',
-
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        ON UPDATE CURRENT_TIMESTAMP,
-
-    CONSTRAINT uq_mentorship_areas_name UNIQUE (name),
-    CONSTRAINT uq_mentorship_areas_slug UNIQUE (slug)
-);
-
-CREATE TABLE alumni_mentorship_areas (
-    alumni_profile_id BIGINT UNSIGNED NOT NULL,
-    mentorship_area_id BIGINT UNSIGNED NOT NULL,
-
-    PRIMARY KEY (alumni_profile_id, mentorship_area_id),
-
-    CONSTRAINT fk_alumni_mentorship_areas_profile
-        FOREIGN KEY (alumni_profile_id)
-        REFERENCES alumni_profiles(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_alumni_mentorship_areas_area
-        FOREIGN KEY (mentorship_area_id)
-        REFERENCES mentorship_areas(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
-
-CREATE TABLE mentorship_requests (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-
-    student_id BIGINT UNSIGNED NOT NULL,
-    alumni_profile_id BIGINT UNSIGNED NOT NULL,
-
-    message TEXT NOT NULL,
-
-    status ENUM(
-        'pending',
-        'accepted',
-        'declined',
-        'completed'
-    ) NOT NULL DEFAULT 'pending',
-
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    responded_at TIMESTAMP NULL,
-    completed_at TIMESTAMP NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        ON UPDATE CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_mentorship_requests_student
-        FOREIGN KEY (student_id)
-        REFERENCES students(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_mentorship_requests_profile
-        FOREIGN KEY (alumni_profile_id)
-        REFERENCES alumni_profiles(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
-
-CREATE TABLE mentorship_reports (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-
-    request_id BIGINT UNSIGNED NOT NULL,
-    reporter_student_id BIGINT UNSIGNED NOT NULL,
-
-    reason VARCHAR(50) NOT NULL,
-    details TEXT NULL,
-    status ENUM(
-        'open',
-        'resolved',
-        'dismissed'
-    ) NOT NULL DEFAULT 'open',
-    resolved_by_admin_id BIGINT UNSIGNED NULL,
-    resolved_at TIMESTAMP NULL,
-
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-    CONSTRAINT uq_mentorship_reports_request_reporter
-        UNIQUE (request_id, reporter_student_id),
-
-    CONSTRAINT fk_mentorship_reports_request
-        FOREIGN KEY (request_id)
-        REFERENCES mentorship_requests(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_mentorship_reports_reporter
-        FOREIGN KEY (reporter_student_id)
-        REFERENCES students(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE,
-
-    CONSTRAINT fk_mentorship_reports_resolver
-        FOREIGN KEY (resolved_by_admin_id)
-        REFERENCES admins(id)
-        ON UPDATE CASCADE
-        ON DELETE SET NULL
-);
-
--- Seeded mentorship guidance areas (fixed selection list).
-INSERT INTO mentorship_areas (name, slug, description, sort_order) VALUES
-    ('Web Development',        'web-development',        'Frontend and backend web application development.', 1),
-    ('Software Development',   'software-development',   'General software engineering and programming practice.', 2),
-    ('Mobile Development',     'mobile-development',     'Android, iOS and cross-platform mobile apps.', 3),
-    ('Data Science',           'data-science',           'Data analysis, statistics and machine learning pipelines.', 4),
-    ('AI/ML',                  'ai-ml',                  'Artificial intelligence and machine learning engineering.', 5),
-    ('Cybersecurity',          'cybersecurity',          'Security engineering, auditing and ethical hacking.', 6),
-    ('Database',               'database',               'Database design, administration and optimisation.', 7),
-    ('UI/UX',                  'ui-ux',                  'User interface and user experience design.', 8),
-    ('Career Planning',        'career-planning',        'Long-term career direction and goal setting.', 9),
-    ('CV Preparation',         'cv-preparation',         'CV writing, formatting and tailoring.', 10),
-    ('Interview Preparation',  'interview-preparation',  'Interview practice, STAR answers and negotiation.', 11),
-    ('Internship Guidance',    'internship-guidance',    'Finding and succeeding in internships.', 12);
-
-
--- =========================================================
--- 19. CAREER OPPORTUNITIES
--- =========================================================
---
--- A job board for the Alumni & Career Community. Verified alumni share real
--- career opportunities (jobs, internships, freelance work) that current
--- students and other alumni can browse publicly. Only verified alumni can
--- post; admins moderate every post.
---
--- status:
---   - 'active' -> visible on the public Career Opportunities page
---   - 'hidden' -> removed from the public site by an admin (kept for audit)
---
--- expires_at is an optional date chosen by the poster. Expired postings
--- (expires_at in the past) drop off the public listing automatically but
--- remain visible to the owner and admins.
---
--- FKs (documented only; tables run on MyISAM which ignores them):
---   career_opportunities.posted_by_student_id -> students(id) ON DELETE CASCADE
---
--- Privacy: only the poster's name and public alumni badge are shown publicly;
--- the poster's personal contact channels are never derived from the profile.
-
-CREATE TABLE career_opportunities (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-
-    posted_by_student_id BIGINT UNSIGNED NOT NULL,
-
-    title VARCHAR(255) NOT NULL,
-    company VARCHAR(255) NOT NULL,
-    location VARCHAR(191) NULL,
-
-    employment_type ENUM(
-        'full_time',
-        'part_time',
-        'internship',
-        'contract',
-        'freelance'
-    ) NOT NULL DEFAULT 'full_time',
-
-    salary_range VARCHAR(191) NULL,
-
-    description TEXT NOT NULL,
-    how_to_apply TEXT NULL,
-    expires_at DATE NULL,
-
-    status ENUM(
-        'active',
-        'hidden'
-    ) NOT NULL DEFAULT 'active',
-
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        ON UPDATE CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_career_opportunities_poster
-        FOREIGN KEY (posted_by_student_id)
-        REFERENCES students(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
-
-
--- =========================================================
--- 20. ALUMNI EVENTS
--- =========================================================
---
--- Alumni & Career Community events (webinars, workshops, networking nights,
--- career fairs) organised by the university. Events are created and managed
--- exclusively by admins; alumni and students view them. The dashboard shows
--- the next upcoming events.
---
--- status:
---   - 'published' -> visible on the public Alumni Events page
---   - 'cancelled' -> taken down (an admin can cancel an event at any time)
---
--- The "upcoming / ongoing / completed" display state is derived from
--- starts_at / ends_at; admins never set it directly.
---
--- FKs (documented only; tables run on MyISAM which ignores them):
---   alumni_events.admin_id -> admins(id) ON DELETE CASCADE
-
-CREATE TABLE alumni_events (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-
-    admin_id BIGINT UNSIGNED NOT NULL,
-
-    title VARCHAR(255) NOT NULL,
-    description TEXT NOT NULL,
-
-    event_type ENUM(
-        'webinar',
-        'workshop',
-        'networking',
-        'seminar',
-        'career_fair',
-        'social'
-    ) NOT NULL DEFAULT 'networking',
-
-    venue VARCHAR(255) NULL,
-    starts_at DATETIME NOT NULL,
-    ends_at DATETIME NULL,
-    registration_link VARCHAR(191) NULL,
-
-    status ENUM(
-        'published',
-        'cancelled'
-    ) NOT NULL DEFAULT 'published',
-
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        ON UPDATE CURRENT_TIMESTAMP,
-
-    CONSTRAINT fk_alumni_events_admin
-        FOREIGN KEY (admin_id)
-        REFERENCES admins(id)
-        ON UPDATE CASCADE
-        ON DELETE CASCADE
-);
-
-
--- =========================================================
 -- INDEXES
 -- =========================================================
 
@@ -1124,6 +845,9 @@ CREATE INDEX idx_alumni_stories_alumni_profile
 CREATE INDEX idx_alumni_stories_admin
     ON alumni_stories(admin_id);
 
+CREATE INDEX idx_alumni_stories_student
+    ON alumni_stories(alumni_student_id);
+
 CREATE INDEX idx_alumni_stories_status
     ON alumni_stories(status);
 
@@ -1162,39 +886,3 @@ CREATE INDEX idx_discussion_reports_status
 
 CREATE INDEX idx_discussion_reports_reporter
     ON discussion_reports(reporter_student_id);
-
-CREATE INDEX idx_mentorship_areas_slug
-    ON mentorship_areas(slug);
-
-CREATE INDEX idx_mentorship_requests_student
-    ON mentorship_requests(student_id);
-
-CREATE INDEX idx_mentorship_requests_alumni
-    ON mentorship_requests(alumni_profile_id);
-
-CREATE INDEX idx_mentorship_requests_status
-    ON mentorship_requests(status);
-
-CREATE INDEX idx_mentorship_reports_request
-    ON mentorship_reports(request_id);
-
-CREATE INDEX idx_mentorship_reports_status
-    ON mentorship_reports(status);
-
-CREATE INDEX idx_career_opportunities_poster
-    ON career_opportunities(posted_by_student_id);
-
-CREATE INDEX idx_career_opportunities_status
-    ON career_opportunities(status);
-
-CREATE INDEX idx_career_opportunities_company
-    ON career_opportunities(company);
-
-CREATE INDEX idx_alumni_events_admin
-    ON alumni_events(admin_id);
-
-CREATE INDEX idx_alumni_events_status
-    ON alumni_events(status);
-
-CREATE INDEX idx_alumni_events_start
-    ON alumni_events(starts_at);

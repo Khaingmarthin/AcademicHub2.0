@@ -225,42 +225,7 @@ require_once __DIR__ . '/../includes/header.php';
                         </svg>
                     </a>
 
-                    <a href="<?php echo htmlspecialchars(BASE_URL . '/my-mentorship.php'); ?>" class="group flex items-center gap-4 border-t border-blue-100 px-5 py-4 transition-colors duration-150 hover:bg-blue-50 sm:px-6 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                        <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-50 text-violet-600 ring-1 ring-violet-100 transition-colors duration-150 group-hover:bg-violet-600 group-hover:text-white" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                <circle cx="9" cy="7" r="4"></circle>
-                                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                            </svg>
-                        </span>
-                        <span class="min-w-0 flex-1">
-                            <span class="block text-sm font-semibold text-slate-900 group-hover:text-violet-700">My Mentorship</span>
-                            <span class="mt-0.5 block text-sm text-slate-500">Track requests and career mentors</span>
-                        </span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-violet-200 transition-all duration-150 group-hover:translate-x-1 group-hover:text-violet-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M9 18l6-6-6-6"></path>
-                        </svg>
-                    </a>
-
                     <!-- Career community (available to every current student) -->
-                    <a href="<?php echo htmlspecialchars(BASE_URL . '/career-opportunities.php'); ?>" class="group flex items-center gap-4 border-t border-blue-100 px-5 py-4 transition-colors duration-150 hover:bg-blue-50 sm:px-6 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                        <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 transition-colors duration-150 group-hover:bg-emerald-600 group-hover:text-white" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path>
-                                <path d="M22 10v6"></path>
-                                <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
-                            </svg>
-                        </span>
-                        <span class="min-w-0 flex-1">
-                            <span class="block text-sm font-semibold text-slate-900 group-hover:text-emerald-700">Career Opportunities</span>
-                            <span class="mt-0.5 block text-sm text-slate-500">Jobs and internships shared by alumni</span>
-                        </span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-emerald-200 transition-all duration-150 group-hover:translate-x-1 group-hover:text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M9 18l6-6-6-6"></path>
-                        </svg>
-                    </a>
-
                     <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="group flex items-center gap-4 border-t border-blue-100 px-5 py-4 transition-colors duration-150 hover:bg-blue-50 sm:px-6 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                         <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 ring-1 ring-cyan-100 transition-colors duration-150 group-hover:bg-cyan-600 group-hover:text-white" aria-hidden="true">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -272,22 +237,6 @@ require_once __DIR__ . '/../includes/header.php';
                             <span class="mt-0.5 block text-sm text-slate-500">Ask questions and share advice</span>
                         </span>
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-cyan-200 transition-all duration-150 group-hover:translate-x-1 group-hover:text-cyan-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M9 18l6-6-6-6"></path>
-                        </svg>
-                    </a>
-
-                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-events.php'); ?>" class="group flex items-center gap-4 border-t border-blue-100 px-5 py-4 transition-colors duration-150 hover:bg-blue-50 sm:px-6 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                        <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-50 text-amber-600 ring-1 ring-amber-100 transition-colors duration-150 group-hover:bg-amber-600 group-hover:text-white" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M8 2v4M16 2v4M3 10h18"></path>
-                                <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                            </svg>
-                        </span>
-                        <span class="min-w-0 flex-1">
-                            <span class="block text-sm font-semibold text-slate-900 group-hover:text-amber-700">Alumni Events</span>
-                            <span class="mt-0.5 block text-sm text-slate-500">Webinars, workshops and networking nights</span>
-                        </span>
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-amber-200 transition-all duration-150 group-hover:translate-x-1 group-hover:text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M9 18l6-6-6-6"></path>
                         </svg>
                     </a>

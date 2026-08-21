@@ -11,16 +11,13 @@
  * view.
  *
  * The verified-alumni dashboard brings together the alumnus's own content:
- * their alumni profile, career opportunities they shared, discussions they
- * started, their mentorship state, upcoming alumni events and the latest
- * alumni stories.
+ * their alumni profile, discussions they started, their discussion count,
+ * and the latest alumni stories.
  */
 require_once __DIR__ . '/../config/app.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/student-auth.php';
 require_once __DIR__ . '/../includes/helpers/alumni-validation.php';
-require_once __DIR__ . '/../includes/helpers/opportunity-validation.php';
-require_once __DIR__ . '/../includes/helpers/alumni-event-validation.php';
 
 student_require_login();
 
@@ -90,7 +87,7 @@ if ($ucsProfile === null) {
                             </span>
                             <p class="mt-3 text-sm leading-6 text-slate-600">
                                 Congratulations on your graduation from UCSMTLA! Your alumni profile is the key to the Alumni &amp; Career Community
-                                &mdash; connect with fellow graduates, share career opportunities, join discussions and mentor current students.
+                                &mdash; connect with fellow graduates, participate in career discussions and share your experience with current students.
                             </p>
                             <div class="mt-6 flex flex-col gap-3 sm:flex-row">
                                 <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-join.php'); ?>"
@@ -162,6 +159,9 @@ if ($ucsProfile === null) {
 
 $pageTitle  = 'Alumni Dashboard';
 
+$ucsFlash = $_SESSION['alumni_flash'] ?? null;
+unset($_SESSION['alumni_flash']);
+
 // ---------------------------------------------------------------------
 // Identity + academic context.
 // ---------------------------------------------------------------------
@@ -192,16 +192,8 @@ try {
 // ---------------------------------------------------------------------
 // Stats.
 // ---------------------------------------------------------------------
-$ucsOpportunityCount = 0;
-$ucsDiscussionCount  = 0;
+$ucsDiscussionCount = 0;
 try {
-    $ucsStmt = $pdo->prepare(
-        "SELECT COUNT(*) FROM career_opportunities
-         WHERE posted_by_student_id = :student_id"
-    );
-    $ucsStmt->execute([':student_id' => (int) $ucsStudent['id']]);
-    $ucsOpportunityCount = (int) $ucsStmt->fetchColumn();
-
     $ucsStmt = $pdo->prepare(
         "SELECT COUNT(*) FROM discussions
          WHERE author_student_id = :student_id AND status <> 'hidden'"
@@ -209,8 +201,7 @@ try {
     $ucsStmt->execute([':student_id' => (int) $ucsStudent['id']]);
     $ucsDiscussionCount = (int) $ucsStmt->fetchColumn();
 } catch (PDOException $e) {
-    $ucsOpportunityCount = 0;
-    $ucsDiscussionCount  = 0;
+    $ucsDiscussionCount = 0;
 }
 
 // Profile completion (10 tracked fields, excluding identity/academic data).
@@ -234,19 +225,9 @@ foreach ($ucsProfileFields as $ucsField) {
 }
 $ucsProfileCompletion = (int) round(($ucsProfileFilled / count($ucsProfileFields)) * 100);
 
-$ucsMentorshipStatus = 'Not available for mentorship';
-if ((int) ($ucsProfile['mentorship_suspended'] ?? 0) === 1) {
-    $ucsMentorshipStatus = 'Mentorship suspended';
-} elseif ((int) ($ucsProfile['mentorship_available'] ?? 0) === 1) {
-    $ucsMentorshipStatus = 'Available for mentorship';
-}
-
 // ---------------------------------------------------------------------
 // Section content.
 // ---------------------------------------------------------------------
-$ucsOwnOpportunities = opportunity_load_recent_own($pdo, (int) $ucsStudent['id'], 5);
-$ucsUpcomingEvents   = alumni_event_load_upcoming($pdo, 3);
-
 $ucsLatestStories = [];
 try {
     $ucsStmt = $pdo->prepare(
@@ -262,9 +243,6 @@ try {
 } catch (PDOException $e) {
     $ucsLatestStories = [];
 }
-
-$ucsFlash = $_SESSION['opportunity_flash'] ?? null;
-unset($_SESSION['opportunity_flash']);
 
 $ucsDisplayName = $ucsStudent['name'] !== '' ? $ucsStudent['name'] : 'Alumnus';
 
@@ -334,12 +312,12 @@ require_once __DIR__ . '/../includes/header.php';
                         <span class="mt-0.5 block text-sm text-slate-500">See how others see you</span>
                     </a>
 
-                    <a href="<?php echo htmlspecialchars(BASE_URL . '/opportunity-create.php'); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-amber-50 text-amber-600 ring-1 ring-amber-100 transition-colors duration-150 group-hover:bg-amber-500 group-hover:text-white" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"></path></svg>
+                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-story-create.php'); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100 transition-colors duration-150 group-hover:bg-indigo-500 group-hover:text-white" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                         </span>
-                        <span class="mt-3 block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Share Career Opportunity</span>
-                        <span class="mt-0.5 block text-sm text-slate-500">Post a job, internship or freelance role</span>
+                        <span class="mt-3 block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Share Your Story</span>
+                        <span class="mt-0.5 block text-sm text-slate-500">Write about your career journey</span>
                     </a>
 
                     <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
@@ -348,22 +326,6 @@ require_once __DIR__ . '/../includes/header.php';
                         </span>
                         <span class="mt-3 block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Ask / Join Career Discussion</span>
                         <span class="mt-0.5 block text-sm text-slate-500">Share advice with students and alumni</span>
-                    </a>
-
-                    <a href="<?php echo htmlspecialchars(BASE_URL . '/mentorship-inbox.php'); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-pink-50 text-pink-600 ring-1 ring-pink-100 transition-colors duration-150 group-hover:bg-pink-600 group-hover:text-white" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                        </span>
-                        <span class="mt-3 block text-sm font-semibold text-slate-900 group-hover:text-blue-700">View Mentorship Requests</span>
-                        <span class="mt-0.5 block text-sm text-slate-500">Review and respond to student requests</span>
-                    </a>
-
-                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-events.php'); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-50 text-cyan-600 ring-1 ring-cyan-100 transition-colors duration-150 group-hover:bg-cyan-600 group-hover:text-white" aria-hidden="true">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2v4M16 2v4M3 10h18"></path><rect x="3" y="4" width="18" height="18" rx="2"></rect></svg>
-                        </span>
-                        <span class="mt-3 block text-sm font-semibold text-slate-900 group-hover:text-blue-700">View Alumni Events</span>
-                        <span class="mt-0.5 block text-sm text-slate-500">Webinars, workshops and networking</span>
                     </a>
                 </div>
             </section>
@@ -376,18 +338,10 @@ require_once __DIR__ . '/../includes/header.php';
                     <span class="h-px flex-1 bg-blue-100" aria-hidden="true"></span>
                 </div>
 
-                <dl class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    <div class="rounded-2xl border border-blue-100 bg-white px-5 py-5 shadow-sm">
-                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Opportunities Shared</dt>
-                        <dd class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900"><?php echo $ucsOpportunityCount; ?></dd>
-                    </div>
+                <dl class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div class="rounded-2xl border border-blue-100 bg-white px-5 py-5 shadow-sm">
                         <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Discussions Started</dt>
                         <dd class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900"><?php echo $ucsDiscussionCount; ?></dd>
-                    </div>
-                    <div class="rounded-2xl border border-blue-100 bg-white px-5 py-5 shadow-sm">
-                        <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Mentorship</dt>
-                        <dd class="mt-1 text-base font-bold leading-6 text-slate-900"><?php echo htmlspecialchars($ucsMentorshipStatus); ?></dd>
                     </div>
                     <div class="rounded-2xl border border-blue-100 bg-white px-5 py-5 shadow-sm">
                         <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Profile Completion</dt>
@@ -426,10 +380,6 @@ require_once __DIR__ . '/../includes/header.php';
                                 <span class="text-sm text-slate-500">Visibility</span>
                                 <span class="text-sm font-semibold text-slate-900"><?php echo (string) $ucsProfile['visibility'] === 'public' ? 'Public directory' : 'Private only'; ?></span>
                             </div>
-                            <div class="flex items-center justify-between gap-4 px-6 py-4">
-                                <span class="text-sm text-slate-500">Mentorship</span>
-                                <span class="text-sm font-semibold text-slate-900"><?php echo htmlspecialchars($ucsMentorshipStatus); ?></span>
-                            </div>
                             <div class="border-t border-blue-100 px-6 py-4">
                                 <p class="text-sm leading-6 text-slate-500">
                                     Your profile is
@@ -437,68 +387,6 @@ require_once __DIR__ . '/../includes/header.php';
                                     complete. Complete your job, skills and links to help fellow alumni and students find you.
                                 </p>
                             </div>
-                        </div>
-                    </section>
-
-                    <!-- My Career Opportunities -->
-                    <section aria-labelledby="my-opportunities-heading">
-                        <div class="flex items-center gap-3">
-                            <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600 ring-4 ring-blue-100" aria-hidden="true"></span>
-                            <h2 id="my-opportunities-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-900">My Career Opportunities</h2>
-                            <span class="h-px flex-1 bg-blue-100" aria-hidden="true"></span>
-                            <a href="<?php echo htmlspecialchars(BASE_URL . '/my-opportunities.php'); ?>" class="shrink-0 text-xs font-semibold text-blue-700 transition-colors duration-150 hover:text-blue-800">View all</a>
-                        </div>
-
-                        <?php if (empty($ucsOwnOpportunities)): ?>
-                            <div class="mt-4 rounded-2xl border border-blue-100 bg-white px-6 py-8 text-center shadow-sm">
-                                <p class="text-sm leading-6 text-slate-500">You haven&rsquo;t shared any career opportunities yet.</p>
-                                <a href="<?php echo htmlspecialchars(BASE_URL . '/opportunity-create.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700">Share an opportunity</a>
-                            </div>
-                        <?php else: ?>
-                            <div class="mt-4 overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm">
-                                <ul class="divide-y divide-blue-100">
-                                    <?php foreach ($ucsOwnOpportunities as $ucsOpportunity): ?>
-                                        <li class="flex items-center gap-4 px-6 py-4">
-                                            <span class="min-w-0 flex-1">
-                                                <span class="block truncate text-sm font-semibold text-slate-900"><?php echo htmlspecialchars((string) $ucsOpportunity['title']); ?></span>
-                                                <span class="mt-0.5 block truncate text-sm text-slate-500">
-                                                    <?php echo htmlspecialchars((string) $ucsOpportunity['company']); ?>
-                                                    <span class="text-slate-400">&middot;</span>
-                                                    <?php echo htmlspecialchars(opportunity_employment_label((string) $ucsOpportunity['employment_type'])); ?>
-                                                </span>
-                                            </span>
-                                            <span class="shrink-0">
-                                                <?php if (opportunity_is_public($ucsOpportunity)): ?>
-                                                    <span class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700 ring-1 ring-green-100">Public</span>
-                                                <?php else: ?>
-                                                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-500 ring-1 ring-gray-200">
-                                                        <?php echo (string) $ucsOpportunity['status'] === 'hidden' ? 'Hidden' : 'Expired'; ?>
-                                                    </span>
-                                                <?php endif; ?>
-                                            </span>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                            </div>
-                        <?php endif; ?>
-                    </section>
-
-                    <!-- My Mentorship -->
-                    <section aria-labelledby="my-mentorship-heading">
-                        <div class="flex items-center gap-3">
-                            <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600 ring-4 ring-blue-100" aria-hidden="true"></span>
-                            <h2 id="my-mentorship-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-900">My Mentorship</h2>
-                            <span class="h-px flex-1 bg-blue-100" aria-hidden="true"></span>
-                            <a href="<?php echo htmlspecialchars(BASE_URL . '/mentorship-inbox.php'); ?>" class="shrink-0 text-xs font-semibold text-blue-700 transition-colors duration-150 hover:text-blue-800">Open inbox</a>
-                        </div>
-
-                        <div class="mt-4 rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
-                            <p class="text-sm leading-6 text-slate-600">
-                                Mentorship requests from students appear in your inbox. You can accept or decline each request, and your contact channels are only revealed to students you accept.
-                            </p>
-                            <span class="mt-4 inline-flex items-center gap-1.5 rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
-                                <?php echo htmlspecialchars($ucsMentorshipStatus); ?>
-                            </span>
                         </div>
                     </section>
                 </div>
@@ -526,45 +414,6 @@ require_once __DIR__ . '/../includes/header.php';
                                 Start a discussion
                             </a>
                         </div>
-                    </section>
-
-                    <!-- Upcoming Alumni Events -->
-                    <section aria-labelledby="upcoming-events-heading">
-                        <div class="flex items-center gap-3">
-                            <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600 ring-4 ring-blue-100" aria-hidden="true"></span>
-                            <h2 id="upcoming-events-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-900">Upcoming Alumni Events</h2>
-                            <span class="h-px flex-1 bg-blue-100" aria-hidden="true"></span>
-                            <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-events.php'); ?>" class="shrink-0 text-xs font-semibold text-blue-700 transition-colors duration-150 hover:text-blue-800">All events</a>
-                        </div>
-
-                        <?php if (empty($ucsUpcomingEvents)): ?>
-                            <div class="mt-4 rounded-2xl border border-blue-100 bg-white px-6 py-8 text-center shadow-sm">
-                                <p class="text-sm leading-6 text-slate-500">No upcoming events are scheduled right now.</p>
-                            </div>
-                        <?php else: ?>
-                            <div class="mt-4 space-y-4">
-                                <?php foreach ($ucsUpcomingEvents as $ucsEvent): ?>
-                                    <div class="rounded-2xl border border-blue-100 bg-white p-5 shadow-sm">
-                                        <div class="flex items-start justify-between gap-3">
-                                            <h3 class="text-sm font-bold leading-snug text-slate-900"><?php echo htmlspecialchars((string) $ucsEvent['title']); ?></h3>
-                                            <span class="inline-flex shrink-0 items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
-                                                <?php echo htmlspecialchars(alumni_event_label((string) $ucsEvent['event_type'])); ?>
-                                            </span>
-                                        </div>
-                                        <p class="mt-2 flex items-center gap-1.5 text-xs text-slate-500">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 2v4M16 2v4M3 10h18"></path><rect x="3" y="4" width="18" height="18" rx="2"></rect></svg>
-                                            <?php echo htmlspecialchars(date('M j, Y g:i A', strtotime((string) $ucsEvent['starts_at']))); ?>
-                                        </p>
-                                        <?php if (!empty($ucsEvent['venue'])): ?>
-                                            <p class="mt-1 flex items-center gap-1.5 text-xs text-slate-500">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                                                <?php echo htmlspecialchars((string) $ucsEvent['venue']); ?>
-                                            </p>
-                                        <?php endif; ?>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endif; ?>
                     </section>
 
                     <!-- Latest Alumni Stories -->

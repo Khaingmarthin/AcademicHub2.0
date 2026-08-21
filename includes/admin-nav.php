@@ -90,24 +90,7 @@ $ucsAdminNavItems = [
         'url'   => '/admin/discussions/reports.php',
         'icon'  => '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line>',
     ],
-    [
-        'key'   => 'mentorship',
-        'label' => 'Mentorship',
-        'url'   => '/admin/mentorship/index.php',
-        'icon'  => '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>',
-    ],
-    [
-        'key'   => 'opportunities',
-        'label' => 'Career Opportunities',
-        'url'   => '/admin/opportunities/index.php',
-        'icon'  => '<path d="M16 20V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2Z"></path><path d="M8 6h4"></path><path d="M8 10h4"></path><path d="M8 14h4"></path><path d="M8 18h2"></path><path d="M22 4v16a2 2 0 0 1-2 2h-4"></path>',
-    ],
-    [
-        'key'   => 'alumni-events',
-        'label' => 'Alumni Events',
-        'url'   => '/admin/events/index.php',
-        'icon'  => '<path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path><path d="m9 16 2 2 4-4"></path>',
-    ],
+
     [
         'key'   => 'admission',
         'label' => 'Admission',

@@ -46,7 +46,6 @@ try {
              linkedin_url = :linkedin_url,
              github_url = :github_url,
              website_url = :website_url,
-             mentorship_available = :mentorship_available,
              visibility = :visibility
          WHERE id = :id"
     );
@@ -60,7 +59,6 @@ try {
         ':linkedin_url'         => $ucsClean['linkedin_url'],
         ':github_url'           => $ucsClean['github_url'],
         ':website_url'          => $ucsClean['website_url'],
-        ':mentorship_available' => $ucsClean['mentorship_available'],
         ':visibility'           => $ucsClean['visibility'],
         ':id'                   => $ucsClean['id'],
     ]);

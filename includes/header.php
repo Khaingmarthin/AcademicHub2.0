@@ -15,7 +15,7 @@ $ucsStudentUser = student_current_user();
 // session itself is left untouched so authenticated pages keep working.
 $ucsStudentAreaPage = in_array(
     basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')),
-    ['student-dashboard.php', 'student-profile.php', 'student-timetable.php', 'alumni-edit.php', 'alumni-join.php', 'my-mentorship.php', 'mentorship-inbox.php', 'mentorship-request.php', 'alumni-dashboard.php', 'my-opportunities.php', 'opportunity-create.php', 'opportunity-edit.php'],
+    ['student-dashboard.php', 'student-profile.php', 'student-timetable.php', 'alumni-edit.php', 'alumni-join.php', 'alumni-dashboard.php', 'career-discussion-create.php'],
     true
 );
 $ucsShowStudentMenu = ($ucsStudentUser !== null) && $ucsStudentAreaPage;
@@ -56,15 +56,15 @@ function ucs_avatar_initial($name)
     <link rel="stylesheet" href="<?php echo htmlspecialchars(ROOT_URL); ?>/assets/css/style.css">
 </head>
 <body class="flex min-h-screen flex-col bg-gray-50 font-sans text-gray-900 antialiased">
-    <header id="site-header" class="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur-sm transition-shadow duration-200">
+    <header id="site-header" class="sticky top-0 z-50 border-b border-slate-200 bg-white shadow-sm transition-shadow duration-200">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="flex h-16 items-center justify-between gap-4">
+            <div class="header-inner flex h-16 items-center justify-between gap-4">
                 <!-- University logo -->
                 <a href="<?php echo htmlspecialchars(BASE_URL . '/index.php'); ?>" class="flex shrink-0 items-center gap-3" aria-label="UCSMTLA Academic Hub - Home">
                     <img src="<?php echo htmlspecialchars(ROOT_URL . '/assets/images/logo.png'); ?>" alt="UCSMTLA Academic Hub logo" class="h-11 w-11 object-contain">
                     <span class="hidden leading-tight sm:block">
-                        <span class="block text-lg font-bold tracking-tight text-gray-900">UCSMTLA</span>
-                        <span class="block text-[10px] font-semibold uppercase tracking-[0.22em] text-blue-700">Academic Hub</span>
+                        <span class="block text-lg font-extrabold tracking-tight text-slate-900">UCSMTLA</span>
+                        <span class="mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.22em] text-slate-500">Academic Hub</span>
                     </span>
                 </a>
 
@@ -72,7 +72,7 @@ function ucs_avatar_initial($name)
 
                 <!-- Right actions -->
                 <div class="flex items-center gap-1.5">
-                    <button type="button" id="search-toggle" class="inline-flex h-10 w-10 items-center justify-center rounded-lg text-gray-600 transition-colors duration-150 hover:bg-gray-100 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" aria-label="Search the website" aria-expanded="false" aria-controls="search-panel">
+                    <button type="button" id="search-toggle" class="inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300" aria-label="Search the website" aria-expanded="false" aria-controls="search-panel">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <circle cx="11" cy="11" r="8"></circle>
                             <path d="m21 21-4.35-4.35"></path>
@@ -81,7 +81,7 @@ function ucs_avatar_initial($name)
 
                     <?php if (!$ucsShowStudentMenu): ?>
                         <!-- Student Login (all screens) -->
-                        <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="inline-flex items-center gap-2 rounded-lg border border-blue-600 bg-white px-3 py-2 text-sm font-semibold text-blue-700 transition-colors duration-150 hover:bg-blue-600 hover:text-white focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="inline-flex h-10 items-center gap-2 rounded-lg bg-sky-600 px-4 text-sm font-semibold text-white shadow-sm shadow-sky-600/20 transition-colors duration-150 hover:bg-sky-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="12" cy="7" r="4"></circle>
@@ -91,12 +91,12 @@ function ucs_avatar_initial($name)
                     <?php else: ?>
                         <!-- Student menu (desktop) -->
                         <div class="group relative hidden lg:block">
-                            <button type="button" class="inline-flex h-10 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-100 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" data-dropdown-toggle aria-expanded="false" aria-haspopup="true">
-                                <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-blue-600 text-xs font-bold text-white" aria-hidden="true">
+                            <button type="button" class="inline-flex h-10 items-center gap-1.5 rounded-lg px-3 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-100 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300" data-dropdown-toggle aria-expanded="false" aria-haspopup="true">
+                                <span class="inline-flex h-6 w-6 items-center justify-center rounded-full bg-sky-600 text-xs font-bold text-white" aria-hidden="true">
                                     <?php echo htmlspecialchars(ucs_avatar_initial($ucsStudentUser['name'])); ?>
                                 </span>
                                 <span class="max-w-[9rem] truncate"><?php echo htmlspecialchars($ucsStudentUser['name']); ?></span>
-                                <svg class="nav-chevron h-3.5 w-3.5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                <svg class="nav-chevron h-3.5 w-3.5 shrink-0 text-slate-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 0 1 1.414 0L10 10.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 0 1 0-1.414Z" clip-rule="evenodd" />
                                 </svg>
                             </button>
@@ -112,7 +112,7 @@ function ucs_avatar_initial($name)
                         </div>
                     <?php endif; ?>
 
-                    <button type="button" id="mobile-menu-toggle" class="inline-flex h-10 w-10 items-center justify-center rounded-lg text-gray-700 transition-colors duration-150 hover:bg-gray-100 lg:hidden focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" aria-label="Open main menu" aria-expanded="false" aria-controls="mobile-menu">
+                    <button type="button" id="mobile-menu-toggle" class="inline-flex h-10 w-10 items-center justify-center rounded-lg text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-900 lg:hidden focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300" aria-label="Open main menu" aria-expanded="false" aria-controls="mobile-menu">
                         <svg id="menu-icon-open" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
                             <path d="M3 6h18M3 12h18M3 18h18"></path>
                         </svg>
@@ -124,17 +124,17 @@ function ucs_avatar_initial($name)
             </div>
 
             <!-- Search panel -->
-            <div id="search-panel" class="search-panel border-t border-gray-100" role="search">
+            <div id="search-panel" class="search-panel border-t border-slate-200" role="search">
                 <div>
                     <form action="<?php echo htmlspecialchars(BASE_URL . '/search.php'); ?>" method="get" class="px-0 pb-3 pt-3">
-                        <div class="flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 transition-colors focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 transition-colors focus-within:border-sky-400 focus-within:ring-2 focus-within:ring-sky-300/30 focus-within:bg-white">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <circle cx="11" cy="11" r="8"></circle>
                                 <path d="m21 21-4.35-4.35"></path>
                             </svg>
-                            <input id="site-search-input" type="search" name="q" placeholder="Search programmes, admissions, news..." autocomplete="off" class="w-full bg-transparent py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:outline-none">
-                            <button type="button" id="search-close" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-gray-400 transition-colors hover:bg-gray-200 hover:text-gray-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" aria-label="Close search">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+                            <input id="site-search-input" type="search" name="q" placeholder="Search programmes, admissions, news..." autocomplete="off" class="w-full bg-transparent py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none">
+                            <button type="button" id="search-close" class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-200 hover:text-slate-600 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300" aria-label="Close search">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M18 6 6 18M6 6l12 12"></path>
                                 </svg>
                             </button>
@@ -142,11 +142,15 @@ function ucs_avatar_initial($name)
                     </form>
                 </div>
             </div>
+                    </form>
+                </div>
+            </div>
         </div>
 
         <!-- Mobile menu -->
-        <div id="mobile-menu" class="hidden border-t border-gray-100 lg:hidden">
+        <div id="mobile-menu" class="hidden border-t border-slate-200 bg-white lg:hidden">
             <nav aria-label="Mobile navigation" class="mx-auto max-w-7xl px-4 py-4 sm:px-6 lg:px-8">
+                <p class="px-2 pb-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Menu</p>
                 <ul class="space-y-1">
                     <?php foreach ($navItems as $item): ?>
                         <?php if (!empty($item['children'])): ?>
@@ -160,18 +164,18 @@ function ucs_avatar_initial($name)
                             }
                             ?>
                             <li>
-                                <button type="button" class="flex w-full items-center justify-between rounded-lg px-3 py-3 text-base font-medium transition-colors hover:bg-blue-50 <?php echo $isActive ? 'text-blue-700' : 'text-gray-800'; ?>" data-mobile-submenu-toggle aria-expanded="false" aria-controls="mobile-submenu-<?php echo htmlspecialchars($item['label']); ?>">
+                                <button type="button" class="flex w-full items-center justify-between rounded-lg px-3 py-3 text-base font-medium text-slate-700 transition-colors hover:bg-slate-100" data-mobile-submenu-toggle aria-expanded="false" aria-controls="mobile-submenu-<?php echo htmlspecialchars($item['label']); ?>">
                                     <span><?php echo htmlspecialchars($item['label']); ?></span>
-                                    <svg data-chevron xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-gray-400 transition-transform duration-200" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                    <svg data-chevron xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-400 transition-transform duration-200" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                                         <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 0 1 1.414 0L10 10.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 0 1 0-1.414Z" clip-rule="evenodd" />
                                     </svg>
                                 </button>
                                 <div class="mobile-submenu" id="mobile-submenu-<?php echo htmlspecialchars($item['label']); ?>">
                                     <div>
-                                        <ul class="mt-1 space-y-1 border-l border-gray-200 pl-4">
+                                        <ul class="mt-1 space-y-1 border-l border-slate-200 pl-4">
                                             <?php foreach ($item['children'] as $child): ?>
                                                 <li>
-                                                    <a href="<?php echo htmlspecialchars($child['url']); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700" data-nav-sections="<?php echo htmlspecialchars(ucs_nav_section($child['url'])); ?>"><?php echo htmlspecialchars($child['label']); ?></a>
+                                                    <a href="<?php echo htmlspecialchars($child['url']); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900" data-nav-sections="<?php echo htmlspecialchars(ucs_nav_section($child['url'])); ?>"><?php echo htmlspecialchars($child['label']); ?></a>
                                                 </li>
                                             <?php endforeach; ?>
                                         </ul>
@@ -181,15 +185,15 @@ function ucs_avatar_initial($name)
                         <?php else: ?>
                             <?php $isActive = ucs_nav_is_active($item['url'], $relativePath); ?>
                             <li>
-                                <a href="<?php echo htmlspecialchars($item['url']); ?>" class="block rounded-lg px-3 py-3 text-base font-medium <?php echo $isActive ? 'bg-blue-50 text-blue-700' : 'text-gray-800 transition-colors hover:bg-blue-50 hover:text-blue-700'; ?>" data-nav-sections="<?php echo htmlspecialchars(ucs_nav_sections($item['url'])); ?>"><?php echo htmlspecialchars($item['label']); ?></a>
+                                <a href="<?php echo htmlspecialchars($item['url']); ?>" class="block rounded-lg px-3 py-3 text-base font-medium <?php echo $isActive ? 'bg-sky-50 text-sky-700' : 'text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900'; ?>" data-nav-sections="<?php echo htmlspecialchars(ucs_nav_sections($item['url'])); ?>"><?php echo htmlspecialchars($item['label']); ?></a>
                             </li>
                         <?php endif; ?>
                     <?php endforeach; ?>
 
                     <?php if (!$ucsShowStudentMenu): ?>
                         <!-- Student Login (mobile) -->
-                        <li class="mt-2 border-t border-gray-100 pt-2">
-                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="flex items-center gap-2 rounded-lg px-3 py-3 text-base font-medium text-blue-700 transition-colors hover:bg-blue-50">
+                        <li class="pt-4">
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="flex w-full items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-3 text-base font-semibold text-white transition-colors hover:bg-sky-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                                     <circle cx="12" cy="7" r="4"></circle>
@@ -199,13 +203,13 @@ function ucs_avatar_initial($name)
                         </li>
                     <?php else: ?>
                         <!-- Student account (mobile) -->
-                        <li class="mt-2 border-t border-gray-100 pt-2">
-                            <p class="px-3 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-gray-400">Student Account</p>
-                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-dashboard.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700">Dashboard</a>
-                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-profile.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700">My Profile</a>
-                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-timetable.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700">My Timetable</a>
+                        <li class="mt-2 border-t border-slate-200 pt-3">
+                            <p class="px-3 pb-1 pt-1 text-xs font-semibold uppercase tracking-wide text-slate-400">Student Account</p>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-dashboard.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900">Dashboard</a>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-profile.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900">My Profile</a>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-timetable.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900">My Timetable</a>
                             <?php if ($ucsVerifiedAlumnus): ?>
-                                <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-gray-600 transition-colors hover:bg-blue-50 hover:text-blue-700">Alumni Dashboard</a>
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900">Alumni Dashboard</a>
                             <?php endif; ?>
                             <a href="<?php echo htmlspecialchars(ROOT_URL . '/actions/student/logout.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50">Logout</a>
                         </li>
@@ -320,13 +324,13 @@ function ucs_avatar_initial($name)
                 closeSearch();
             });
 
-            // --- Sticky header shadow on scroll ---
+            // --- Sticky header subtle shadow + compact height on scroll ---
             if (header) {
                 function onScroll() {
                     if (window.scrollY > 8) {
-                        header.classList.add('shadow-md');
+                        header.classList.add('site-header-scrolled');
                     } else {
-                        header.classList.remove('shadow-md');
+                        header.classList.remove('site-header-scrolled');
                     }
                 }
                 window.addEventListener('scroll', onScroll, { passive: true });
@@ -355,17 +359,12 @@ function ucs_avatar_initial($name)
             });
 
             // --- Highlight the nav item matching the current homepage section ---
-            var navActiveUnderline = ['text-blue-700', 'after:absolute', 'after:inset-x-3', 'after:bottom-1', 'after:h-0.5', 'after:rounded-full', 'after:bg-blue-600'];
-
             function setNavActiveState(el, active) {
                 var childLike = el.classList.contains('nav-dropdown-link') || !!el.closest('#mobile-menu');
-                el.classList.toggle('text-blue-700', active);
+                el.classList.toggle('text-white', active);
+                el.classList.toggle('is-active', active && !childLike);
                 if (childLike) {
-                    el.classList.toggle('bg-blue-50', active);
-                } else {
-                    navActiveUnderline.forEach(function (cls) {
-                        el.classList.toggle(cls, active);
-                    });
+                    el.classList.toggle('bg-white/20', active);
                 }
             }
 

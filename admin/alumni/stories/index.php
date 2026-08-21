@@ -17,7 +17,7 @@ unset($_SESSION['alumni_story_flash']);
 
 // --- Filters -----------------------------------------------------------------
 $ucsQuery  = trim((string) ($_GET['q'] ?? ''));
-$ucsStatus = in_array((string) ($_GET['status'] ?? ''), ['draft', 'published', 'unpublished'], true) ? (string) $_GET['status'] : '';
+$ucsStatus = in_array((string) ($_GET['status'] ?? ''), ['draft', 'pending', 'published', 'rejected', 'unpublished'], true) ? (string) $_GET['status'] : '';
 $ucsShow   = in_array((string) ($_GET['show'] ?? ''), ['10', '25', '50'], true) ? (int) $_GET['show'] : 10;
 $ucsPage   = max(1, (int) ($_GET['page'] ?? 1));
 
@@ -145,7 +145,7 @@ require_once __DIR__ . '/../../../includes/admin-layout-top.php';
                 <select id="status" name="status"
                         class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                     <option value="">All Statuses</option>
-                    <?php foreach (['draft', 'published', 'unpublished'] as $ucsOptionStatus): ?>
+                    <?php foreach (['draft', 'pending', 'published', 'rejected', 'unpublished'] as $ucsOptionStatus): ?>
                         <option value="<?php echo $ucsOptionStatus; ?>" <?php echo $ucsStatus === $ucsOptionStatus ? 'selected' : ''; ?>>
                             <?php echo ucfirst($ucsOptionStatus); ?>
                         </option>
@@ -256,8 +256,12 @@ require_once __DIR__ . '/../../../includes/admin-layout-top.php';
                             <td class="px-5 py-4 whitespace-nowrap">
                                 <?php if ($ucsStoryStatus === 'published'): ?>
                                     <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-green-700">Published</span>
+                                <?php elseif ($ucsStoryStatus === 'pending'): ?>
+                                    <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-amber-700">Pending</span>
+                                <?php elseif ($ucsStoryStatus === 'rejected'): ?>
+                                    <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-red-700">Rejected</span>
                                 <?php elseif ($ucsStoryStatus === 'unpublished'): ?>
-                                    <span class="inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-amber-700">Unpublished</span>
+                                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-gray-500">Unpublished</span>
                                 <?php else: ?>
                                     <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-gray-500">Draft</span>
                                 <?php endif; ?>
@@ -282,21 +286,7 @@ require_once __DIR__ . '/../../../includes/admin-layout-top.php';
                                         </svg>
                                         Edit
                                     </a>
-                                    <?php if ($ucsStoryStatus !== 'published'): ?>
-                                        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/alumni-story-publish.php'); ?>" class="inline-flex"
-                                              onsubmit="return confirm('Publish &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;?');">
-                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
-                                            <input type="hidden" name="id" value="<?php echo (int) $ucsStory['id']; ?>">
-                                            <button type="submit" title="Publish <?php echo htmlspecialchars($ucsStoryTitle); ?>"
-                                                    class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold text-green-600 transition-colors duration-150 hover:bg-green-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                                    <path d="M22 2 11 13"></path>
-                                                    <path d="M22 2 15 22l-4-9-9-4Z"></path>
-                                                </svg>
-                                                Publish
-                                            </button>
-                                        </form>
-                                    <?php else: ?>
+                                    <?php if ($ucsStoryStatus === 'published'): ?>
                                         <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/alumni-story-unpublish.php'); ?>" class="inline-flex"
                                               onsubmit="return confirm('Unpublish &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;?');">
                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
@@ -311,6 +301,36 @@ require_once __DIR__ . '/../../../includes/admin-layout-top.php';
                                                 Unpublish
                                             </button>
                                         </form>
+                                    <?php else: ?>
+                                        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/alumni-story-publish.php'); ?>" class="inline-flex"
+                                              onsubmit="return confirm('Publish &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;?');">
+                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
+                                            <input type="hidden" name="id" value="<?php echo (int) $ucsStory['id']; ?>">
+                                            <button type="submit" title="Publish <?php echo htmlspecialchars($ucsStoryTitle); ?>"
+                                                    class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold text-green-600 transition-colors duration-150 hover:bg-green-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-green-600">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                    <path d="M22 2 11 13"></path>
+                                                    <path d="M22 2 15 22l-4-9-9-4Z"></path>
+                                                </svg>
+                                                Publish
+                                            </button>
+                                        </form>
+                                        <?php if ($ucsStoryStatus === 'pending'): ?>
+                                            <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/alumni-story-reject.php'); ?>" class="inline-flex"
+                                                  onsubmit="return confirm('Reject &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;?');">
+                                                <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
+                                                <input type="hidden" name="id" value="<?php echo (int) $ucsStory['id']; ?>">
+                                                <button type="submit" title="Reject <?php echo htmlspecialchars($ucsStoryTitle); ?>"
+                                                        class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold text-red-600 transition-colors duration-150 hover:bg-red-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                        <circle cx="12" cy="12" r="10"></circle>
+                                                        <line x1="15" y1="9" x2="9" y2="15"></line>
+                                                        <line x1="9" y1="9" x2="15" y2="15"></line>
+                                                    </svg>
+                                                    Reject
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
                                     <?php endif; ?>
                                     <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/alumni-story-delete.php'); ?>" class="inline-flex"
                                           onsubmit="return confirm('Delete alumni story &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;? This cannot be undone.');">

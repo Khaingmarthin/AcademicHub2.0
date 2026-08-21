@@ -5,13 +5,12 @@
  * Only an authenticated, verified alumnus can access this page. It lets the
  * alumnus manage the public information shown on their profile: photo,
  * occupation, professional field, biography, career journey, skills,
- * professional links, visibility and mentorship availability.
+ * professional links, visibility.
  */
 require_once __DIR__ . '/../config/app.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/student-auth.php';
 require_once __DIR__ . '/../includes/helpers/alumni-validation.php';
-require_once __DIR__ . '/../includes/helpers/mentorship-validation.php';
 
 student_require_login();
 
@@ -43,16 +42,8 @@ $ucsForm = [
     'linkedin_url'         => $ucsOld['linkedin_url'] ?? (string) $ucsProfile['linkedin_url'],
     'github_url'           => $ucsOld['github_url'] ?? (string) $ucsProfile['github_url'],
     'website_url'          => $ucsOld['website_url'] ?? (string) $ucsProfile['website_url'],
-    'mentorship_available' => (int) ($ucsOld['mentorship_available'] ?? (int) $ucsProfile['mentorship_available']),
-    'mentorship_contact_email' => (string) ($ucsOld['mentorship_contact_email'] ?? (string) $ucsProfile['mentorship_contact_email']),
-    'mentorship_areas'     => isset($ucsOld['mentorship_areas'])
-        ? (array) $ucsOld['mentorship_areas']
-        : mentorship_load_profile_area_ids($pdo, (int) $ucsProfile['id']),
     'visibility'           => $ucsOld['visibility'] ?? (string) $ucsProfile['visibility'],
 ];
-
-$ucsMentorshipAreas = mentorship_load_areas($pdo, true);
-$ucsMentorshipSuspended = (int) $ucsProfile['mentorship_suspended'] === 1;
 
 $ucsStudent = student_current_user();
 
@@ -229,65 +220,16 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                     </div>
 
-                    <!-- Visibility & mentorship -->
+                    <!-- Visibility -->
                     <div class="px-6 py-6 sm:px-8">
                         <h2 class="text-base font-semibold text-gray-900">Profile Settings</h2>
-                        <div class="mt-5 grid gap-6 sm:grid-cols-2">
-                            <div>
-                                <label for="visibility" class="block text-sm font-medium text-gray-700">Profile Visibility</label>
-                                <select id="visibility" name="visibility" required
-                                        class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                                    <option value="private" <?php echo $ucsForm['visibility'] === 'private' ? 'selected' : ''; ?>>Private (hidden from the public directory)</option>
-                                    <option value="public" <?php echo $ucsForm['visibility'] === 'public' ? 'selected' : ''; ?>>Public (visible to students and visitors)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <span class="block text-sm font-medium text-gray-700">Mentorship Availability</span>
-                                <label for="mentorship_available" class="mt-2 flex cursor-pointer items-center justify-between rounded-xl border border-gray-300 px-4 py-2.5">
-                                    <span class="text-sm font-medium text-gray-700">Open to mentoring students</span>
-                                    <input type="checkbox" id="mentorship_available" name="mentorship_available" value="1"
-                                           class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                           <?php echo $ucsForm['mentorship_available'] === 1 ? 'checked' : ''; ?>
-                                           <?php echo $ucsMentorshipSuspended ? 'disabled' : ''; ?>>
-                                </label>
-                                <?php if ($ucsMentorshipSuspended): ?>
-                                    <p class="mt-2 text-xs leading-5 text-red-600">
-                                        Mentorship has been disabled by an administrator. Contact the university to restore access.
-                                    </p>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-
-                        <!-- Mentorship areas -->
-                        <div class="mt-6 border-t border-gray-100 pt-6">
-                            <h3 class="text-sm font-semibold text-gray-700">Mentorship Areas</h3>
-                            <p class="mt-1 text-sm text-gray-500">Select the career topics you can guide students on (optional).</p>
-                            <?php if ($ucsMentorshipSuspended): ?>
-                                <p class="mt-3 text-xs font-medium text-red-600">Mentorship areas are locked while mentorship is disabled.</p>
-                            <?php else: ?>
-                                <div class="mt-4 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
-                                    <?php foreach ($ucsMentorshipAreas as $ucsArea): ?>
-                                        <label class="flex cursor-pointer items-center gap-2.5 rounded-xl border border-gray-200 bg-gray-50/60 px-3.5 py-2.5 transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50">
-                                            <input type="checkbox" name="mentorship_areas[]" value="<?php echo (int) $ucsArea['id']; ?>"
-                                                   class="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                                   <?php echo in_array((int) $ucsArea['id'], $ucsForm['mentorship_areas'], true) ? 'checked' : ''; ?>>
-                                            <span class="text-sm font-medium text-gray-700"><?php echo htmlspecialchars((string) $ucsArea['name']); ?></span>
-                                        </label>
-                                    <?php endforeach; ?>
-                                </div>
-                            <?php endif; ?>
-                        </div>
-
-                        <!-- Mentorship contact -->
-                        <div class="mt-6 border-t border-gray-100 pt-6">
-                            <label for="mentorship_contact_email" class="block text-sm font-medium text-gray-700">Mentorship Contact Email <span class="text-gray-400">(optional)</span></label>
-                            <p class="mt-1 text-sm leading-5 text-gray-500">
-                                Only shared with students after you accept their mentorship request. Never shown publicly.
-                            </p>
-                            <input type="email" id="mentorship_contact_email" name="mentorship_contact_email"
-                                   value="<?php echo htmlspecialchars($ucsForm['mentorship_contact_email']); ?>"
-                                   maxlength="191" placeholder="mentor@example.com"
-                                   class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        <div class="mt-5">
+                            <label for="visibility" class="block text-sm font-medium text-gray-700">Profile Visibility</label>
+                            <select id="visibility" name="visibility" required
+                                    class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                                <option value="private" <?php echo $ucsForm['visibility'] === 'private' ? 'selected' : ''; ?>>Private (hidden from the public directory)</option>
+                                <option value="public" <?php echo $ucsForm['visibility'] === 'public' ? 'selected' : ''; ?>>Public (visible to students and visitors)</option>
+                            </select>
                         </div>
                     </div>
 

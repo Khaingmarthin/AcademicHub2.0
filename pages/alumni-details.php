@@ -14,8 +14,6 @@ require_once '../config/app.php';
 require_once '../config/database.php';
 require_once '../includes/student-auth.php';
 require_once __DIR__ . '/../includes/helpers/alumni-validation.php';
-require_once __DIR__ . '/../includes/helpers/mentorship-validation.php';
-require_once __DIR__ . '/../includes/helpers/opportunity-validation.php';
 
 $pageTitle = 'Alumni Profile';
 
@@ -46,8 +44,7 @@ try {
         $ucsSql = "SELECT ap.id, ap.student_id, ap.current_job, ap.company, ap.professional_field,
                           ap.skills, ap.bio, ap.career_journey,
                           ap.profile_photo, ap.linkedin_url, ap.github_url,
-                          ap.website_url, ap.mentorship_available,
-                          ap.mentorship_suspended, ap.updated_at,
+                          ap.website_url, ap.updated_at,
                           s.name AS student_name, s.graduation_year,
                           m.name AS major_name
                    FROM alumni_profiles ap
@@ -301,142 +298,6 @@ require_once '../includes/header.php';
                             </div>
                         <?php endif; ?>
 
-                        <!-- Alumni mentorship -->
-                        <?php
-                        $ucsMentorshipAreas   = mentorship_load_profile_areas($pdo, (int) $ucsProfile['id']);
-                        $ucsMentorshipSuspended = (int) $ucsProfile['mentorship_suspended'] === 1;
-                        $ucsMentorshipOpen    = !$ucsMentorshipSuspended && (int) $ucsProfile['mentorship_available'] === 1;
-                        $ucsMentorshipStudent = null;
-                        $ucsActiveRequest     = null;
-                        $ucsHadDeclined       = false;
-                        $ucsLoggedInStudent   = student_current_user();
-                        if ($ucsLoggedInStudent !== null && !$ucsIsOwner) {
-                            $ucsMentorshipStudent = $ucsLoggedInStudent;
-                            $ucsActiveRequest     = mentorship_active_request($pdo, (int) $ucsLoggedInStudent['id'], (int) $ucsProfile['id']);
-                            if ($ucsActiveRequest === null) {
-                                try {
-                                    $ucsStmt = $pdo->prepare(
-                                        "SELECT COUNT(*) FROM mentorship_requests
-                                         WHERE student_id = :student_id AND alumni_profile_id = :profile_id AND status = 'declined'"
-                                    );
-                                    $ucsStmt->execute([
-                                        ':student_id' => (int) $ucsLoggedInStudent['id'],
-                                        ':profile_id' => (int) $ucsProfile['id'],
-                                    ]);
-                                    $ucsHadDeclined = (int) $ucsStmt->fetchColumn() > 0;
-                                } catch (PDOException $e) {
-                                    $ucsHadDeclined = false;
-                                }
-                            }
-                        }
-                        ?>
-                        <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 sm:p-8">
-                            <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400">Alumni Mentorship</h3>
-                            <?php if ($ucsMentorshipSuspended): ?>
-                                <div class="mt-4 flex items-start gap-4 rounded-xl bg-red-50 px-4 py-4 ring-1 ring-red-100">
-                                    <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-red-100 text-red-600 ring-1 ring-red-200" aria-hidden="true">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-                                    </span>
-                                    <div class="min-w-0">
-                                        <p class="text-sm font-semibold text-red-800">Mentorship Currently Disabled</p>
-                                        <p class="mt-0.5 text-sm text-red-700">
-                                            This alumnus is not accepting mentorship requests at the moment.
-                                        </p>
-                                    </div>
-                                </div>
-                            <?php elseif ($ucsMentorshipOpen): ?>
-                                <div class="mt-4 flex items-start gap-4 rounded-xl bg-emerald-50 px-4 py-4 ring-1 ring-emerald-100">
-                                    <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 ring-1 ring-emerald-200" aria-hidden="true">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                                    </span>
-                                    <div class="min-w-0">
-                                        <p class="text-sm font-semibold text-emerald-800">Available for Mentorship</p>
-                                        <p class="mt-0.5 text-sm text-emerald-700">
-                                            Open to guiding current students on career topics.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <?php if (!empty($ucsMentorshipAreas)): ?>
-                                    <div class="mt-4 flex flex-wrap gap-2">
-                                        <?php foreach ($ucsMentorshipAreas as $ucsArea): ?>
-                                            <span class="inline-flex items-center rounded-full bg-violet-50 px-3 py-1.5 text-sm font-medium text-violet-700 ring-1 ring-violet-100">
-                                                <?php echo htmlspecialchars((string) $ucsArea['name']); ?>
-                                            </span>
-                                        <?php endforeach; ?>
-                                    </div>
-                                <?php endif; ?>
-
-                                <?php if ($ucsIsOwner): ?>
-                                    <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                        <p class="text-sm leading-6 text-gray-600">
-                                            You are open to mentoring students.
-                                        </p>
-                                        <a href="<?php echo htmlspecialchars(BASE_URL . '/mentorship-inbox.php'); ?>"
-                                           class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                            View Mentorship Requests
-                                        </a>
-                                    </div>
-                                <?php elseif ($ucsMentorshipStudent !== null && $ucsActiveRequest !== null): ?>
-                                    <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                        <p class="text-sm leading-6 text-gray-600">
-                                            <?php if ($ucsActiveRequest['status'] === 'accepted'): ?>
-                                                Mentorship accepted. Contact details are available in your mentorship requests.
-                                            <?php else: ?>
-                                                Your mentorship request is awaiting a response.
-                                            <?php endif; ?>
-                                        </p>
-                                        <a href="<?php echo htmlspecialchars(BASE_URL . '/my-mentorship.php'); ?>"
-                                           class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                            View My Mentorship
-                                        </a>
-                                    </div>
-                                <?php elseif ($ucsMentorshipStudent !== null): ?>
-                                    <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                        <p class="text-sm leading-6 text-gray-600">
-                                            <?php echo $ucsHadDeclined
-                                                ? 'Your previous request was declined. You are welcome to request again.'
-                                                : 'Interested in career guidance from this alumnus?'; ?>
-                                        </p>
-                                        <a href="<?php echo htmlspecialchars(BASE_URL . '/mentorship-request.php?id=' . (int) $ucsProfile['id']); ?>"
-                                           class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                            <?php echo $ucsHadDeclined ? 'Request Again' : 'Request Mentorship'; ?>
-                                        </a>
-                                    </div>
-                                <?php else: ?>
-                                    <div class="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                                        <p class="text-sm leading-6 text-gray-600">
-                                            Log in as a student to request mentorship from this alumnus.
-                                        </p>
-                                        <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>"
-                                           class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                            Student Login
-                                        </a>
-                                    </div>
-                                <?php endif; ?>
-                            <?php else: ?>
-                                <div class="mt-4 flex items-center gap-4 rounded-xl bg-gray-50 px-4 py-4 ring-1 ring-gray-100">
-                                    <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gray-100 text-gray-600 ring-1 ring-gray-200" aria-hidden="true">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
-                                    </span>
-                                    <div class="min-w-0">
-                                        <p class="text-sm font-semibold text-gray-800">Not Currently Offering Mentorship</p>
-                                        <p class="mt-0.5 text-sm text-gray-600">
-                                            <?php echo $ucsIsOwner
-                                                ? 'Turn on "Open to mentoring students" in your profile to accept requests.'
-                                                : 'This alumnus is not accepting mentorship requests right now.'; ?>
-                                        </p>
-                                    </div>
-                                </div>
-                                <?php if ($ucsIsOwner): ?>
-                                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-edit.php'); ?>"
-                                       class="mt-4 inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                        Manage Mentorship
-                                    </a>
-                                <?php endif; ?>
-                            <?php endif; ?>
-                        </div>
-
                         <div class="text-center">
                             <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni.php'); ?>" class="group inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-150 group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -445,41 +306,6 @@ require_once '../includes/header.php';
                                 Back to Alumni Directory
                             </a>
                         </div>
-
-                        <!-- Career opportunities shared by this alumnus -->
-                        <?php
-                        $ucsAlumnusOpportunities = [];
-                        if (!empty($ucsProfile['student_id'])) {
-                            $ucsAlumnusOpportunities = opportunity_load_public_by_student($pdo, (int) $ucsProfile['student_id'], 5);
-                        }
-                        ?>
-                        <?php if (!empty($ucsAlumnusOpportunities)): ?>
-                            <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-200 sm:p-8">
-                                <h3 class="text-sm font-bold uppercase tracking-wider text-gray-400">Career Opportunities Shared</h3>
-                                <p class="mt-1 text-sm leading-6 text-gray-600">
-                                    Openings shared by <?php echo htmlspecialchars($ucsAlumnusName); ?> with the UCSMTLA community.
-                                </p>
-                                <ul class="mt-5 space-y-3">
-                                    <?php foreach ($ucsAlumnusOpportunities as $ucsAlumnusOpportunity): ?>
-                                        <li>
-                                            <a href="<?php echo htmlspecialchars(BASE_URL . '/career-opportunity-details.php?id=' . (int) $ucsAlumnusOpportunity['id']); ?>" class="group flex items-center justify-between gap-4 rounded-xl border border-gray-100 bg-gray-50 px-4 py-3.5 transition-colors duration-150 hover:border-blue-100 hover:bg-blue-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                                <span class="min-w-0">
-                                                    <span class="block truncate text-sm font-bold text-gray-900 group-hover:text-blue-700"><?php echo htmlspecialchars((string) $ucsAlumnusOpportunity['title']); ?></span>
-                                                    <span class="mt-0.5 block truncate text-sm text-gray-500"><?php echo htmlspecialchars((string) $ucsAlumnusOpportunity['company']); ?></span>
-                                                </span>
-                                                <span class="inline-flex shrink-0 items-center rounded-full bg-emerald-50 px-2.5 py-1 text-xs font-bold text-emerald-700 ring-1 ring-emerald-100">
-                                                    <?php echo htmlspecialchars(opportunity_employment_label((string) $ucsAlumnusOpportunity['employment_type'])); ?>
-                                                </span>
-                                            </a>
-                                        </li>
-                                    <?php endforeach; ?>
-                                </ul>
-                                <a href="<?php echo htmlspecialchars(BASE_URL . '/career-opportunities.php'); ?>" class="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                    Browse all career opportunities
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
-                                </a>
-                            </div>
-                        <?php endif; ?>
                     </div>
                 </div>
             </div>

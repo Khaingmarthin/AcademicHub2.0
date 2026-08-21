@@ -171,7 +171,7 @@ require_once __DIR__ . '/../../../includes/admin-layout-top.php';
                     <label for="status" class="block text-sm font-medium text-gray-700">Status <span class="text-red-500">*</span></label>
                     <select id="status" name="status" required
                             class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                        <?php foreach (ALUMNI_STORY_STATUSES as $ucsStatus): ?>
+                        <?php foreach (['draft', 'published', 'unpublished'] as $ucsStatus): ?>
                             <option value="<?php echo $ucsStatus; ?>" <?php echo $ucsForm['status'] === $ucsStatus ? 'selected' : ''; ?>><?php echo ucfirst($ucsStatus); ?></option>
                         <?php endforeach; ?>
                     </select>

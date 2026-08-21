@@ -48,16 +48,13 @@ $footerLinks = [
     'Alumni'            => BASE_URL . '/alumni-overview.php',
     'Alumni Directory'  => BASE_URL . '/alumni.php',
     'Alumni Stories'    => BASE_URL . '/alumni-stories.php',
-    'Career Opportunities' => BASE_URL . '/career-opportunities.php',
     'Career Discussions' => BASE_URL . '/career-discussions.php',
-    'Mentorship'        => BASE_URL . '/alumni-mentorship.php',
-    'Alumni Events'     => BASE_URL . '/alumni-events.php',
     'Admissions'        => BASE_URL . '/entrance-information.php',
     'Faculties'         => BASE_URL . '/faculties.php',
     'News'              => BASE_URL . '/news.php',
 ];
 ?>
-<footer class="mt-12 bg-gray-900 text-gray-400">
+<footer class="mt-12 bg-blue-950 text-gray-400">
     <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
 
@@ -125,7 +122,7 @@ $footerLinks = [
         </div>
     </div>
 
-    <div class="border-t border-gray-800">
+    <div class="border-t border-blue-900/60">
         <div class="mx-auto max-w-7xl px-4 pt-5 pb-4 text-center text-xs text-gray-500 sm:px-6 lg:px-8">
             &copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars($ucsShortName . ' Academic Hub'); ?>. All rights reserved.
         </div>

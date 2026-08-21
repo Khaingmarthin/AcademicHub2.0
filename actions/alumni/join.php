@@ -54,7 +54,6 @@ try {
                  linkedin_url = :linkedin_url,
                  github_url = :github_url,
                  website_url = :website_url,
-                 mentorship_available = :mentorship_available,
                  visibility = :visibility,
                  verification_status = 'pending'
              WHERE id = :id"
@@ -68,7 +67,6 @@ try {
             ':linkedin_url'         => $ucsClean['linkedin_url'],
             ':github_url'           => $ucsClean['github_url'],
             ':website_url'          => $ucsClean['website_url'],
-            ':mentorship_available' => $ucsClean['mentorship_available'],
             ':visibility'           => $ucsClean['visibility'],
             ':id'                   => $ucsExisting['id'],
         ]);
@@ -78,11 +76,11 @@ try {
             "INSERT INTO alumni_profiles
                 (student_id, current_job, company, professional_field, skills,
                  bio, career_journey, linkedin_url, github_url, website_url,
-                 mentorship_available, visibility)
+                 visibility)
              VALUES
                 (:student_id, :current_job, :company, :professional_field, :skills,
                  :bio, :career_journey, :linkedin_url, :github_url, :website_url,
-                 :mentorship_available, :visibility)"
+                 :visibility)"
         )->execute([
             ':student_id'           => $ucsClean['student_id'],
             ':current_job'          => $ucsClean['current_job'],
@@ -94,7 +92,6 @@ try {
             ':linkedin_url'         => $ucsClean['linkedin_url'],
             ':github_url'           => $ucsClean['github_url'],
             ':website_url'          => $ucsClean['website_url'],
-            ':mentorship_available' => $ucsClean['mentorship_available'],
             ':visibility'           => $ucsClean['visibility'],
         ]);
         $_SESSION['student_alumni_flash'] = ['type' => 'success', 'message' => 'Your alumni profile has been submitted for review.'];

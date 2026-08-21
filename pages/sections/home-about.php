@@ -45,7 +45,7 @@ if (!preg_match('~^https?://~i', $ucsAboutMedia)) {
     $ucsAboutMedia = ROOT_URL . '/assets/' . ltrim($ucsAboutMedia, '/');
 }
 ?>
-<section class="bg-slate-50 py-16 sm:py-20" aria-labelledby="about-heading">
+<section class="bg-blue-50/60 py-16 sm:py-20" aria-labelledby="about-heading">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-16">
 

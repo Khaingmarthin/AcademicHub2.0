@@ -157,3 +157,274 @@ html {
     animation: none;
   }
 }
+
+/* ==========================================================================
+   Navbar / header refinements
+   ========================================================================== */
+
+/* Animated hover / active indicator for primary navigation links */
+.ucs-nav-link {
+  position: relative;
+}
+
+.ucs-nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.375rem;
+  height: 2px;
+  border-radius: 9999px;
+  background-color: #e0f2fe;
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.2s ease;
+}
+
+.ucs-nav-link:hover::after,
+.ucs-nav-link:focus-visible::after,
+.ucs-nav-link.is-active::after {
+  transform: scaleX(1);
+}
+
+/* Subtle shadow + compact height applied to the sticky header on scroll */
+.site-header-scrolled {
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.05), 0 8px 20px -8px rgb(15 23 42 / 0.12);
+}
+
+.header-inner {
+  transition: height 0.2s ease;
+}
+
+@media (min-width: 1024px) {
+  .site-header-scrolled .header-inner {
+    height: 3.5rem;
+  }
+}
+
+/* ==========================================================================
+   Hero refinements
+   ========================================================================== */
+
+/* Institutional eyebrow over the hero image with a leading rule */
+.ucs-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  color: #bfdbfe;
+}
+
+.ucs-hero-eyebrow::before {
+  content: "";
+  width: 2rem;
+  height: 2px;
+  border-radius: 9999px;
+  background-color: #60a5fa;
+}
+
+/* Small institutional detail line under the hero call-to-actions */
+.ucs-hero-info {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: rgb(226 232 240 / 0.7);
+}
+
+.ucs-hero-info::before {
+  content: "";
+  width: 2.5rem;
+  height: 1px;
+  background-color: rgb(96 165 250 / 0.5);
+}
+
+/* Light-hero variants for the clean white & blue hero */
+.ucs-hero-eyebrow-light {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.24em;
+  color: #2563eb;
+}
+
+.ucs-hero-eyebrow-light::before {
+  content: "";
+  width: 2rem;
+  height: 2px;
+  border-radius: 9999px;
+  background-color: #2563eb;
+}
+
+.ucs-hero-info-light {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: rgb(30 58 138 / 0.75);
+}
+
+.ucs-hero-info-light::before {
+  content: "";
+  width: 2.5rem;
+  height: 1px;
+  background-color: rgb(37 99 235 / 0.5);
+}
+
+/* ==========================================================================
+   Editorial component classes preserved from the compiled stylesheet
+   (currently unused in markup, kept to avoid regressions on rebuild)
+   ========================================================================== */
+
+/* Editorial eyebrow label used above section headings */
+.ucs-eyebrow {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: #2563eb;
+}
+
+/* Primary call-to-action button */
+.ucs-btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: #2563eb;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+.ucs-btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.ucs-btn-primary:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Secondary button on light backgrounds */
+.ucs-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  border-width: 1px;
+  border-color: #cbd5e1;
+  background-color: #ffffff;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  color: #1e293b;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+.ucs-btn-outline:hover {
+  border-color: #2563eb;
+  color: #1d4ed8;
+}
+
+.ucs-btn-outline:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+/* Secondary button on dark navy sections */
+.ucs-btn-outline-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  border-width: 1px;
+  border-color: rgb(255 255 255 / 0.3);
+  background-color: transparent;
+  padding-left: 1.5rem;
+  padding-right: 1.5rem;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  color: #ffffff;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+.ucs-btn-outline-dark:hover {
+  border-color: #ffffff;
+  background-color: rgb(255 255 255 / 0.1);
+}
+
+.ucs-btn-outline-dark:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 2px;
+}
+
+/* Text link with arrow */
+.ucs-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  font-weight: 600;
+  color: #2563eb;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 150ms;
+}
+
+.ucs-text-link:hover {
+  color: #1d4ed8;
+}
+
+.ucs-text-link:focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.ucs-link-arrow {
+  height: 1rem;
+  width: 1rem;
+  transition-property: transform;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 200ms;
+}
+
+.group:hover .ucs-link-arrow {
+  transform: translateX(4px);
+}

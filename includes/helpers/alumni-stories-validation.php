@@ -16,7 +16,7 @@ if (!defined('BASE_URL')) {
 
 require_once __DIR__ . '/ucs-upload.php';
 
-const ALUMNI_STORY_STATUSES    = ['draft', 'published', 'unpublished'];
+const ALUMNI_STORY_STATUSES    = ['draft', 'pending', 'published', 'rejected', 'unpublished'];
 const ALUMNI_STORY_COVER_MAX_BYTES = 5242880; // 5 MB
 
 /**
@@ -131,6 +131,95 @@ function alumni_story_validate_input($input, $pdo, $excludeId = null)
             'career_field'      => $careerField,
             'publication_date'  => $ucsCleanDate,
             'status'            => $status,
+            'cover_image'       => $ucsCoverImage,
+        ],
+        'errors' => $errors,
+    ];
+}
+
+/**
+ * Validate and normalise an alumni self-service story submission.
+ *
+ * Verified alumni can submit stories for admin review. The story is stored
+ * with status 'pending' and must then be approved or rejected by an admin.
+ * Alumni cannot set their own status to 'published' directly.
+ *
+ * @param array $input Raw form values (e.g. $_POST).
+ * @param PDO   $pdo   Database connection.
+ * @return array{clean:array, errors:array}
+ */
+function alumni_story_submit_validate_input($input, $pdo)
+{
+    $errors = [];
+
+    $studentId = (int) (student_current_user()['id'] ?? 0);
+    if ($studentId < 1) {
+        $errors[] = 'You must be logged in to submit a story.';
+        return ['clean' => [], 'errors' => $errors];
+    }
+
+    $alumniProfileId = null;
+    try {
+        $ucsStmt = $pdo->prepare(
+            "SELECT ap.id FROM alumni_profiles ap
+             WHERE ap.student_id = :student_id
+               AND ap.verification_status = 'verified'
+             LIMIT 1"
+        );
+        $ucsStmt->execute([':student_id' => $studentId]);
+        $alumniProfileId = $ucsStmt->fetchColumn() ?: null;
+    } catch (PDOException $e) {
+        $errors[] = 'Unable to verify your alumni profile. Please try again.';
+        return ['clean' => [], 'errors' => $errors];
+    }
+
+    if ($alumniProfileId === null) {
+        $errors[] = 'Only verified alumni can submit stories.';
+        return ['clean' => [], 'errors' => $errors];
+    }
+
+    $title       = trim((string) ($input['title'] ?? ''));
+    $summary     = trim((string) ($input['summary'] ?? ''));
+    $content     = trim((string) ($input['content'] ?? ''));
+    $careerField = trim((string) ($input['career_field'] ?? ''));
+
+    if ($title === '') {
+        $errors[] = 'Title is required.';
+    } elseif (mb_strlen($title) > 255) {
+        $errors[] = 'Title must be 255 characters or fewer.';
+    }
+
+    if ($summary === '') {
+        $errors[] = 'A short summary is required.';
+    } elseif (mb_strlen($summary) > 500) {
+        $errors[] = 'The summary must be 500 characters or fewer.';
+    }
+
+    if ($content === '') {
+        $errors[] = 'Story content is required.';
+    } elseif (mb_strlen($content) > 100000) {
+        $errors[] = 'Story content is too long. Please keep it under 100,000 characters.';
+    }
+
+    if (mb_strlen($careerField) > 255) {
+        $errors[] = 'Career field must be 255 characters or fewer.';
+    }
+
+    $ucsCoverImage = null;
+    try {
+        $ucsCoverImage = ucs_handle_upload('cover_image', ['jpg', 'jpeg', 'png', 'gif', 'webp'], ALUMNI_STORY_COVER_MAX_BYTES);
+    } catch (RuntimeException $e) {
+        $errors[] = $e->getMessage();
+    }
+
+    return [
+        'clean' => [
+            'alumni_profile_id' => (int) $alumniProfileId,
+            'alumni_student_id' => $studentId,
+            'title'             => $title,
+            'summary'           => $summary,
+            'content'           => $content,
+            'career_field'      => $careerField,
             'cover_image'       => $ucsCoverImage,
         ],
         'errors' => $errors,

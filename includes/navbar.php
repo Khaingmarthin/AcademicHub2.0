@@ -86,16 +86,12 @@ $navItems = [
     ],
     ['label' => 'Faculties', 'url' => BASE_URL . '/faculties.php'],
     ['label' => 'Campus Life', 'url' => BASE_URL . '/campus-life.php'],
-    [
+        [
         'label'    => 'Alumni',
         'children' => [
-            ['label' => 'Alumni Overview', 'url' => BASE_URL . '/alumni-overview.php', 'match' => ['alumni-overview.php', 'alumni-dashboard.php']],
             ['label' => 'Alumni Directory', 'url' => BASE_URL . '/alumni.php', 'match' => ['alumni.php', 'alumni-details.php']],
             ['label' => 'Alumni Stories', 'url' => BASE_URL . '/alumni-stories.php', 'match' => ['alumni-stories.php', 'alumni-story-details.php']],
-            ['label' => 'Career Opportunities', 'url' => BASE_URL . '/career-opportunities.php', 'match' => ['career-opportunities.php', 'career-opportunity-details.php', 'my-opportunities.php', 'opportunity-create.php', 'opportunity-edit.php']],
             ['label' => 'Career Discussions', 'url' => BASE_URL . '/career-discussions.php', 'match' => ['career-discussions.php', 'career-discussion-details.php', 'career-discussion-create.php']],
-            ['label' => 'Mentorship', 'url' => BASE_URL . '/alumni-mentorship.php', 'match' => ['alumni-mentorship.php', 'my-mentorship.php', 'mentorship-inbox.php', 'mentorship-request.php']],
-            ['label' => 'Alumni Events', 'url' => BASE_URL . '/alumni-events.php', 'match' => ['alumni-events.php']],
         ],
     ],
     ['label' => 'News', 'url' => BASE_URL . '/news.php'],
@@ -109,12 +105,12 @@ $navItems = [
     ['label' => 'Contact', 'url' => BASE_URL . '/index.php#location-contact-heading'],
 ];
 
-$navLinkBase = 'relative inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600';
-$navLinkActive = 'text-blue-700 after:absolute after:inset-x-3 after:bottom-1 after:h-0.5 after:rounded-full after:bg-blue-600';
+$navLinkBase = 'ucs-nav-link relative inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300';
+$navLinkActive = 'is-active';
 ?>
 
 <nav class="hidden lg:block" aria-label="Main navigation">
-    <ul class="flex items-center gap-0.5">
+    <ul class="flex items-center gap-1">
         <?php foreach ($navItems as $item): ?>
             <?php if (!empty($item['children'])): ?>
                 <?php
@@ -133,7 +129,7 @@ $navLinkActive = 'text-blue-700 after:absolute after:inset-x-3 after:bottom-1 af
                 <li class="group relative">
                     <button type="button" class="<?php echo $navLinkBase . ($isActive ? ' ' . $navLinkActive : ''); ?>" data-nav-sections="<?php echo htmlspecialchars(implode(' ', $ucsParentSections)); ?>" data-dropdown-toggle aria-expanded="false" aria-haspopup="true">
                         <?php echo htmlspecialchars($item['label']); ?>
-                        <svg class="nav-chevron h-3.5 w-3.5 shrink-0 text-gray-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <svg class="nav-chevron h-3.5 w-3.5 shrink-0 text-slate-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                             <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 0 1 1.414 0L10 10.586l3.293-3.293a1 1 0 1 1 1.414 1.414l-4 4a1 1 0 0 1-1.414 0l-4-4a1 1 0 0 1 0-1.414Z" clip-rule="evenodd" />
                         </svg>
                     </button>

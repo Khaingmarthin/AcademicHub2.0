@@ -75,7 +75,6 @@ $ucsForm = [
     'linkedin_url'         => $ucsOld['linkedin_url'] ?? '',
     'github_url'           => $ucsOld['github_url'] ?? '',
     'website_url'          => $ucsOld['website_url'] ?? '',
-    'mentorship_available' => (int) ($ucsOld['mentorship_available'] ?? 0),
     'visibility'           => $ucsOld['visibility'] ?? 'private',
 ];
 
@@ -213,27 +212,16 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                     </div>
 
-                    <!-- Visibility & mentorship -->
+                    <!-- Visibility -->
                     <div class="px-6 py-6 sm:px-8">
                         <h2 class="text-base font-semibold text-gray-900">Profile Settings</h2>
-                        <div class="mt-5 grid gap-6 sm:grid-cols-2">
-                            <div>
-                                <label for="visibility" class="block text-sm font-medium text-gray-700">Profile Visibility</label>
-                                <select id="visibility" name="visibility" required
-                                        class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                                    <option value="private" <?php echo $ucsForm['visibility'] === 'private' ? 'selected' : ''; ?>>Private (hidden from the public directory)</option>
-                                    <option value="public" <?php echo $ucsForm['visibility'] === 'public' ? 'selected' : ''; ?>>Public (visible to students and visitors)</option>
-                                </select>
-                            </div>
-                            <div>
-                                <span class="block text-sm font-medium text-gray-700">Mentorship Availability</span>
-                                <label for="mentorship_available" class="mt-2 flex cursor-pointer items-center justify-between rounded-xl border border-gray-300 px-4 py-2.5">
-                                    <span class="text-sm font-medium text-gray-700">Open to mentoring students</span>
-                                    <input type="checkbox" id="mentorship_available" name="mentorship_available" value="1"
-                                           class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                           <?php echo $ucsForm['mentorship_available'] === 1 ? 'checked' : ''; ?>>
-                                </label>
-                            </div>
+                        <div class="mt-5">
+                            <label for="visibility" class="block text-sm font-medium text-gray-700">Profile Visibility</label>
+                            <select id="visibility" name="visibility" required
+                                    class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                                <option value="private" <?php echo $ucsForm['visibility'] === 'private' ? 'selected' : ''; ?>>Private (hidden from the public directory)</option>
+                                <option value="public" <?php echo $ucsForm['visibility'] === 'public' ? 'selected' : ''; ?>>Public (visible to students and visitors)</option>
+                            </select>
                         </div>
                     </div>
 

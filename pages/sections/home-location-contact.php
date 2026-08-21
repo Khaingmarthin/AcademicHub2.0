@@ -41,7 +41,7 @@ $ucsLocEmail     = $ucsProfile['email']   ?? '';
 $ucsLocPhoneHref = $ucsLocPhone !== '' ? 'tel:+' . preg_replace('/\D/', '', $ucsLocPhone) : '';
 $ucsLocMapUrl    = 'https://www.google.com/maps?q=' . rawurlencode('University of Computer Studies, Meiktila') . '&output=embed';
 ?>
-<section class="bg-slate-50 py-16 sm:py-20">
+<section class="bg-blue-50/60 py-16 sm:py-20">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-10">
 
