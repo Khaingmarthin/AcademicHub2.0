@@ -2,26 +2,14 @@
 /**
  * Homepage Faculties & Departments section.
  *
- * Surfaces the unified Faculties & Departments module on the homepage using
- * the exact same shared component as the Navbar → Faculties page
- * (includes/helpers/ucs-faculties-directory.php), so the design and content are
- * consistent everywhere. The section header is followed directly by the
- * shared tabbed directory:
- *
- *   Faculties & Departments
- *       ↓
- *   [ Faculties ] [ Departments ]
- *       ↓
- *   Selected content/cards
- *
- * All data is read from the database by the shared component.
+ * Section wrapper for the shared faculties directory component.
+ * Clean editorial header with institutional styling.
  */
 
 if (!defined('BASE_URL')) {
     require_once __DIR__ . '/../../config/app.php';
 }
 
-// Reuse the existing database connection if the page already connected.
 if (!isset($pdo)) {
     $ucsDbFile = __DIR__ . '/../../config/database.php';
     if (file_exists($ucsDbFile)) {
@@ -29,11 +17,15 @@ if (!isset($pdo)) {
     }
 }
 ?>
-<section class="bg-blue-50/60 py-16 sm:py-20" aria-labelledby="faculties-heading">
+<section class="border-t border-gray-200 bg-white py-20 sm:py-24" aria-labelledby="faculties-heading">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="mx-auto max-w-2xl text-center">
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Academic Structure</p>
-            <h2 id="faculties-heading" class="mt-3 scroll-mt-24 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">Faculties &amp; Departments</h2>
+            <div class="flex items-center justify-center gap-3">
+                <span class="h-px w-8 bg-blue-600" aria-hidden="true"></span>
+                <span class="text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-blue-600">Academic Structure</span>
+                <span class="h-px w-8 bg-blue-600" aria-hidden="true"></span>
+            </div>
+            <h2 id="faculties-heading" class="mt-4 scroll-mt-24 text-3xl font-bold tracking-[-0.02em] text-gray-900 sm:text-4xl">Faculties &amp; Departments</h2>
             <p class="mt-4 text-base leading-7 text-gray-600">
                 Discover the academic faculties and departments that support teaching, learning, and academic development at UCSMTLA.
             </p>

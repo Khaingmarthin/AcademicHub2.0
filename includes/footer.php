@@ -54,18 +54,18 @@ $footerLinks = [
     'News'              => BASE_URL . '/news.php',
 ];
 ?>
-<footer class="mt-12 bg-blue-950 text-gray-400">
-    <div class="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+<footer class="mt-12 bg-slate-900 text-slate-400">
+    <div class="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
 
             <!-- About the university -->
             <section class="lg:col-span-5" aria-labelledby="footer-university-heading">
-                <h2 id="footer-university-heading" class="text-base font-semibold text-white">About the University</h2>
-                <a href="<?php echo htmlspecialchars(BASE_URL . '/index.php'); ?>" class="mt-4 inline-flex items-center gap-3" aria-label="<?php echo htmlspecialchars($ucsShortName); ?> - Home">
+                <h2 id="footer-university-heading" class="text-[0.9375rem] font-semibold text-white">About the University</h2>
+                <a href="<?php echo htmlspecialchars(BASE_URL . '/index.php'); ?>" class="mt-4 inline-flex items-center gap-3 transition-opacity hover:opacity-80" aria-label="<?php echo htmlspecialchars($ucsShortName); ?> - Home">
                     <img src="<?php echo htmlspecialchars($ucsLogo); ?>" alt="<?php echo htmlspecialchars($ucsShortName); ?> logo" class="h-10 w-10 shrink-0 object-contain">
-                    <span class="leading-tight">
-                        <span class="block text-base font-bold tracking-tight text-white"><?php echo htmlspecialchars($ucsShortName); ?></span>
-                        <span class="block text-[10px] font-semibold uppercase tracking-[0.22em] text-blue-400">Academic Hub</span>
+                    <span class="leading-none">
+                        <span class="block text-[0.9375rem] font-bold tracking-[-0.01em] text-white"><?php echo htmlspecialchars($ucsShortName); ?></span>
+                        <span class="mt-px block text-[0.62rem] font-semibold uppercase tracking-[0.2em] text-sky-400">Academic Hub</span>
                     </span>
                 </a>
                 <p class="mt-3 max-w-sm text-sm leading-6">
@@ -75,9 +75,9 @@ $footerLinks = [
 
             <!-- Quick links -->
             <section class="lg:col-span-3" aria-labelledby="footer-quick-links-heading">
-                <h2 id="footer-quick-links-heading" class="text-base font-semibold text-white">Quick Links</h2>
+                <h2 id="footer-quick-links-heading" class="text-[0.9375rem] font-semibold text-white">Quick Links</h2>
                 <nav aria-label="Footer quick links">
-                    <ul class="mt-4 space-y-2">
+                    <ul class="mt-4 space-y-2.5">
                         <?php foreach ($footerLinks as $ucsLabel => $ucsUrl): ?>
                             <li>
                                 <a href="<?php echo htmlspecialchars($ucsUrl); ?>" class="text-sm transition-colors duration-150 hover:text-white"><?php echo htmlspecialchars($ucsLabel); ?></a>
@@ -89,11 +89,11 @@ $footerLinks = [
 
             <!-- Contact information -->
             <section class="md:col-span-2 lg:col-span-4" aria-labelledby="footer-contact-heading">
-                <h2 id="footer-contact-heading" class="text-base font-semibold text-white">Contact Information</h2>
+                <h2 id="footer-contact-heading" class="text-[0.9375rem] font-semibold text-white">Contact Information</h2>
                 <ul class="mt-4 space-y-3">
                     <?php if ($ucsAddress !== ''): ?>
                         <li class="flex items-start gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mt-1 h-4 w-4 shrink-0 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
                                 <circle cx="12" cy="10" r="3"></circle>
                             </svg>
@@ -102,7 +102,7 @@ $footerLinks = [
                     <?php endif; ?>
                     <?php if ($ucsPhone !== '' && $ucsPhoneHref !== ''): ?>
                         <li class="flex items-start gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mt-1 h-4 w-4 shrink-0 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
                             </svg>
                             <a href="<?php echo htmlspecialchars($ucsPhoneHref); ?>" class="text-sm leading-6 transition-colors duration-150 hover:text-white"><?php echo htmlspecialchars($ucsPhone); ?></a>
@@ -110,7 +110,7 @@ $footerLinks = [
                     <?php endif; ?>
                     <?php if ($ucsEmail !== ''): ?>
                         <li class="flex items-start gap-3">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="mt-1 h-4 w-4 shrink-0 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0 text-sky-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <rect x="2" y="4" width="20" height="16" rx="2"></rect>
                                 <path d="m22 7-10 5L2 7"></path>
                             </svg>
@@ -122,8 +122,8 @@ $footerLinks = [
         </div>
     </div>
 
-    <div class="border-t border-blue-900/60">
-        <div class="mx-auto max-w-7xl px-4 pt-5 pb-4 text-center text-xs text-gray-500 sm:px-6 lg:px-8">
+    <div class="border-t border-slate-800">
+        <div class="mx-auto max-w-7xl px-4 py-5 text-center text-xs text-slate-500 sm:px-6 lg:px-8">
             &copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars($ucsShortName . ' Academic Hub'); ?>. All rights reserved.
         </div>
     </div>

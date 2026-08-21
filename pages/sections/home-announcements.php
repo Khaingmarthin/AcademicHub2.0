@@ -2,18 +2,14 @@
 /**
  * Homepage Latest Announcements section.
  *
- * Surfaces the existing announcement/news system on the homepage using the
- * existing publishing and status logic (only published items whose publish
- * date has passed). One item is featured prominently and the next three are
- * shown as smaller supporting cards. The "View All Announcements" link
- * points to the existing News page.
+ * Editorial news section with featured announcement and supporting list.
+ * Clean typography, clear hierarchy, institutional university style.
  */
 
 if (!defined('BASE_URL')) {
     require_once __DIR__ . '/../../config/app.php';
 }
 
-// Reuse the existing database connection if the page already connected.
 if (!isset($pdo)) {
     $ucsDbFile = __DIR__ . '/../../config/database.php';
     if (file_exists($ucsDbFile)) {
@@ -40,7 +36,6 @@ if (isset($pdo)) {
     }
 }
 
-// Build a clean single-line excerpt from announcement content.
 if (function_exists('mb_strlen')) {
     $ucsExcerpt = function ($ucsText, $ucsMax) {
         $ucsText = trim((string) preg_replace('/\s+/', ' ', strip_tags((string) $ucsText)));
@@ -59,96 +54,96 @@ if (function_exists('mb_strlen')) {
     };
 }
 
-// First item is featured; the rest are supporting cards.
 $ucsFeatured = $ucsAnnouncements[0] ?? null;
 $ucsSupporting = array_slice($ucsAnnouncements, 1, 3);
 ?>
-<section class="bg-white py-16 sm:py-20" aria-labelledby="announcements-heading">
+<section class="border-t border-gray-200 bg-gray-50 py-20 sm:py-24" aria-labelledby="announcements-heading">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div class="mx-auto max-w-2xl text-center">
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">News &amp; Updates</p>
-            <h2 id="announcements-heading" class="mt-3 scroll-mt-24 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">Latest News</h2>
+
+        <!-- Section header -->
+        <div class="flex items-end justify-between">
+            <div>
+                <div class="flex items-center gap-3">
+                    <span class="h-px w-8 bg-blue-600" aria-hidden="true"></span>
+                    <span class="text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-blue-600">News &amp; Updates</span>
+                </div>
+                <h2 id="announcements-heading" class="mt-4 scroll-mt-24 text-3xl font-bold tracking-[-0.02em] text-gray-900 sm:text-4xl">Latest Announcements</h2>
+            </div>
+            <a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="hidden items-center gap-2 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 sm:inline-flex">
+                View all
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M5 12h14M12 5l7 7-7 7"></path>
+                </svg>
+            </a>
         </div>
 
         <?php if ($ucsFeatured !== null): ?>
-            <div class="mt-12 grid grid-cols-1 gap-6 lg:grid-cols-5 lg:gap-8">
+            <div class="mt-10 grid grid-cols-1 gap-10 lg:grid-cols-5 lg:gap-12">
 
                 <!-- Featured announcement -->
-                <article class="group flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-900/5 lg:col-span-3">
-                    <div class="h-1.5 w-full bg-blue-600" aria-hidden="true"></div>
-                    <div class="flex flex-1 flex-col p-6 sm:p-8">
-                        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-                            <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
-                                <?php echo htmlspecialchars($ucsFeatured['category'] ?? 'Announcement'); ?>
-                            </span>
-                            <?php if (!empty($ucsFeatured['published_at'])): ?>
-                                <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <path d="M8 2v4M16 2v4M3 10h18"></path>
-                                        <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                                    </svg>
-                                    <?php echo htmlspecialchars(date('F j, Y', strtotime($ucsFeatured['published_at']))); ?>
-                                </span>
-                            <?php endif; ?>
-                        </div>
-
-                        <h3 class="mt-5 text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">
-                            <?php echo htmlspecialchars($ucsFeatured['title']); ?>
-                        </h3>
-                        <p class="mt-3 flex-1 text-sm leading-6 text-gray-600 sm:text-base sm:leading-7">
-                            <?php echo htmlspecialchars($ucsExcerpt($ucsFeatured['content'], 220)); ?>
-                        </p>
-
-                        <a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="mt-6 inline-flex items-center gap-2 self-start rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-md hover:shadow-blue-600/25 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                            Read More
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M5 12h14M12 5l7 7-7 7"></path>
-                            </svg>
-                        </a>
+                <article class="lg:col-span-3">
+                    <div class="flex items-center gap-3">
+                        <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700">
+                            <?php echo htmlspecialchars($ucsFeatured['category'] ?? 'Announcement'); ?>
+                        </span>
+                        <?php if (!empty($ucsFeatured['published_at'])): ?>
+                            <time class="text-xs text-gray-500" datetime="<?php echo htmlspecialchars($ucsFeatured['published_at']); ?>">
+                                <?php echo htmlspecialchars(date('F j, Y', strtotime($ucsFeatured['published_at']))); ?>
+                            </time>
+                        <?php endif; ?>
                     </div>
+                    <h3 class="mt-4 text-2xl font-bold tracking-[-0.01em] text-gray-900 sm:text-3xl">
+                        <?php echo htmlspecialchars($ucsFeatured['title']); ?>
+                    </h3>
+                    <p class="mt-3 text-base leading-7 text-gray-600">
+                        <?php echo htmlspecialchars($ucsExcerpt($ucsFeatured['content'], 280)); ?>
+                    </p>
+                    <a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        Read full announcement
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M5 12h14M12 5l7 7-7 7"></path>
+                        </svg>
+                    </a>
                 </article>
 
                 <!-- Supporting announcements -->
-                <div class="flex flex-col gap-6 lg:col-span-2">
-                    <?php foreach ($ucsSupporting as $ucsAnnouncement): ?>
-                        <article class="group flex flex-1 flex-col rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-900/5">
-                            <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-                                <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
-                                    <?php echo htmlspecialchars($ucsAnnouncement['category'] ?? 'Announcement'); ?>
-                                </span>
-                                <?php if (!empty($ucsAnnouncement['published_at'])): ?>
-                                    <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                            <path d="M8 2v4M16 2v4M3 10h18"></path>
-                                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                                        </svg>
-                                        <?php echo htmlspecialchars(date('M j, Y', strtotime($ucsAnnouncement['published_at']))); ?>
+                <div class="lg:col-span-2">
+                    <div class="divide-y divide-gray-200 border-t border-gray-200 lg:border-t-0">
+                        <?php foreach ($ucsSupporting as $ucsAnnouncement): ?>
+                            <article class="py-5 first:pt-0 lg:first:pt-0">
+                                <div class="flex items-center gap-3">
+                                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-[0.6875rem] font-medium text-gray-600">
+                                        <?php echo htmlspecialchars($ucsAnnouncement['category'] ?? 'Announcement'); ?>
                                     </span>
-                                <?php endif; ?>
-                            </div>
-
-                            <h3 class="mt-3 text-base font-bold tracking-tight text-gray-900">
-                                <?php echo htmlspecialchars($ucsAnnouncement['title']); ?>
-                            </h3>
-                            <p class="mt-2 flex-1 text-sm leading-6 text-gray-600 line-clamp-2">
-                                <?php echo htmlspecialchars($ucsExcerpt($ucsAnnouncement['content'], 160)); ?>
-                            </p>
-
-                            <a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="mt-4 inline-flex items-center gap-1.5 self-start text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                Read More
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-150 group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M5 12h14M12 5l7 7-7 7"></path>
-                                </svg>
-                            </a>
-                        </article>
-                    <?php endforeach; ?>
+                                    <?php if (!empty($ucsAnnouncement['published_at'])): ?>
+                                        <time class="text-xs text-gray-400" datetime="<?php echo htmlspecialchars($ucsAnnouncement['published_at']); ?>">
+                                            <?php echo htmlspecialchars(date('M j, Y', strtotime($ucsAnnouncement['published_at']))); ?>
+                                        </time>
+                                    <?php endif; ?>
+                                </div>
+                                <h3 class="mt-2 text-base font-semibold tracking-tight text-gray-900">
+                                    <?php echo htmlspecialchars($ucsAnnouncement['title']); ?>
+                                </h3>
+                                <p class="mt-1 text-sm leading-6 text-gray-500 line-clamp-2">
+                                    <?php echo htmlspecialchars($ucsExcerpt($ucsAnnouncement['content'], 140)); ?>
+                                </p>
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700">
+                                    Read more
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M5 12h14M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </div>
 
-            <div class="mt-10 text-center">
-                <a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="group inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                    View All Announcements
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-150 group-hover:translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <!-- Mobile view all link -->
+            <div class="mt-8 text-center sm:hidden">
+                <a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700">
+                    View all announcements
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M5 12h14M12 5l7 7-7 7"></path>
                     </svg>
                 </a>

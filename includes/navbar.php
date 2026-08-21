@@ -105,12 +105,12 @@ $navItems = [
     ['label' => 'Contact', 'url' => BASE_URL . '/index.php#location-contact-heading'],
 ];
 
-$navLinkBase = 'ucs-nav-link relative inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300';
-$navLinkActive = 'is-active';
+$navLinkBase = 'ucs-nav-link relative inline-flex items-center gap-1.5 rounded-lg px-3 py-2 text-[0.8125rem] font-semibold text-slate-600 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-900 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300';
+$navLinkActive = 'is-active text-slate-900';
 ?>
 
 <nav class="hidden lg:block" aria-label="Main navigation">
-    <ul class="flex items-center gap-1">
+    <ul class="flex items-center gap-0.5">
         <?php foreach ($navItems as $item): ?>
             <?php if (!empty($item['children'])): ?>
                 <?php
