@@ -2,11 +2,7 @@
 /**
  * Admin Students module - list.
  *
- * Students are managed across all academic years: the page shows students
- * from every year by default (All Years) but lets the admin switch to a
- * single academic year via a dropdown. It supports combined search + year
- * level + major + classroom + status filtering and displays a small summary
- * computed from the real database. Passwords are never displayed.
+ * Students are managed across all academic years.
  */
 require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
@@ -16,16 +12,13 @@ require_once __DIR__ . '/../../includes/helpers/ucs-admin-lists.php';
 
 admin_require_login();
 
-$pageTitle    = 'Students';
-$pageSubtitle = 'Manage students across academic years.';
+$pageSubtitle = 'Manage current students.';
 $activeNav    = 'students';
 
 $ucsFlash = $_SESSION['student_flash'] ?? null;
 unset($_SESSION['student_flash']);
 
-// ---------------------------------------------------------------------
-// Academic year context: defaults to All Years, filterable per year.
-// ---------------------------------------------------------------------
+// Academic year context.
 $ucsActiveYear     = ucs_admin_active_academic_year($pdo);
 $ucsActiveYearId   = $ucsActiveYear !== null ? (int) $ucsActiveYear['id'] : 0;
 $ucsActiveYearName = $ucsActiveYear !== null ? (string) $ucsActiveYear['year_name'] : '';
@@ -35,7 +28,7 @@ $ucsYearIds        = array_map('intval', array_column($ucsAcademicYears, 'id'));
 
 $ucsYearId = filter_var($_GET['year'] ?? '', FILTER_VALIDATE_INT);
 if ($ucsYearId === false || ($ucsYearId !== 0 && !in_array($ucsYearId, $ucsYearIds, true))) {
-    $ucsYearId = 0; // 0 = All Years
+    $ucsYearId = 0;
 }
 
 $ucsSelectedYear = null;
@@ -48,16 +41,13 @@ foreach ($ucsAcademicYears as $ucsYearRow) {
 $ucsSelectedYearName   = $ucsSelectedYear !== null ? (string) $ucsSelectedYear['year_name'] : '';
 $ucsSelectedYearStatus = $ucsSelectedYear !== null ? (string) $ucsSelectedYear['status'] : '';
 
-// ---------------------------------------------------------------------
-// Filters
-// ---------------------------------------------------------------------
+// Filters.
 $ucsQuery      = trim((string) ($_GET['q'] ?? ''));
 $ucsYearLevel  = trim((string) ($_GET['year_level'] ?? ''));
 $ucsMajorId    = filter_var($_GET['major'] ?? '', FILTER_VALIDATE_INT);
 $ucsClassroomId = filter_var($_GET['classroom'] ?? '', FILTER_VALIDATE_INT);
 $ucsStatus     = trim((string) ($_GET['status'] ?? ''));
 
-// Reject values that are not part of the allowed option lists.
 if (!in_array($ucsYearLevel, CLASSROOM_YEAR_LEVELS, true)) {
     $ucsYearLevel = '';
 }
@@ -65,15 +55,6 @@ if (!in_array($ucsStatus, ['', '1', '0'], true)) {
     $ucsStatus = '';
 }
 
-// Academic status (active / graduated) filters separately from the account
-// status; the two concepts are distinct.
-$ucsAcademicStatus = trim((string) ($_GET['academic_status'] ?? ''));
-if (!in_array($ucsAcademicStatus, ['', 'active', 'graduated'], true)) {
-    $ucsAcademicStatus = '';
-}
-
-// Majors and classrooms are loaded from the database so future records
-// appear automatically in the filters.
 $ucsMajors     = ucs_admin_majors($pdo);
 $ucsClassrooms = ucs_admin_classrooms($pdo);
 
@@ -86,46 +67,33 @@ if ($ucsClassroomId === false || !in_array($ucsClassroomId, $ucsClassroomIds, tr
     $ucsClassroomId = 0;
 }
 
-$ucsHasFilters = $ucsQuery !== '' || $ucsYearLevel !== '' || $ucsMajorId > 0 || $ucsClassroomId > 0 || $ucsStatus !== '' || $ucsAcademicStatus !== '';
+$ucsHasFilters = $ucsQuery !== '' || $ucsYearLevel !== '' || $ucsMajorId > 0 || $ucsClassroomId > 0 || $ucsStatus !== '' || $ucsYearId > 0;
 
-// ---------------------------------------------------------------------
-// Data: summary + filtered listing for the active academic year.
-// ---------------------------------------------------------------------
-$ucsStudents = [];
-$ucsSummary  = ['total' => 0, 'active' => 0, 'inactive' => 0, 'graduated' => 0];
-
+// Summary counts.
+$ucsSummary = ['active' => 0];
 try {
-    $ucsSummaryWhere  = $ucsYearId > 0 ? ' WHERE cl.academic_year_id = :ay' : '';
-    $ucsSummaryParams = $ucsYearId > 0 ? [':ay' => $ucsYearId] : [];
-    $ucsStmt = $pdo->prepare(
-        "SELECT COUNT(*) AS total,
-                COALESCE(SUM(st.status = 1), 0) AS active,
-                COALESCE(SUM(st.status = 0), 0) AS inactive,
-                COALESCE(SUM(st.student_status = 'graduated'), 0) AS graduated
-         FROM students st
-         JOIN classrooms cl ON cl.id = st.classroom_id"
-        . $ucsSummaryWhere
+    $ucsStmt = $pdo->query(
+        "SELECT
+            COALESCE(SUM(st.student_status = 'active'), 0) AS active
+         FROM students st"
     );
-    $ucsStmt->execute($ucsSummaryParams);
-    $ucsSummaryRow = $ucsStmt->fetch() ?: [];
+    $ucsRow = $ucsStmt->fetch() ?: [];
     $ucsSummary = [
-        'total'     => (int) ($ucsSummaryRow['total'] ?? 0),
-        'active'    => (int) ($ucsSummaryRow['active'] ?? 0),
-        'inactive'  => (int) ($ucsSummaryRow['inactive'] ?? 0),
-        'graduated' => (int) ($ucsSummaryRow['graduated'] ?? 0),
+        'active' => (int) ($ucsRow['active'] ?? 0),
     ];
 } catch (PDOException $e) {
-    // Keep zeroed summary when the database is unavailable.
 }
 
+// Data query.
+$ucsStudents = [];
 try {
     $ucsConditions = [];
     $ucsParams     = [];
+
     if ($ucsYearId > 0) {
         $ucsConditions[] = 'cl.academic_year_id = :ay';
         $ucsParams[':ay'] = $ucsYearId;
     }
-
     if ($ucsQuery !== '') {
         $ucsEscaped = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $ucsQuery);
         $ucsConditions[] = '(st.name LIKE :q_name OR st.student_id LIKE :q_id OR st.roll_number LIKE :q_roll OR st.email LIKE :q_email)';
@@ -134,31 +102,25 @@ try {
         $ucsParams[':q_roll']  = '%' . $ucsEscaped . '%';
         $ucsParams[':q_email'] = '%' . $ucsEscaped . '%';
     }
-
     if ($ucsYearLevel !== '') {
         $ucsConditions[] = 'cl.year_level = :year_level';
         $ucsParams[':year_level'] = $ucsYearLevel;
     }
-
     if ($ucsMajorId > 0) {
         $ucsConditions[] = 'cl.major_id = :major_id';
         $ucsParams[':major_id'] = $ucsMajorId;
     }
-
     if ($ucsClassroomId > 0) {
         $ucsConditions[] = 'st.classroom_id = :classroom_id';
         $ucsParams[':classroom_id'] = $ucsClassroomId;
     }
-
     if ($ucsStatus !== '') {
         $ucsConditions[] = 'st.status = :status';
         $ucsParams[':status'] = (int) $ucsStatus;
     }
 
-    if ($ucsAcademicStatus !== '') {
-        $ucsConditions[] = 'st.student_status = :academic_status';
-        $ucsParams[':academic_status'] = $ucsAcademicStatus;
-    }
+    // Exclude graduated (alumni) students.
+    $ucsConditions[] = "st.student_status != 'graduated'";
 
     $ucsWhereSql = count($ucsConditions) > 0 ? ' WHERE ' . implode(' AND ', $ucsConditions) : '';
     $ucsStmt = $pdo->prepare(
@@ -181,33 +143,46 @@ try {
 $ucsStudentCount = count($ucsStudents);
 $ucsResultLabel  = $ucsStudentCount . ' student' . ($ucsStudentCount === 1 ? '' : 's');
 if ($ucsHasFilters) {
-    $ucsResultLabel .= ' matching your filters';
-}
-if ($ucsYearId === 0) {
-    $ucsResultLabel .= ' &middot; All Years';
-} elseif ($ucsSelectedYearName !== '') {
-    $ucsResultLabel .= ' &middot; ' . $ucsSelectedYearName;
-    if ($ucsSelectedYearStatus !== '' && $ucsSelectedYearStatus !== 'Active') {
-        $ucsResultLabel .= ' (' . $ucsSelectedYearStatus . ')';
-    }
+    $ucsResultLabel .= ' matching';
 }
 
+$hidePageHeader = true;
 require_once __DIR__ . '/../../includes/admin-layout-top.php';
 ?>
+<!-- Page Header -->
+<div class="mb-6 flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+    <div>
+        <h1 class="text-2xl font-bold tracking-tight text-slate-900">Student Management</h1>
+        <p class="text-sm text-slate-500"><?php echo htmlspecialchars($pageSubtitle); ?></p>
+    </div>
+    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/create.php'); ?>" class="mt-3 inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 sm:mt-0">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+        Add Student
+    </a>
+</div>
+
+<!-- Summary Stats -->
+<div class="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+            </div>
+            <div>
+                <p class="text-2xl font-bold text-emerald-700"><?php echo number_format($ucsSummary['active']); ?></p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Active Students</p>
+            </div>
+        </div>
+    </div>
+</div>
+
 <?php if ($ucsFlash !== null): ?>
-    <div class="<?php echo $ucsFlash['type'] === 'error' ? 'bg-red-50 ring-red-100 text-red-700' : 'bg-blue-50 ring-blue-100 text-blue-700'; ?> rounded-xl px-4 py-3 ring-1" role="<?php echo $ucsFlash['type'] === 'error' ? 'alert' : 'status'; ?>">
+    <div class="<?php echo $ucsFlash['type'] === 'error' ? 'bg-red-50 border border-red-200 text-red-700' : 'bg-emerald-50 border border-emerald-200 text-emerald-700'; ?> mb-6 rounded-lg px-4 py-3" role="<?php echo $ucsFlash['type'] === 'error' ? 'alert' : 'status'; ?>">
         <p class="flex items-start gap-2 text-sm font-medium">
             <?php if ($ucsFlash['type'] === 'error'): ?>
-                <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="12" cy="12" r="10"></circle>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
             <?php else: ?>
-                <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                    <path d="m9 11 3 3L22 4"></path>
-                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="mt-0.5 h-4 w-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><path d="m9 11 3 3L22 4"></path></svg>
             <?php endif; ?>
             <?php echo htmlspecialchars($ucsFlash['message']); ?>
         </p>
@@ -215,16 +190,13 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
 <?php endif; ?>
 
 <?php if ($ucsActiveYear === null): ?>
-    <div class="rounded-2xl bg-white p-10 text-center shadow-sm ring-1 ring-gray-100">
-        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-            <line x1="16" y1="2" x2="16" y2="6"></line>
-            <line x1="8" y1="2" x2="8" y2="6"></line>
-            <line x1="3" y1="10" x2="21" y2="10"></line>
-        </svg>
-        <h2 class="mt-4 text-lg font-semibold text-gray-800">No active academic year</h2>
-        <p class="mt-2 text-sm text-gray-500">Students are managed under the active academic year. Activate an academic year to get started.</p>
-        <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/academic-years/index.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+    <div class="flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+        </div>
+        <h2 class="mt-4 text-lg font-semibold text-slate-900">No active academic year</h2>
+        <p class="mt-2 text-sm text-slate-500">Students are managed under the active academic year. Activate an academic year to get started.</p>
+        <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/academic-years/index.php'); ?>" class="mt-6 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
             Manage Academic Years
         </a>
     </div>
@@ -232,332 +204,229 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
     <?php exit; ?>
 <?php endif; ?>
 
-<!-- Search + Filters toolbar -->
-<div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
-    <form method="get" action="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/index.php'); ?>" role="search">
-        <div class="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div class="relative w-full lg:max-w-md">
-                <svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="m21 21-4.35-4.35"></path>
-                </svg>
-                <input type="search" name="q" value="<?php echo htmlspecialchars($ucsQuery); ?>" placeholder="Search students..." aria-label="Search students"
-                       class="block w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+<!-- Search + Filters -->
+<div class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <form method="get" action="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/index.php'); ?>" role="search" class="flex flex-col gap-5">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
+                <div class="relative w-full sm:w-64 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                    <input type="search" name="q" value="<?php echo htmlspecialchars($ucsQuery); ?>" placeholder="Search by name, ID, roll, or email..." aria-label="Search students"
+                           class="block w-full rounded-lg border border-slate-300 bg-slate-50 py-2 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+                <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-1 shrink-0">
+                    Search
+                </button>
+                <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/create.php'); ?>" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+                    Add Student
+                </a>
             </div>
-
-            <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/create.php'); ?>" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M5 12h14"></path>
-                    <path d="M12 5v14"></path>
-                </svg>
-                Add Student
-            </a>
+            <?php if ($ucsHasFilters): ?>
+                <div class="flex shrink-0">
+                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/index.php'); ?>" class="inline-flex w-full items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200 focus:ring-offset-1">
+                        Clear Filters
+                    </a>
+                </div>
+            <?php endif; ?>
         </div>
 
-        <div class="mt-5 grid gap-4 border-t border-gray-100 pt-5 sm:grid-cols-2 lg:grid-cols-6">
+        <div class="h-px w-full bg-slate-100"></div>
+
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
             <div>
-                <label for="year-filter" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">Academic Year</label>
+                <label for="year-filter" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">Academic Year</label>
                 <select id="year-filter" name="year" onchange="this.form.submit()" aria-label="Filter by academic year"
-                        class="mt-1.5 block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
                     <option value="">All Years</option>
                     <?php foreach ($ucsAcademicYears as $ucsYearOption): ?>
-                        <?php
-                        $ucsYearOptionStatus = (string) $ucsYearOption['status'];
-                        $ucsYearOptionLabel  = (string) $ucsYearOption['year_name'];
-                        if ($ucsYearOptionStatus !== '') {
-                            $ucsYearOptionLabel .= ' (' . $ucsYearOptionStatus . ')';
-                        }
-                        ?>
-                        <option value="<?php echo (int) $ucsYearOption['id']; ?>" <?php echo $ucsYearId === (int) $ucsYearOption['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($ucsYearOptionLabel); ?></option>
+                        <option value="<?php echo (int) $ucsYearOption['id']; ?>" <?php echo $ucsYearId === (int) $ucsYearOption['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($ucsYearOption['year_name']); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-
             <div>
-                <label for="year-level-filter" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">Year Level</label>
+                <label for="year-level-filter" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">Year Level</label>
                 <select id="year-level-filter" name="year_level" onchange="this.form.submit()" aria-label="Filter by year level"
-                        class="mt-1.5 block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
                     <option value="">All Year Levels</option>
                     <?php foreach (CLASSROOM_YEAR_LEVELS as $ucsYearLevelOption): ?>
                         <option value="<?php echo htmlspecialchars($ucsYearLevelOption); ?>" <?php echo $ucsYearLevel === $ucsYearLevelOption ? 'selected' : ''; ?>><?php echo htmlspecialchars($ucsYearLevelOption); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-
             <div>
-                <label for="major-filter" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">Major</label>
+                <label for="major-filter" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">Major</label>
                 <select id="major-filter" name="major" onchange="this.form.submit()" aria-label="Filter by major"
-                        class="mt-1.5 block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
                     <option value="">All Majors</option>
                     <?php foreach ($ucsMajors as $ucsMajorOption): ?>
                         <option value="<?php echo (int) $ucsMajorOption['id']; ?>" <?php echo (int) $ucsMajorId === (int) $ucsMajorOption['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($ucsMajorOption['name']); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-
             <div>
-                <label for="classroom-filter" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">Section / Classroom</label>
-                <select id="classroom-filter" name="classroom" onchange="this.form.submit()" aria-label="Filter by classroom or section"
-                        class="mt-1.5 block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                <label for="classroom-filter" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">Classroom</label>
+                <select id="classroom-filter" name="classroom" onchange="this.form.submit()" aria-label="Filter by classroom"
+                        class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
                     <option value="">All Classrooms</option>
                     <?php foreach ($ucsClassrooms as $ucsClassroomOption): ?>
-                        <option value="<?php echo (int) $ucsClassroomOption['id']; ?>" <?php echo (int) $ucsClassroomId === (int) $ucsClassroomOption['id'] ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($ucsClassroomOption['classroom_name'] . (!empty($ucsClassroomOption['academic_year']) ? ' — ' . $ucsClassroomOption['academic_year'] : '')); ?>
-                        </option>
+                        <option value="<?php echo (int) $ucsClassroomOption['id']; ?>" <?php echo (int) $ucsClassroomId === (int) $ucsClassroomOption['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($ucsClassroomOption['classroom_name']); ?></option>
                     <?php endforeach; ?>
                 </select>
             </div>
-
             <div>
-                <label for="status-filter" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">Status</label>
+                <label for="status-filter" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">Status</label>
                 <select id="status-filter" name="status" onchange="this.form.submit()" aria-label="Filter by status"
-                        class="mt-1.5 block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                    <option value="">All Status</option>
+                        class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                    <option value="">All Statuses</option>
                     <option value="1" <?php echo $ucsStatus === '1' ? 'selected' : ''; ?>>Active</option>
                     <option value="0" <?php echo $ucsStatus === '0' ? 'selected' : ''; ?>>Inactive</option>
                 </select>
-            </div>
-
-            <div>
-                <label for="academic-status-filter" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">Academic Status</label>
-                <select id="academic-status-filter" name="academic_status" onchange="this.form.submit()" aria-label="Filter by academic status"
-                        class="mt-1.5 block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                    <option value="">All Academic Statuses</option>
-                    <option value="active" <?php echo $ucsAcademicStatus === 'active' ? 'selected' : ''; ?>>Active</option>
-                    <option value="graduated" <?php echo $ucsAcademicStatus === 'graduated' ? 'selected' : ''; ?>>Graduated</option>
-                </select>
-            </div>
-
-            <div class="flex items-end">
-                <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/index.php'); ?>" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400 sm:w-auto">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                        <path d="M3 3v5h5"></path>
-                    </svg>
-                    Clear Filters
-                </a>
             </div>
         </div>
     </form>
 </div>
 
-<!-- Student summary -->
-<div class="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-    <div class="flex items-center gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
-        <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-sm shadow-blue-600/20" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-        </span>
-        <div class="min-w-0">
-            <p class="text-2xl font-extrabold tracking-tight text-gray-900"><?php echo htmlspecialchars(number_format($ucsSummary['total'])); ?></p>
-            <p class="truncate text-sm font-medium text-gray-500">Total Students</p>
-        </div>
-    </div>
-    <div class="flex items-center gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
-        <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 ring-1 ring-blue-100" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                <path d="m9 11 3 3L22 4"></path>
-            </svg>
-        </span>
-        <div class="min-w-0">
-            <p class="text-2xl font-extrabold tracking-tight text-gray-900"><?php echo htmlspecialchars(number_format($ucsSummary['active'])); ?></p>
-            <p class="truncate text-sm font-medium text-gray-500">Active Students</p>
-        </div>
-    </div>
-    <div class="flex items-center gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
-        <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600 ring-1 ring-blue-100" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <circle cx="12" cy="12" r="10"></circle>
-                <line x1="12" y1="8" x2="12" y2="12"></line>
-                <line x1="12" y1="16" x2="12.01" y2="16"></line>
-            </svg>
-        </span>
-        <div class="min-w-0">
-            <p class="text-2xl font-extrabold tracking-tight text-gray-900"><?php echo htmlspecialchars(number_format($ucsSummary['inactive'])); ?></p>
-            <p class="truncate text-sm font-medium text-gray-500">Inactive Students</p>
-        </div>
-    </div>
-    <div class="flex items-center gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
-        <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path>
-                <path d="M22 10v6"></path>
-                <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
-            </svg>
-        </span>
-        <div class="min-w-0">
-            <p class="text-2xl font-extrabold tracking-tight text-gray-900"><?php echo htmlspecialchars(number_format($ucsSummary['graduated'])); ?></p>
-            <p class="truncate text-sm font-medium text-gray-500">Graduated Students</p>
-        </div>
-    </div>
-</div>
 
-<!-- Student table -->
-<div class="mt-6 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
-    <div class="flex flex-col gap-1 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-            <h2 class="text-base font-semibold text-gray-900">Student List</h2>
-            <p class="mt-1 text-sm text-gray-500"><?php echo $ucsResultLabel; ?></p>
-        </div>
+<!-- Student Table -->
+<div class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-100 px-5 py-4">
+        <h2 class="text-sm font-semibold text-slate-900">Student List</h2>
+        <p class="mt-0.5 text-xs text-slate-500"><?php echo $ucsResultLabel; ?></p>
     </div>
 
     <?php if (empty($ucsStudents)): ?>
-        <div class="p-10 text-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                <circle cx="9" cy="7" r="4"></circle>
-                <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
-                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-            </svg>
-            <h3 class="mt-4 text-lg font-semibold text-gray-800">No students found</h3>
-            <p class="mt-2 text-sm text-gray-500">
+        <div class="flex flex-col items-center justify-center p-12 text-center">
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+            </div>
+            <h3 class="mt-4 text-lg font-semibold text-slate-900">
                 <?php if ($ucsHasFilters): ?>
-                    Try changing your search or filter criteria.
-                <?php elseif ($ucsSelectedYearStatus !== '' && $ucsSelectedYearStatus !== 'Active'): ?>
-                    No students were enrolled for this academic year.
+                    No matching students found
                 <?php else: ?>
-                    Add your first student to get started.
+                    No active students found
+                <?php endif; ?>
+            </h3>
+            <p class="mt-2 max-w-sm text-sm text-slate-500">
+                <?php if ($ucsHasFilters): ?>
+                    Try adjusting your search or filter criteria to find what you're looking for.
+                <?php else: ?>
+                    No students are currently enrolled. Add a new student to get started.
                 <?php endif; ?>
             </p>
-            <?php if ($ucsHasFilters): ?>
-                <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/index.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                    Clear Filters
-                </a>
-            <?php else: ?>
-                <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/create.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                    Add Student
-                </a>
-            <?php endif; ?>
+            <div class="mt-6 flex items-center gap-3">
+                <?php if ($ucsHasFilters): ?>
+                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/index.php'); ?>" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200">
+                        Clear Filters
+                    </a>
+                <?php else: ?>
+                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/create.php'); ?>" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+                        Add Student
+                    </a>
+                <?php endif; ?>
+            </div>
         </div>
     <?php else: ?>
-        <div class="overflow-x-auto">
-            <table class="w-full min-w-full text-sm">
+        <!-- Table -->
+        <div class="w-full overflow-x-auto">
+            <table class="w-full text-sm">
                 <thead>
-                    <tr class="bg-gray-50">
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Student</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Roll Number</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Major</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Year Level</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Section</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Academic Status</th>
-                        <th scope="col" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+                    <tr class="border-b border-slate-200 bg-slate-50/80">
+                        <th scope="col" class="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Student</th>
+                        <th scope="col" class="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Major</th>
+                        <th scope="col" class="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Year / Class</th>
+                        <th scope="col" class="px-3 py-2 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Status</th>
+                        <th scope="col" class="px-3 py-2 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-gray-100">
+                <tbody class="divide-y divide-slate-100">
                     <?php foreach ($ucsStudents as $ucsStudent): ?>
                         <?php
                         $ucsStudentName = (string) $ucsStudent['name'];
-                        $ucsJsName      = str_replace(['\\', "'"], ['\\\\', "\\'"], $ucsStudentName);
+                        $ucsStudentJson = htmlspecialchars(json_encode([
+                            'name'           => $ucsStudent['name'],
+                            'student_id'     => $ucsStudent['student_id'],
+                            'roll_number'    => $ucsStudent['roll_number'],
+                            'email'          => $ucsStudent['email'],
+                            'major'          => $ucsStudent['major_name'],
+                            'year_level'     => $ucsStudent['year_level'],
+                            'section'        => $ucsStudent['section'] ?? '',
+                            'classroom'      => $ucsStudent['classroom_name'] ?? '',
+                            'status'         => $ucsStudent['status'] == 1 ? 'Active' : 'Inactive',
+                            'student_status' => ucfirst($ucsStudent['student_status']),
+                            'graduation_year'=> $ucsStudent['graduation_year'] ?? '',
+                        ], JSON_UNESCAPED_SLASHES));
+                        $ucsInitials = '';
+                        $ucsNameParts = explode(' ', trim($ucsStudentName));
+                        foreach ($ucsNameParts as $ucsPart) {
+                            $ucsInitials .= mb_strtoupper(mb_substr($ucsPart, 0, 1));
+                            if (mb_strlen($ucsInitials) >= 2) break;
+                        }
                         ?>
-                        <tr class="transition-colors hover:bg-gray-50/60">
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 ring-1 ring-blue-100" aria-hidden="true">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="9" cy="7" r="4"></circle>
-                                        </svg>
+                        <tr class="transition-colors hover:bg-slate-50/50">
+                            <td class="px-3 py-2">
+                                <div class="flex items-center gap-2.5">
+                                    <span class="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-blue-50 text-[10px] font-bold text-blue-600" aria-hidden="true">
+                                        <?php echo htmlspecialchars($ucsInitials); ?>
                                     </span>
                                     <div class="min-w-0">
-                                        <p class="max-w-[15rem] truncate font-semibold text-gray-900"><?php echo htmlspecialchars($ucsStudentName); ?></p>
-                                        <p class="max-w-[15rem] truncate text-xs text-gray-500"><?php echo htmlspecialchars((string) $ucsStudent['email']); ?></p>
+                                        <p class="font-semibold text-slate-900 truncate max-w-[12rem]"><?php echo htmlspecialchars($ucsStudentName); ?></p>
+                                        <p class="text-[11px] text-slate-500 truncate max-w-[12rem]"><?php echo htmlspecialchars((string) $ucsStudent['student_id']); ?></p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <span class="inline-flex rounded-lg bg-gray-100 px-2.5 py-1 font-mono text-xs font-semibold text-gray-800 ring-1 ring-gray-200"><?php echo htmlspecialchars((string) $ucsStudent['roll_number']); ?></span>
-                                <span class="mt-1 block text-xs text-gray-400">ID <?php echo htmlspecialchars((string) $ucsStudent['student_id']); ?></span>
-                            </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-gray-600"><?php echo htmlspecialchars((string) $ucsStudent['major_name']); ?></td>
-                            <td class="whitespace-nowrap px-6 py-4 text-gray-600"><?php echo htmlspecialchars((string) $ucsStudent['year_level']); ?></td>
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <div class="flex items-center gap-2">
-                                    <?php if (!empty($ucsStudent['section'])): ?>
-                                        <span class="inline-flex items-center rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-gray-800 ring-1 ring-gray-200"><?php echo htmlspecialchars((string) $ucsStudent['section']); ?></span>
-                                    <?php else: ?>
-                                        <span class="text-gray-400">—</span>
-                                    <?php endif; ?>
-                                    <span class="text-xs text-gray-500"><?php echo htmlspecialchars((string) $ucsStudent['classroom_name']); ?></span>
-                                </div>
-                            </td>
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <?php if ((int) $ucsStudent['status'] === 1): ?>
-                                    <span class="inline-flex items-center rounded-full bg-blue-600 px-2.5 py-0.5 text-xs font-semibold text-white">Active</span>
-                                <?php else: ?>
-                                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-500">Inactive</span>
+                            <td class="px-3 py-2 text-xs text-slate-600"><?php echo htmlspecialchars((string) $ucsStudent['major_name']); ?></td>
+                            <td class="px-3 py-2">
+                                <p class="text-slate-900 font-medium text-xs"><?php echo htmlspecialchars((string) $ucsStudent['year_level']); ?></p>
+                                <?php if (!empty($ucsStudent['section'])): ?>
+                                    <p class="text-[11px] text-slate-500">Sec <?php echo htmlspecialchars((string) $ucsStudent['section']); ?></p>
                                 <?php endif; ?>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <?php if ($ucsStudent['student_status'] === 'graduated'): ?>
-                                    <div class="flex flex-wrap items-center gap-2">
-                                        <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200">Graduated</span>
-                                        <?php if (!empty($ucsStudent['graduation_year'])): ?>
-                                            <span class="text-xs text-gray-500"><?php echo htmlspecialchars((string) $ucsStudent['graduation_year']); ?></span>
-                                        <?php endif; ?>
-                                    </div>
+                            <td class="px-3 py-2">
+                                <?php if ($ucsStudent['status'] == 1): ?>
+                                    <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Active</span>
                                 <?php else: ?>
-                                    <span class="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">Active</span>
+                                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 ring-1 ring-inset ring-slate-500/20">Inactive</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <div class="flex flex-wrap items-center justify-end gap-2">
-                                    <?php if ((int) $ucsStudent['status'] === 1 && $ucsStudent['student_status'] !== 'graduated'): ?>
-                                        <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/graduate.php?id=' . (int) $ucsStudent['id']); ?>" title="Confirm graduation for <?php echo htmlspecialchars($ucsStudentName); ?>" aria-label="Confirm graduation for <?php echo htmlspecialchars($ucsStudentName); ?>"
-                                           class="inline-flex h-8 items-center gap-1.5 rounded-lg border border-emerald-200 bg-white px-2.5 text-xs font-semibold text-emerald-700 transition-colors duration-150 hover:bg-emerald-50 hover:text-emerald-800 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                                <path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path>
-                                                <path d="M22 10v6"></path>
-                                                <path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path>
-                                            </svg>
-                                            Graduate
-                                        </a>
-                                    <?php endif; ?>
-
-                                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/edit.php?id=' . (int) $ucsStudent['id']); ?>" title="Edit <?php echo htmlspecialchars($ucsStudentName); ?>" aria-label="Edit <?php echo htmlspecialchars($ucsStudentName); ?>"
-                                       class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-colors duration-150 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <td class="px-3 py-2 text-right">
+                                <div class="flex items-center justify-end gap-1.5">
+                                    <button type="button" onclick="openStudentModal(this)" data-student="<?php echo $ucsStudentJson; ?>"
+                                            class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-[11px] font-semibold text-blue-600 transition-colors hover:bg-blue-100 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
+                                            title="View <?php echo htmlspecialchars($ucsStudentName); ?>" aria-label="View <?php echo htmlspecialchars($ucsStudentName); ?>">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path>
+                                            <circle cx="12" cy="12" r="3"></circle>
+                                        </svg>
+                                        View
+                                    </button>
+                                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/edit.php?id=' . (int) $ucsStudent['id']); ?>"
+                                       class="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-1 text-[11px] font-semibold text-amber-600 transition-colors hover:bg-amber-100 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600"
+                                       title="Edit <?php echo htmlspecialchars($ucsStudentName); ?>" aria-label="Edit <?php echo htmlspecialchars($ucsStudentName); ?>">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
                                             <path d="m15 5 4 4"></path>
                                         </svg>
+                                        Edit
                                     </a>
-
-                                    <?php if ((int) $ucsStudent['status'] !== 1): ?>
-                                        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/student-activate.php'); ?>" class="inline-flex">
-                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
-                                            <input type="hidden" name="id" value="<?php echo (int) $ucsStudent['id']; ?>">
-                                            <button type="submit"
-                                                    class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors duration-150 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                                Activate
-                                            </button>
-                                        </form>
-                                    <?php else: ?>
-                                        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/student-deactivate.php'); ?>" class="inline-flex"
-                                              onsubmit="return confirm('Deactivate student &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;?');">
-                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
-                                            <input type="hidden" name="id" value="<?php echo (int) $ucsStudent['id']; ?>">
-                                            <button type="submit"
-                                                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-                                                Deactivate
-                                            </button>
-                                        </form>
-                                    <?php endif; ?>
-
-                                    <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/student-delete.php'); ?>" class="inline-flex"
-                                          onsubmit="return confirm('Delete student &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;? This cannot be undone.');">
+                                    <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/student-delete.php'); ?>" class="inline-flex" onsubmit="return confirm('Are you sure you want to delete this student? This action cannot be undone.');">
                                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
                                         <input type="hidden" name="id" value="<?php echo (int) $ucsStudent['id']; ?>">
-                                        <button type="submit" title="Delete <?php echo htmlspecialchars($ucsStudentName); ?>" aria-label="Delete <?php echo htmlspecialchars($ucsStudentName); ?>"
-                                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 bg-white text-red-600 transition-colors duration-150 hover:bg-red-50 hover:text-red-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <button type="submit"
+                                                class="inline-flex items-center gap-1 rounded-md bg-red-50 px-2 py-1 text-[11px] font-semibold text-red-500 transition-colors hover:bg-red-100 hover:text-red-600 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                                                title="Delete <?php echo htmlspecialchars($ucsStudentName); ?>" aria-label="Delete <?php echo htmlspecialchars($ucsStudentName); ?>">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M3 6h18"></path>
-                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                                                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                <line x1="14" y1="11" x2="14" y2="17"></line>
                                             </svg>
                                         </button>
                                     </form>
@@ -570,4 +439,168 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
         </div>
     <?php endif; ?>
 </div>
+<!-- View Student Modal -->
+<div id="studentModal" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true" aria-labelledby="studentModalTitle">
+    <div class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="closeStudentModal()"></div>
+    <div class="fixed inset-0 flex items-center justify-center p-4">
+        <div class="relative w-full max-w-2xl rounded-xl border border-slate-200 bg-white shadow-xl" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between border-b border-slate-100 px-6 py-4">
+                <h3 id="studentModalTitle" class="text-base font-semibold text-slate-900">Student Details</h3>
+                <button type="button" onclick="closeStudentModal()" class="inline-flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-600" aria-label="Close modal">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg>
+                </button>
+            </div>
+            <div class="px-6 py-5">
+                <div id="studentModalAvatar" class="mb-5 flex items-center gap-4">
+                    <span class="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-blue-50 text-lg font-bold text-blue-600 ring-1 ring-inset ring-blue-100"></span>
+                    <div class="min-w-0">
+                        <p id="modalStudentName" class="text-xl font-semibold text-slate-900 truncate"></p>
+                        <p id="modalStudentId" class="text-sm text-slate-500"></p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="rounded-lg border border-slate-100 bg-slate-50 p-4">
+                        <h4 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Personal Information</h4>
+                        <dl class="space-y-3 text-sm">
+                            <div>
+                                <dt class="text-slate-500">Roll Number</dt>
+                                <dd id="modalRollNumber" class="mt-0.5 font-medium text-slate-900"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-slate-500">Email</dt>
+                                <dd id="modalEmail" class="mt-0.5 font-medium text-slate-900 truncate"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-slate-500">Account Status</dt>
+                                <dd id="modalStatus" class="mt-0.5"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-slate-500">Academic Status</dt>
+                                <dd id="modalStudentStatus" class="mt-0.5"></dd>
+                            </div>
+                        </dl>
+                    </div>
+
+                    <div class="rounded-lg border border-slate-100 bg-slate-50 p-4">
+                        <h4 class="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Academic Information</h4>
+                        <dl class="space-y-3 text-sm">
+                            <div>
+                                <dt class="text-slate-500">Major</dt>
+                                <dd id="modalMajor" class="mt-0.5 font-medium text-slate-900"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-slate-500">Year Level</dt>
+                                <dd id="modalYearLevel" class="mt-0.5 font-medium text-slate-900"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-slate-500">Section</dt>
+                                <dd id="modalSection" class="mt-0.5 font-medium text-slate-900"></dd>
+                            </div>
+                            <div>
+                                <dt class="text-slate-500">Classroom</dt>
+                                <dd id="modalClassroom" class="mt-0.5 font-medium text-slate-900"></dd>
+                            </div>
+                            <div id="modalGraduationYearWrap">
+                                <dt class="text-slate-500">Graduation Year</dt>
+                                <dd id="modalGraduationYear" class="mt-0.5 font-medium text-slate-900"></dd>
+                            </div>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-3 border-t border-slate-100 px-6 py-4">
+                <button type="button" onclick="closeStudentModal()" class="inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+(function() {
+    'use strict';
+
+    var modal = document.getElementById('studentModal');
+    if (!modal) return;
+
+    function getInitials(name) {
+        var parts = (name || '').trim().split(/\s+/);
+        var initials = '';
+        for (var i = 0; i < parts.length && initials.length < 2; i++) {
+            initials += (parts[i].charAt(0) || '').toUpperCase();
+        }
+        return initials;
+    }
+
+    window.openStudentModal = function(btn) {
+        var data;
+        try {
+            data = JSON.parse(btn.getAttribute('data-student'));
+        } catch (e) {
+            return;
+        }
+
+        var avatar = document.getElementById('studentModalAvatar');
+        if (avatar) {
+            var span = avatar.querySelector('span');
+            if (span) span.textContent = getInitials(data.name);
+        }
+
+        document.getElementById('modalStudentName').textContent = data.name || '';
+        document.getElementById('modalStudentId').textContent = data.student_id || '';
+        document.getElementById('modalRollNumber').textContent = data.roll_number || '\u2014';
+        document.getElementById('modalEmail').textContent = data.email || '\u2014';
+        document.getElementById('modalMajor').textContent = data.major || '\u2014';
+        document.getElementById('modalYearLevel').textContent = data.year_level || '\u2014';
+        document.getElementById('modalSection').textContent = data.section || '\u2014';
+
+        var classroomEl = document.getElementById('modalClassroom');
+        classroomEl.textContent = data.classroom || 'Not Assigned';
+        if (!data.classroom) {
+            classroomEl.classList.remove('font-medium', 'text-slate-900');
+            classroomEl.classList.add('italic', 'text-slate-400');
+        } else {
+            classroomEl.classList.remove('italic', 'text-slate-400');
+            classroomEl.classList.add('font-medium', 'text-slate-900');
+        }
+
+        var statusEl = document.getElementById('modalStatus');
+        if (data.status === 'Active') {
+            statusEl.innerHTML = '<span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Active</span>';
+        } else {
+            statusEl.innerHTML = '<span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-500/20">Inactive</span>';
+        }
+
+        var studentStatusEl = document.getElementById('modalStudentStatus');
+        if (data.student_status === 'Active') {
+            studentStatusEl.innerHTML = '<span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Active</span>';
+        } else {
+            studentStatusEl.innerHTML = '<span class="inline-flex items-center rounded-full bg-violet-50 px-2 py-0.5 text-xs font-semibold text-violet-700 ring-1 ring-inset ring-violet-600/20">' + (data.student_status || 'Graduated') + '</span>';
+        }
+
+        var gradWrap = document.getElementById('modalGraduationYearWrap');
+        if (data.graduation_year) {
+            gradWrap.style.display = '';
+            document.getElementById('modalGraduationYear').textContent = data.graduation_year;
+        } else {
+            gradWrap.style.display = 'none';
+        }
+
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    };
+
+    window.closeStudentModal = function() {
+        modal.classList.add('hidden');
+        document.body.style.overflow = '';
+    };
+
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+            window.closeStudentModal();
+        }
+    });
+})();
+</script>
 <?php require_once __DIR__ . '/../../includes/admin-layout-bottom.php'; ?>

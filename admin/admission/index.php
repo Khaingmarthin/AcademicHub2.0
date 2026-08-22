@@ -117,15 +117,15 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             <?php endif; ?>
         </div>
     <?php else: ?>
-        <div class="overflow-x-auto">
-            <table class="w-full min-w-full text-sm">
-                <thead>
-                    <tr class="bg-gray-50">
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Admission</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Academic Year</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Document</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
-                        <th scope="col" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+        <div class="w-full">
+            <table class="w-full table-fixed text-left text-[13px] text-gray-600">
+                <thead class="border-b border-gray-100 bg-gray-50/50 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <tr>
+                        <th scope="col" class="w-[35%] px-4 py-3">Admission</th>
+                        <th scope="col" class="w-[15%] px-4 py-3">Academic Year</th>
+                        <th scope="col" class="w-1/4 px-4 py-3">Document</th>
+                        <th scope="col" class="w-[10%] px-4 py-3">Status</th>
+                        <th scope="col" class="w-[15%] px-4 py-3 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -134,53 +134,54 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                         $ucsAdmissionTitle = (string) $ucsAdmission['title'];
                         $ucsJsName         = str_replace(['\\', "'"], ['\\\\', "\\'"], $ucsAdmissionTitle);
                         ?>
-                        <tr class="transition-colors hover:bg-gray-50/60">
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 ring-1 ring-blue-100" aria-hidden="true">
+                        <tr class="transition-colors hover:bg-gray-50/50">
+                            <td class="px-4 py-3 truncate">
+                                <div class="flex items-center gap-2">
+                                    <span class="hidden sm:inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 ring-1 ring-blue-100" aria-hidden="true">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M12 2v20"></path>
                                             <path d="m17 5 4 4-4 4"></path>
                                             <path d="m7 19-4-4 4-4"></path>
                                         </svg>
                                     </span>
-                                    <div class="min-w-0">
-                                        <p class="max-w-[16rem] truncate font-semibold text-gray-900"><?php echo htmlspecialchars($ucsAdmissionTitle); ?></p>
-                                        <p class="text-xs text-gray-500">Added <?php echo date('j M Y', strtotime((string) $ucsAdmission['created_at'])); ?></p>
+                                    <div class="min-w-0 flex-1 truncate">
+                                        <p class="truncate font-semibold text-gray-900"><?php echo htmlspecialchars($ucsAdmissionTitle); ?></p>
+                                        <p class="truncate text-[11px] text-gray-500">Added <?php echo date('j M Y', strtotime((string) $ucsAdmission['created_at'])); ?></p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-gray-600"><?php echo htmlspecialchars((string) $ucsAdmission['academic_year']); ?></td>
-                            <td class="whitespace-nowrap px-6 py-4 text-gray-600">
+                            <td class="px-4 py-3 truncate text-gray-600"><?php echo htmlspecialchars((string) $ucsAdmission['academic_year']); ?></td>
+                            <td class="px-4 py-3 truncate text-gray-600">
                                 <?php if (!empty($ucsAdmission['document_title'])): ?>
-                                    <span class="inline-flex items-center gap-1.5 rounded-lg bg-gray-100 px-2.5 py-1 text-xs font-medium text-gray-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                    <span class="inline-flex items-center gap-1.5 rounded bg-gray-100 px-2 py-0.5 text-[11px] font-medium text-gray-600 truncate max-w-full">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                             <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                             <path d="M7 10l5 5 5-5"></path>
                                             <path d="M12 15V3"></path>
                                         </svg>
-                                        <?php echo htmlspecialchars($ucsAdmission['document_title']); ?>
-                                        <span class="rounded bg-white px-1.5 py-0.5 text-[10px] font-semibold text-gray-400"><?php echo htmlspecialchars((string) $ucsAdmission['document_type']); ?></span>
+                                        <span class="truncate"><?php echo htmlspecialchars($ucsAdmission['document_title']); ?></span>
+                                        <span class="ml-1 shrink-0 rounded bg-white px-1 text-[9px] font-semibold text-gray-400"><?php echo htmlspecialchars((string) $ucsAdmission['document_type']); ?></span>
                                     </span>
                                 <?php else: ?>
-                                    <span class="text-xs text-gray-400">No document</span>
+                                    <span class="text-[11px] text-gray-400">No document</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4">
+                            <td class="px-4 py-3">
                                 <?php if ((int) $ucsAdmission['status'] === 1): ?>
-                                    <span class="inline-flex items-center rounded-full bg-blue-600 px-2.5 py-0.5 text-xs font-semibold text-white">Active</span>
+                                    <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Active</span>
                                 <?php else: ?>
-                                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-500">Inactive</span>
+                                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 ring-1 ring-inset ring-slate-500/20">Inactive</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <div class="flex flex-wrap items-center justify-end gap-2">
-                                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/admission/edit.php?id=' . (int) $ucsAdmission['id']); ?>" title="Edit <?php echo htmlspecialchars($ucsAdmissionTitle); ?>" aria-label="Edit <?php echo htmlspecialchars($ucsAdmissionTitle); ?>"
-                                       class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-colors duration-150 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end gap-1.5">
+                                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/admission/edit.php?id=' . (int) $ucsAdmission['id']); ?>" title="Edit <?php echo htmlspecialchars($ucsAdmissionTitle); ?>"
+                                       class="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-1 text-[11px] font-semibold text-amber-600 transition-colors hover:bg-amber-100">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
                                             <path d="m15 5 4 4"></path>
                                         </svg>
+                                        Edit
                                     </a>
 
                                     <?php if ((int) $ucsAdmission['status'] !== 1): ?>
@@ -188,7 +189,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
                                             <input type="hidden" name="id" value="<?php echo (int) $ucsAdmission['id']; ?>">
                                             <button type="submit"
-                                                    class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors duration-150 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                                    class="inline-flex items-center gap-1 rounded-md bg-blue-50 px-2 py-1 text-[11px] font-semibold text-blue-600 transition-colors hover:bg-blue-100">
                                                 Activate
                                             </button>
                                         </form>
@@ -198,7 +199,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
                                             <input type="hidden" name="id" value="<?php echo (int) $ucsAdmission['id']; ?>">
                                             <button type="submit"
-                                                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                                    class="inline-flex items-center gap-1 rounded-md bg-slate-100 px-2 py-1 text-[11px] font-semibold text-slate-600 transition-colors hover:bg-slate-200">
                                                 Deactivate
                                             </button>
                                         </form>
@@ -208,13 +209,16 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                                           onsubmit="return confirm('Delete admission &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;? This cannot be undone.');">
                                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
                                         <input type="hidden" name="id" value="<?php echo (int) $ucsAdmission['id']; ?>">
-                                        <button type="submit" title="Delete <?php echo htmlspecialchars($ucsAdmissionTitle); ?>" aria-label="Delete <?php echo htmlspecialchars($ucsAdmissionTitle); ?>"
-                                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 bg-white text-red-600 transition-colors duration-150 hover:bg-red-50 hover:text-red-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <button type="submit" title="Delete <?php echo htmlspecialchars($ucsAdmissionTitle); ?>"
+                                                class="inline-flex items-center gap-1 rounded-md bg-red-50 px-2 py-1 text-[11px] font-semibold text-red-500 transition-colors hover:bg-red-100 hover:text-red-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                                 <path d="M3 6h18"></path>
-                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                                                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                                <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+                                                <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+                                                <line x1="10" y1="11" x2="10" y2="17"></line>
+                                                <line x1="14" y1="11" x2="14" y2="17"></line>
                                             </svg>
+                                            Del
                                         </button>
                                     </form>
                                 </div>

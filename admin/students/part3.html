@@ -1,0 +1,96 @@
+﻿<!-- Student table -->
+<div class="rounded-xl border border-slate-200 bg-white shadow-sm">
+    <div class="border-b border-slate-100 px-6 py-4">
+        <h2 class="text-sm font-semibold text-slate-900"><?php echo $ucsTab === 'alumni' ? 'Alumni' : 'Active Students'; ?></h2>
+        <p class="mt-0.5 text-xs text-slate-500"><?php echo $ucsResultLabel; ?></p>
+    </div>
+    <?php if (empty($ucsStudents)): ?>
+        <div class="flex flex-col items-center justify-center p-12 text-center">
+            <div class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+            </div>
+            <h3 class="mt-4 text-sm font-semibold text-slate-900"><?php echo $ucsTab === 'alumni' ? 'No alumni records found.' : 'No active students found.'; ?></h3>
+            <p class="mt-1.5 text-xs text-slate-500"><?php if ($ucsHasFilters): ?>Try changing your search or filter criteria.<?php elseif ($ucsTab === 'alumni'): ?>No students have been graduated yet.<?php else: ?>Add your first student to get started.<?php endif; ?></p>
+            <?php if ($ucsHasFilters): ?>
+                <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/index.php?tab=' . $ucsTab); ?>" class="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50">Clear Filters</a>
+            <?php elseif ($ucsTab === 'active'): ?>
+                <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/create.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition-colors hover:bg-blue-700">Add Student</a>
+            <?php endif; ?>
+        </div>
+    <?php else: ?>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="border-b border-slate-100 bg-slate-50/50">
+                        <th scope="col" class="px-6 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Student</th>
+                        <th scope="col" class="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Roll No.</th>
+                        <th scope="col" class="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Major</th>
+                        <th scope="col" class="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Year</th>
+                        <th scope="col" class="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Section</th>
+                        <th scope="col" class="px-4 py-2.5 text-left text-[11px] font-semibold uppercase tracking-wider text-slate-500">Status</th>
+                        <th scope="col" class="px-4 py-2.5 text-right text-[11px] font-semibold uppercase tracking-wider text-slate-500">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <?php foreach ($ucsStudents as $ucsStudent): ?>
+                        <?php
+                        $ucsStudentName = (string) $ucsStudent['name'];
+                        $ucsJsName = str_replace(['\\', "'"], ['\\\\', "\\'"], $ucsStudentName);
+                        $ucsStudentJson = htmlspecialchars(json_encode([
+                            'name' => $ucsStudent['name'], 'student_id' => $ucsStudent['student_id'],
+                            'roll_number' => $ucsStudent['roll_number'], 'email' => $ucsStudent['email'],
+                            'major' => $ucsStudent['major_name'], 'year_level' => $ucsStudent['year_level'],
+                            'section' => $ucsStudent['section'] ?? '', 'classroom' => $ucsStudent['classroom_name'],
+                            'status' => (int) $ucsStudent['status'] === 1 ? 'Active' : 'Inactive',
+                            'student_status' => $ucsStudent['student_status'],
+                            'graduation_year' => $ucsStudent['graduation_year'] ?? '',
+                        ], JSON_UNESCAPED_SLASHES));
+                        ?>
+                        <tr class="transition-colors hover:bg-slate-50/50">
+                            <td class="whitespace-nowrap px-6 py-3">
+                                <div class="flex items-center gap-3">
+                                    <span class="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 ring-1 ring-blue-100"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg></span>
+                                    <div class="min-w-0">
+                                        <p class="max-w-[14rem] truncate font-semibold text-slate-900"><?php echo htmlspecialchars($ucsStudentName); ?></p>
+                                        <p class="max-w-[14rem] truncate text-xs text-slate-400"><?php echo htmlspecialchars((string) $ucsStudent['student_id']); ?></p>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3"><span class="inline-flex rounded-md bg-slate-100 px-2 py-0.5 font-mono text-xs font-semibold text-slate-700"><?php echo htmlspecialchars((string) $ucsStudent['roll_number']); ?></span></td>
+                            <td class="whitespace-nowrap px-4 py-3 text-xs text-slate-600"><?php echo htmlspecialchars((string) $ucsStudent['major_name']); ?></td>
+                            <td class="whitespace-nowrap px-4 py-3 text-xs text-slate-600"><?php echo htmlspecialchars((string) $ucsStudent['year_level']); ?></td>
+                            <td class="whitespace-nowrap px-4 py-3">
+                                <?php if (!empty($ucsStudent['section'])): ?>
+                                    <div class="flex items-center gap-1.5">
+                                        <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-0.5 text-xs font-semibold uppercase tracking-wide text-slate-700"><?php echo htmlspecialchars((string) $ucsStudent['section']); ?></span>
+                                        <span class="text-[11px] text-slate-400"><?php echo htmlspecialchars((string) $ucsStudent['classroom_name']); ?></span>
+                                    </div>
+                                <?php else: ?>
+                                    <span class="text-xs text-slate-400"><?php echo htmlspecialchars((string) $ucsStudent['classroom_name']); ?></span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3">
+                                <?php if ((int) $ucsStudent['status'] === 1): ?>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/10"><span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>Active</span>
+                                <?php else: ?>
+                                    <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-500 ring-1 ring-inset ring-slate-500/10"><span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>Inactive</span>
+                                <?php endif; ?>
+                            </td>
+                            <td class="whitespace-nowrap px-4 py-3">
+                                <div class="flex items-center justify-end gap-1.5">
+                                    <button type="button" onclick="openStudentModal(<?php echo $ucsStudentJson; ?>)" title="View <?php echo htmlspecialchars($ucsStudentName); ?>" class="inline-flex items-center gap-1 rounded-md bg-slate-50 px-2 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100 hover:text-slate-900"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>View</button>
+                                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/edit.php?id=' . (int) $ucsStudent['id']); ?>" title="Edit <?php echo htmlspecialchars($ucsStudentName); ?>" class="inline-flex items-center gap-1 rounded-md bg-amber-50 px-2 py-1 text-xs font-medium text-amber-600 transition-colors hover:bg-amber-100 hover:text-amber-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>Edit</a>
+                                    <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/student-delete.php'); ?>" class="inline-flex" onsubmit="return confirm('Delete student &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;? This cannot be undone.');">
+                                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
+                                        <input type="hidden" name="id" value="<?php echo (int) $ucsStudent['id']; ?>">
+                                        <button type="submit" title="Delete" class="inline-flex items-center gap-1 rounded-md bg-rose-50 px-2 py-1 text-xs font-medium text-rose-600 transition-colors hover:bg-rose-100 hover:text-rose-700"><svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg></button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php endif; ?>
+</div>

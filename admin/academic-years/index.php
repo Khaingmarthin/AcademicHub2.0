@@ -80,7 +80,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
 
 <div class="rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
     <!-- Card header: title, search, add button -->
-    <div class="flex flex-col gap-4 border-b border-gray-100 p-6 lg:flex-row lg:items-center lg:justify-between">
+    <div class="flex flex-col gap-4 border-b border-gray-100 p-6">
         <div>
             <h2 class="text-base font-semibold text-gray-900">Academic Year List</h2>
             <p class="mt-1 text-sm text-gray-500">Only one academic year can be Active at a time. Activating a year automatically archives the previous Active one.</p>
@@ -135,15 +135,14 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             <?php endif; ?>
         </div>
     <?php else: ?>
-        <div class="overflow-x-auto">
-            <table class="w-full min-w-full text-sm">
-                <thead>
-                    <tr class="bg-gray-50">
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Academic Year</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Start Date</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">End Date</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Status</th>
-                        <th scope="col" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+        <div class="w-full">
+            <table class="w-full table-fixed text-left text-[13px] text-gray-600">
+                <thead class="border-b border-gray-100 bg-gray-50/50 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <tr>
+                        <th scope="col" class="w-[40%] px-4 py-3">Academic Year</th>
+                        <th scope="col" class="w-[20%] px-4 py-3">Status</th>
+                        <th scope="col" class="w-[22%] px-4 py-3">Created At</th>
+                        <th scope="col" class="w-[18%] px-4 py-3 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -152,10 +151,10 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                         $ucsYearName = (string) $ucsYear['year_name'];
                         $ucsJsName   = str_replace(['\\', "'"], ['\\\\', "\\'"], $ucsYearName);
                         ?>
-                        <tr class="transition-colors hover:bg-gray-50/60">
-                            <td class="whitespace-nowrap px-6 py-4">
+                        <tr class="transition-colors hover:bg-gray-50/50">
+                            <td class="px-4 py-3 truncate">
                                 <div class="flex items-center gap-3">
-                                    <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 ring-1 ring-blue-100" aria-hidden="true">
+                                    <span class="hidden sm:inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-50 text-blue-600 ring-1 ring-blue-100" aria-hidden="true">
                                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <rect x="3" y="4" width="18" height="18" rx="2"></rect>
                                             <line x1="16" y1="2" x2="16" y2="6"></line>
@@ -163,82 +162,54 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                                             <line x1="3" y1="10" x2="21" y2="10"></line>
                                         </svg>
                                     </span>
-                                    <div class="min-w-0">
-                                        <p class="font-semibold text-gray-900"><?php echo htmlspecialchars($ucsYearName); ?></p>
-                                        <p class="text-xs text-gray-500">Added <?php echo $ucsFmtDate($ucsYear['created_at']); ?></p>
+                                    <div class="min-w-0 flex-1 truncate">
+                                        <p class="truncate font-semibold text-gray-900"><?php echo htmlspecialchars($ucsYearName); ?></p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-gray-600"><?php echo $ucsFmtDate($ucsYear['start_date']); ?></td>
-                            <td class="whitespace-nowrap px-6 py-4 text-gray-600"><?php echo $ucsFmtDate($ucsYear['end_date']); ?></td>
-                            <td class="whitespace-nowrap px-6 py-4">
+                            <td class="px-4 py-3">
                                 <?php if ($ucsYear['status'] === 'Active'): ?>
-                                    <span class="inline-flex items-center rounded-full bg-blue-600 px-2.5 py-0.5 text-xs font-semibold text-white">
+                                    <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">
                                         Active
                                     </span>
                                 <?php elseif ($ucsYear['status'] === 'Preparation'): ?>
-                                    <span class="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
+                                    <span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700 ring-1 ring-inset ring-blue-600/20">
                                         Preparation
                                     </span>
                                 <?php else: ?>
-                                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-500">
+                                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 ring-1 ring-inset ring-slate-500/20">
                                         Archived
                                     </span>
                                 <?php endif; ?>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <div class="flex flex-wrap items-center justify-end gap-2">
-                                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/academic-years/edit.php?id=' . (int) $ucsYear['id']); ?>" title="Edit <?php echo htmlspecialchars($ucsYearName); ?>" aria-label="Edit <?php echo htmlspecialchars($ucsYearName); ?>"
-                                       class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-colors duration-150 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-                                            <path d="m15 5 4 4"></path>
-                                        </svg>
-                                    </a>
+                            <td class="px-4 py-3 truncate text-gray-600"><?php echo $ucsFmtDate($ucsYear['created_at']); ?></td>
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end gap-2">
+                                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/academic-years/edit.php?id=' . (int) $ucsYear['id']); ?>"
+                                       class="text-[12px] font-semibold text-amber-600 hover:text-amber-700 transition-colors">Edit</a>
 
                                     <?php if ($ucsYear['status'] !== 'Active'): ?>
-                                        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/academic-year-activate.php'); ?>" class="inline-flex">
+                                        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/academic-year-activate.php'); ?>" class="inline m-0">
                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
                                             <input type="hidden" name="id" value="<?php echo (int) $ucsYear['id']; ?>">
-                                            <button type="submit"
-                                                    class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors duration-150 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                                    <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"></path>
-                                                </svg>
-                                                Activate
-                                            </button>
+                                            <button type="submit" class="text-[12px] font-semibold text-blue-600 hover:text-blue-700 transition-colors">Activate</button>
                                         </form>
                                     <?php endif; ?>
 
                                     <?php if ($ucsYear['status'] !== 'Archived'): ?>
-                                        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/academic-year-archive.php'); ?>" class="inline-flex"
-                                              onsubmit="return confirm('Archive academic year &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;? Archived years are kept for reference and are no longer active.');">
+                                        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/academic-year-archive.php'); ?>" class="inline m-0"
+                                              onsubmit="return confirm('Archive academic year &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;?');">
                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
                                             <input type="hidden" name="id" value="<?php echo (int) $ucsYear['id']; ?>">
-                                            <button type="submit"
-                                                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                                    <rect x="2" y="3" width="20" height="5" rx="1"></rect>
-                                                    <path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"></path>
-                                                    <path d="M10 12h4"></path>
-                                                </svg>
-                                                Archive
-                                            </button>
+                                            <button type="submit" class="text-[12px] font-semibold text-slate-500 hover:text-slate-700 transition-colors">Archive</button>
                                         </form>
                                     <?php endif; ?>
 
-                                    <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/academic-year-delete.php'); ?>" class="inline-flex"
-                                          onsubmit="return confirm('Delete academic year &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;? This permanently removes it and can only be done if it has no linked courses, classrooms, admissions or news.');">
+                                    <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/academic-year-delete.php'); ?>" class="inline m-0"
+                                          onsubmit="return confirm('Delete academic year &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;? This cannot be undone.');">
                                         <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
                                         <input type="hidden" name="id" value="<?php echo (int) $ucsYear['id']; ?>">
-                                        <button type="submit" title="Delete <?php echo htmlspecialchars($ucsYearName); ?>" aria-label="Delete <?php echo htmlspecialchars($ucsYearName); ?>"
-                                                class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-red-200 bg-white text-red-600 transition-colors duration-150 hover:bg-red-50 hover:text-red-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                                <path d="M3 6h18"></path>
-                                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                                                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                                            </svg>
-                                        </button>
+                                        <button type="submit" class="text-[12px] font-semibold text-red-500 hover:text-red-600 transition-colors">Delete</button>
                                     </form>
                                 </div>
                             </td>

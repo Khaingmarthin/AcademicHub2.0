@@ -18,7 +18,7 @@ $ucsId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
 
 try {
     $ucsStmt = $pdo->prepare(
-        "SELECT id, category_id, title, content, cover_image, published_at, expired_at, status
+        "SELECT id, category_id, title, content, cover_image, published_at, status
          FROM news
          WHERE id = :id
          LIMIT 1"
@@ -46,7 +46,6 @@ $ucsForm = [
     'title'       => $ucsOld['title'] ?? $ucsNews['title'],
     'content'     => $ucsOld['content'] ?? $ucsNews['content'],
     'publish_at'  => $ucsOld['publish_at'] ?? (!empty($ucsNews['published_at']) ? date('Y-m-d\TH:i', strtotime($ucsNews['published_at'])) : ''),
-    'expired_at'  => $ucsOld['expired_at'] ?? (!empty($ucsNews['expired_at']) ? date('Y-m-d\TH:i', strtotime($ucsNews['expired_at'])) : ''),
 ];
 
 $ucsCategories  = ucs_admin_categories($pdo);
@@ -139,10 +138,6 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                         <p class="mt-1.5 text-xs text-gray-500">Status updates automatically based on dates.</p>
                     </div>
                     <div>
-                        <label for="expired_at" class="block text-sm font-medium text-gray-700">Expired Date <span class="text-gray-400">(optional)</span></label>
-                        <input type="datetime-local" id="expired_at" name="expired_at" value="<?php echo htmlspecialchars($ucsForm['expired_at']); ?>"
-                               class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                        <p class="mt-1.5 text-xs text-gray-500">When this date passes, the announcement is automatically marked as expired.</p>
                     </div>
                 </div>
 

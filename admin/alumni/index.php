@@ -376,17 +376,17 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             <?php endif; ?>
         </div>
     <?php else: ?>
-        <div class="overflow-x-auto">
-            <table class="w-full min-w-full text-sm">
-                <thead>
-                    <tr class="bg-gray-50">
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Alumnus</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Major</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Graduation Year</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Current Occupation</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Verification</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider text-gray-500">Visibility</th>
-                        <th scope="col" class="px-6 py-3 text-right text-xs font-semibold uppercase tracking-wider text-gray-500">Actions</th>
+        <div class="w-full">
+            <table class="w-full table-fixed text-left text-[13px] text-gray-600">
+                <thead class="border-b border-gray-100 bg-gray-50/50 text-xs font-semibold uppercase tracking-wider text-gray-500">
+                    <tr>
+                        <th scope="col" class="w-1/4 px-4 py-3">Alumnus</th>
+                        <th scope="col" class="w-[15%] px-4 py-3">Major</th>
+                        <th scope="col" class="w-[10%] px-4 py-3">Class of</th>
+                        <th scope="col" class="w-1/5 px-4 py-3">Occupation</th>
+                        <th scope="col" class="w-[10%] px-4 py-3 text-center">Status</th>
+                        <th scope="col" class="w-[10%] px-4 py-3 text-center">Vis</th>
+                        <th scope="col" class="w-[10%] px-4 py-3 text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -398,110 +398,83 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                         $ucsIsVerified  = $ucsProfile['verification_status'] === 'verified';
                         $ucsIsRejected  = $ucsProfile['verification_status'] === 'rejected';
                         ?>
-                        <tr class="transition-colors hover:bg-gray-50/60">
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <div class="flex items-center gap-3">
-                                    <span class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 ring-1 ring-blue-100" aria-hidden="true">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <tr class="transition-colors hover:bg-gray-50/50">
+                            <td class="px-4 py-3 truncate">
+                                <div class="flex items-center gap-2">
+                                    <span class="hidden sm:inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-blue-50 text-blue-600 ring-1 ring-blue-100" aria-hidden="true">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
                                             <circle cx="9" cy="7" r="4"></circle>
                                         </svg>
                                     </span>
-                                    <div class="min-w-0">
-                                        <p class="max-w-[13rem] truncate font-semibold text-gray-900"><?php echo htmlspecialchars($ucsProfileName); ?></p>
-                                        <p class="max-w-[13rem] truncate text-xs text-gray-500"><?php echo htmlspecialchars((string) $ucsProfile['roll_number']); ?> &middot; <?php echo htmlspecialchars((string) $ucsProfile['student_code']); ?></p>
+                                    <div class="min-w-0 flex-1 truncate">
+                                        <p class="truncate font-semibold text-gray-900"><?php echo htmlspecialchars($ucsProfileName); ?></p>
+                                        <p class="truncate text-[11px] text-gray-500"><?php echo htmlspecialchars((string) $ucsProfile['roll_number']); ?></p>
                                     </div>
                                 </div>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4 text-gray-600"><?php echo htmlspecialchars((string) $ucsProfile['major_name']); ?></td>
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <span class="inline-flex rounded-lg bg-gray-100 px-2.5 py-1 font-mono text-xs font-semibold text-gray-800 ring-1 ring-gray-200"><?php echo htmlspecialchars((string) $ucsProfile['graduation_year']); ?></span>
+                            <td class="px-4 py-3 truncate" title="<?php echo htmlspecialchars((string) $ucsProfile['major_name']); ?>">
+                                <?php echo htmlspecialchars((string) $ucsProfile['major_name']); ?>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4">
+                            <td class="px-4 py-3">
+                                <span class="inline-flex rounded bg-gray-100 px-2 py-0.5 font-mono text-xs font-semibold text-gray-800 ring-1 ring-gray-200"><?php echo htmlspecialchars((string) $ucsProfile['graduation_year']); ?></span>
+                            </td>
+                            <td class="px-4 py-3 truncate">
                                 <?php if (!empty($ucsProfile['current_job']) || !empty($ucsProfile['company'])): ?>
-                                    <span class="block max-w-[12rem] truncate font-medium text-gray-800"><?php echo htmlspecialchars((string) $ucsProfile['current_job']); ?></span>
-                                    <span class="block max-w-[12rem] truncate text-xs text-gray-500"><?php echo htmlspecialchars((string) $ucsProfile['company']); ?></span>
+                                    <p class="truncate font-medium text-gray-800" title="<?php echo htmlspecialchars((string) $ucsProfile['current_job']); ?>"><?php echo htmlspecialchars((string) $ucsProfile['current_job']); ?></p>
+                                    <p class="truncate text-[11px] text-gray-500" title="<?php echo htmlspecialchars((string) $ucsProfile['company']); ?>"><?php echo htmlspecialchars((string) $ucsProfile['company']); ?></p>
                                 <?php else: ?>
                                     <span class="text-gray-400">—</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4">
+                            <td class="px-4 py-3 text-center">
                                 <?php if ($ucsIsVerified): ?>
-                                    <span class="inline-flex items-center rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-emerald-200">Verified</span>
+                                    <span class="inline-flex items-center rounded bg-emerald-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-emerald-700 ring-1 ring-emerald-200">Verified</span>
                                 <?php elseif ($ucsIsRejected): ?>
-                                    <span class="inline-flex items-center rounded-full bg-red-50 px-2.5 py-0.5 text-xs font-semibold text-red-700 ring-1 ring-red-200">Rejected</span>
+                                    <span class="inline-flex items-center rounded bg-red-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-red-700 ring-1 ring-red-200">Rejected</span>
                                 <?php else: ?>
-                                    <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 ring-1 ring-amber-200">Pending</span>
+                                    <span class="inline-flex items-center rounded bg-amber-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-700 ring-1 ring-amber-200">Pending</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4">
+                            <td class="px-4 py-3 text-center">
                                 <?php if ($ucsProfile['visibility'] === 'public'): ?>
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path></svg>
-                                        Public
+                                    <span class="inline-flex items-center justify-center rounded text-blue-600" title="Public">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path></svg>
                                     </span>
                                 <?php else: ?>
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-500 ring-1 ring-gray-200">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>
-                                        Private
+                                    <span class="inline-flex items-center justify-center rounded text-gray-400" title="Private">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>
                                     </span>
                                 <?php endif; ?>
                             </td>
-                            <td class="whitespace-nowrap px-6 py-4">
-                                <div class="flex flex-wrap items-center justify-end gap-2">
-                                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/view.php?id=' . (int) $ucsProfile['id']); ?>" title="View <?php echo htmlspecialchars($ucsProfileName); ?>" aria-label="View <?php echo htmlspecialchars($ucsProfileName); ?>"
-                                       class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-colors duration-150 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <td class="px-4 py-3 text-right">
+                                <div class="flex items-center justify-end gap-1.5">
+                                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/view.php?id=' . (int) $ucsProfile['id']); ?>" title="View <?php echo htmlspecialchars($ucsProfileName); ?>"
+                                       class="inline-flex h-7 w-7 items-center justify-center rounded bg-blue-50 text-blue-600 transition-colors hover:bg-blue-100">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                             <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path>
                                             <circle cx="12" cy="12" r="3"></circle>
                                         </svg>
                                     </a>
-                                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/edit.php?id=' . (int) $ucsProfile['id']); ?>" title="Edit <?php echo htmlspecialchars($ucsProfileName); ?>" aria-label="Edit <?php echo htmlspecialchars($ucsProfileName); ?>"
-                                       class="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-gray-200 bg-white text-gray-600 transition-colors duration-150 hover:bg-gray-50 hover:text-gray-900 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-                                            <path d="m15 5 4 4"></path>
-                                        </svg>
-                                    </a>
-
+                                    
                                     <?php if ($ucsIsPending): ?>
                                         <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/alumni-verify.php'); ?>" class="inline-flex">
                                             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
                                             <input type="hidden" name="id" value="<?php echo (int) $ucsProfile['id']; ?>">
-                                            <button type="submit"
-                                                    class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors duration-150 hover:bg-emerald-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
-                                                Verify
-                                            </button>
-                                        </form>
-                                        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/alumni-reject.php'); ?>" class="inline-flex"
-                                              onsubmit="return confirm('Reject verification for alumnus &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;?');">
-                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
-                                            <input type="hidden" name="id" value="<?php echo (int) $ucsProfile['id']; ?>">
-                                            <button type="submit"
-                                                    class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors duration-150 hover:bg-red-50 hover:text-red-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
-                                                Reject
-                                            </button>
-                                        </form>
-                                    <?php elseif ($ucsIsVerified): ?>
-                                        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/alumni-reject.php'); ?>" class="inline-flex"
-                                              onsubmit="return confirm('Deactivate alumnus &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;? This marks the profile as rejected.');">
-                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
-                                            <input type="hidden" name="id" value="<?php echo (int) $ucsProfile['id']; ?>">
-                                            <button type="submit"
-                                                    class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 bg-white px-3 py-1.5 text-xs font-semibold text-red-600 transition-colors duration-150 hover:bg-red-50 hover:text-red-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
-                                                Deactivate
-                                            </button>
-                                        </form>
-                                    <?php elseif ($ucsIsRejected): ?>
-                                        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/alumni-verify.php'); ?>" class="inline-flex">
-                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
-                                            <input type="hidden" name="id" value="<?php echo (int) $ucsProfile['id']; ?>">
-                                            <button type="submit"
-                                                    class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-semibold text-white transition-colors duration-150 hover:bg-emerald-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
-                                                Activate
+                                            <button type="submit" title="Verify"
+                                                    class="inline-flex h-7 w-7 items-center justify-center rounded bg-emerald-50 text-emerald-600 transition-colors hover:bg-emerald-100">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
                                             </button>
                                         </form>
                                     <?php endif; ?>
+                                    
+                                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/edit.php?id=' . (int) $ucsProfile['id']); ?>" title="Edit <?php echo htmlspecialchars($ucsProfileName); ?>"
+                                       class="inline-flex h-7 w-7 items-center justify-center rounded bg-amber-50 text-amber-600 transition-colors hover:bg-amber-100">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+                                            <path d="m15 5 4 4"></path>
+                                        </svg>
+                                    </a>
                                 </div>
                             </td>
                         </tr>

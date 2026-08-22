@@ -38,14 +38,13 @@ try {
     $ucsPublishAt = $ucsClean['publish_at'] !== null
         ? $ucsClean['publish_at']
         : (($ucsClean['status'] === 'Published') ? date('Y-m-d H:i:s') : null);
-    $ucsExpiredAt = $ucsClean['expired_at'] !== null ? $ucsClean['expired_at'] : null;
 
     $ucsStmt = $pdo->prepare(
         "INSERT INTO news
-            (category_id, admin_id, title, slug, content, cover_image, published_at, expired_at, status)
+            (category_id, admin_id, title, slug, content, cover_image, published_at, status)
          VALUES
             (:category_id, :admin_id, :title, :slug, :content, :cover_image,
-             :published_at, :expired_at, :status)"
+             :published_at, :status)"
     );
     $ucsStmt->execute([
         ':category_id' => $ucsClean['category_id'],
@@ -55,7 +54,6 @@ try {
         ':content'     => $ucsClean['content'],
         ':cover_image' => $ucsClean['cover_image'],
         ':published_at' => $ucsPublishAt,
-        ':expired_at'  => $ucsExpiredAt,
         ':status'      => $ucsClean['status'],
     ]);
 

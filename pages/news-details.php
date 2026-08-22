@@ -25,14 +25,19 @@ if ($ucsSlug !== '') {
         $ucsProfileRow = $ucsProfileStmt->fetch() ?: null;
         $ucsHeroMedia  = $ucsProfileRow['hero_media'] ?? 'images/front_view.jpg';
 
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $isAdmin = isset($_SESSION['admin_id']);
+        $statusCondition = $isAdmin ? "" : "AND n.status = 'Published' AND (n.published_at IS NULL OR n.published_at <= NOW())";
+
         $ucsStmt = $pdo->prepare(
             "SELECT n.id, n.title, n.slug, n.content, n.cover_image,
                     n.published_at, n.created_at, c.name AS category
              FROM news n
              LEFT JOIN categories c ON c.id = n.category_id
              WHERE n.slug = :slug
-               AND n.status = 'Published'
-               AND (n.published_at IS NULL OR n.published_at <= NOW())
+               $statusCondition
              LIMIT 1"
         );
         $ucsStmt->execute([':slug' => $ucsSlug]);

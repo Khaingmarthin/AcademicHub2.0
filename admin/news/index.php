@@ -126,46 +126,51 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
     </div>
 <?php endif; ?>
 
-<!-- Search + Add (on page background) -->
-<div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-    <form method="get" action="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/index.php'); ?>" class="flex w-full max-w-xl items-stretch" role="search">
-        <div class="relative flex-1">
-            <svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.35-4.35"></path>
-            </svg>
-            <input type="search" name="q" value="<?php echo htmlspecialchars($ucsQuery); ?>" placeholder="Search news…" aria-label="Search news"
-                   class="h-full w-full rounded-l-xl border border-r-0 border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+<!-- Search + Filters toolbar -->
+<div class="mb-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <form method="get" action="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/index.php'); ?>" role="search" class="flex flex-col gap-5">
+        
+        <!-- Top Row: Search & Actions -->
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <!-- Search Group & Add Button -->
+            <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full lg:w-auto">
+                <!-- Search Input -->
+                <div class="relative w-full sm:w-64 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.35-4.35"></path></svg>
+                    <input type="search" name="q" value="<?php echo htmlspecialchars($ucsQuery); ?>" placeholder="Search news..." aria-label="Search news"
+                           class="block w-full rounded-lg border border-slate-300 bg-slate-50 py-2 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                </div>
+
+                <!-- Search Button -->
+                <button type="submit" class="inline-flex items-center justify-center rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:ring-offset-1 shrink-0">
+                    Search
+                </button>
+
+                <!-- Add News Button -->
+                <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/create.php'); ?>" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-1 shrink-0">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg>
+                    Add News
+                </a>
+            </div>
+
+            <!-- Clear Filters -->
+            <?php if ($ucsQuery !== '' || $ucsCategoryId !== null || $ucsStatus !== '' || $ucsFromDate !== '' || $ucsToDate !== ''): ?>
+                <div class="flex shrink-0">
+                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/index.php'); ?>" class="inline-flex w-full items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200 focus:ring-offset-1">
+                        Clear Filters
+                    </a>
+                </div>
+            <?php endif; ?>
         </div>
-        <button type="submit"
-                class="inline-flex shrink-0 items-center justify-center gap-2 rounded-r-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <circle cx="11" cy="11" r="8"></circle>
-                <path d="m21 21-4.35-4.35"></path>
-            </svg>
-            Search
-        </button>
-    </form>
 
-    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/create.php'); ?>" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M5 12h14"></path>
-            <path d="M12 5v14"></path>
-        </svg>
-        Add News
-    </a>
-</div>
+        <div class="h-px w-full bg-slate-100"></div>
 
-<!-- Advanced filters -->
-<div class="mb-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100">
-    <form method="get" action="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/index.php'); ?>">
-        <input type="hidden" name="q" value="<?php echo htmlspecialchars($ucsQuery); ?>">
-
-        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            <div>
-                <label for="category_id" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">Category</label>
-                <select id="category_id" name="category_id"
-                        class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+        <!-- Bottom Row: Filters Grid -->
+        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+            <div class="xl:col-span-1">
+                <label for="category_id" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">Category</label>
+                <select id="category_id" name="category_id" onchange="this.form.submit()" aria-label="Filter by category"
+                        class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
                     <option value="">All Categories</option>
                     <?php foreach ($ucsCategories as $ucsCategory): ?>
                         <option value="<?php echo (int) $ucsCategory['id']; ?>" <?php echo $ucsCategoryId !== null && (int) $ucsCategoryId === (int) $ucsCategory['id'] ? 'selected' : ''; ?>>
@@ -174,10 +179,11 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div>
-                <label for="status" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">Status</label>
-                <select id="status" name="status"
-                        class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+
+            <div class="xl:col-span-1">
+                <label for="status" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">Status</label>
+                <select id="status" name="status" onchange="this.form.submit()" aria-label="Filter by status"
+                        class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
                     <option value="">All Statuses</option>
                     <?php foreach (['Draft', 'Published', 'Expired'] as $ucsOptionStatus): ?>
                         <option value="<?php echo $ucsOptionStatus; ?>" <?php echo $ucsStatus === $ucsOptionStatus ? 'selected' : ''; ?>>
@@ -186,85 +192,77 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                     <?php endforeach; ?>
                 </select>
             </div>
-            <div>
-                <label for="from_date" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">From Date</label>
-                <input type="date" id="from_date" name="from_date" value="<?php echo htmlspecialchars($ucsFromDate); ?>"
-                       class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-            </div>
-            <div>
-                <label for="to_date" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">To Date</label>
-                <input type="date" id="to_date" name="to_date" value="<?php echo htmlspecialchars($ucsToDate); ?>"
-                       class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-            </div>
-        </div>
 
-        <div class="mt-4 flex flex-col gap-3 border-t border-gray-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
-            <div class="flex flex-wrap items-center gap-x-5 gap-y-3">
-                <div class="flex items-center gap-2 text-sm text-gray-600">
-                    <label for="sort" class="font-semibold text-gray-500">Sort:</label>
-                    <select id="sort" name="sort"
-                            class="rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                        <option value="newest" <?php echo $ucsSort === 'newest' ? 'selected' : ''; ?>>Newest First</option>
-                        <option value="oldest" <?php echo $ucsSort === 'oldest' ? 'selected' : ''; ?>>Oldest First</option>
-                    </select>
-                </div>
-                <div class="flex items-center gap-2 text-sm text-gray-600">
-                    <label for="show" class="font-semibold text-gray-500">Show:</label>
-                    <select id="show" name="show"
-                            class="rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                        <?php foreach ([10, 25, 50] as $ucsShowOption): ?>
-                            <option value="<?php echo $ucsShowOption; ?>" <?php echo $ucsShow === $ucsShowOption ? 'selected' : ''; ?>>
-                                <?php echo $ucsShowOption; ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <span>entries</span>
-                </div>
+            <div class="xl:col-span-1">
+                <label for="from_date" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">From Date</label>
+                <input type="date" id="from_date" name="from_date" value="<?php echo htmlspecialchars($ucsFromDate); ?>" onchange="this.form.submit()"
+                       class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
             </div>
-            <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/index.php'); ?>"
-               class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                    <path d="M3 3v5h5"></path>
-                </svg>
-                Reset Filters
-            </a>
+
+            <div class="xl:col-span-1">
+                <label for="to_date" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">To Date</label>
+                <input type="date" id="to_date" name="to_date" value="<?php echo htmlspecialchars($ucsToDate); ?>" onchange="this.form.submit()"
+                       class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
+            </div>
+            
+            <div class="xl:col-span-1">
+                <label for="sort" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">Sort By</label>
+                <select id="sort" name="sort" onchange="this.form.submit()"
+                        class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                    <option value="newest" <?php echo $ucsSort === 'newest' ? 'selected' : ''; ?>>Newest First</option>
+                    <option value="oldest" <?php echo $ucsSort === 'oldest' ? 'selected' : ''; ?>>Oldest First</option>
+                </select>
+            </div>
+            
+            <div class="xl:col-span-1">
+                <label for="show" class="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-slate-500">Entries</label>
+                <select id="show" name="show" onchange="this.form.submit()"
+                        class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
+                    <?php foreach ([10, 25, 50] as $ucsShowOption): ?>
+                        <option value="<?php echo $ucsShowOption; ?>" <?php echo $ucsShow === $ucsShowOption ? 'selected' : ''; ?>><?php echo $ucsShowOption; ?></option>
+                    <?php endforeach; ?>
+                </select>
+            </div>
         </div>
     </form>
 </div>
 
 <?php if (empty($ucsNewsItems)): ?>
-    <div class="rounded-2xl bg-white p-10 text-center shadow-sm ring-1 ring-gray-100">
-        <svg xmlns="http://www.w3.org/2000/svg" class="mx-auto h-10 w-10 text-gray-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
-            <path d="M18 14h-8"></path>
-            <path d="M15 18h-5"></path>
-            <path d="M10 6h8v4h-8V6Z"></path>
-        </svg>
-        <h3 class="mt-4 text-lg font-semibold text-gray-800">
+    <div class="mt-6 flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-slate-100">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
+                <path d="M18 14h-8"></path>
+                <path d="M15 18h-5"></path>
+                <path d="M10 6h8v4h-8V6Z"></path>
+            </svg>
+        </div>
+        <h3 class="mt-4 text-lg font-semibold text-slate-900">
             <?php echo $ucsQuery !== '' || $ucsCategoryId !== null || $ucsStatus !== '' || $ucsFromDate !== '' || $ucsToDate !== '' ? 'No matching news' : 'No news articles yet'; ?>
         </h3>
-        <p class="mt-2 text-sm text-gray-500">
+        <p class="mt-2 text-sm text-slate-500">
             <?php echo $ucsQuery !== '' || $ucsCategoryId !== null || $ucsStatus !== '' || $ucsFromDate !== '' || $ucsToDate !== '' ? 'Try adjusting or resetting your filters.' : 'Add your first news article to get started.'; ?>
         </p>
         <?php if ($ucsQuery !== '' || $ucsCategoryId !== null || $ucsStatus !== '' || $ucsFromDate !== '' || $ucsToDate !== ''): ?>
-            <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/index.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+            <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/index.php'); ?>" class="mt-6 inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 shadow-sm transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-slate-200">
                 Clear Filters
             </a>
         <?php else: ?>
-            <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/create.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+            <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/create.php'); ?>" class="mt-6 inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
                 Add News
             </a>
         <?php endif; ?>
     </div>
 <?php else: ?>
-    <p class="mb-4 text-sm text-gray-600">
-        Showing <span class="font-semibold text-gray-900"><?php echo $ucsTotal; ?></span>
-        <?php echo $ucsTotal === 1 ? 'news article' : 'news articles'; ?>
-        <?php if ($ucsTotalPages > 1): ?>
-            &middot; Page <span class="font-semibold text-gray-900"><?php echo $ucsPage; ?></span> of <span class="font-semibold text-gray-900"><?php echo $ucsTotalPages; ?></span>
-        <?php endif; ?>
-    </p>
+    <div class="mb-4 flex items-center justify-between">
+        <p class="text-sm font-medium text-slate-600">
+            Showing <span class="font-semibold text-slate-900"><?php echo $ucsTotal; ?></span>
+            <?php echo $ucsTotal === 1 ? 'news article' : 'news articles'; ?>
+            <?php if ($ucsTotalPages > 1): ?>
+                &middot; Page <span class="font-semibold text-slate-900"><?php echo $ucsPage; ?></span> of <span class="font-semibold text-slate-900"><?php echo $ucsTotalPages; ?></span>
+            <?php endif; ?>
+        </p>
+    </div>
 
     <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
         <?php foreach ($ucsNewsItems as $ucsNews): ?>
@@ -281,108 +279,71 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             $ucsPublishedAt = !empty($ucsNews['published_at']) ? (string) $ucsNews['published_at'] : '';
             $ucsArticleUrl  = BASE_URL . '/news-details.php?slug=' . urlencode((string) $ucsNews['slug']);
             ?>
-            <article class="flex flex-col overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
-                <div class="flex items-center justify-between gap-3 px-5 pt-5">
-                    <span class="inline-flex max-w-[60%] items-center truncate rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-blue-700">
+            <article class="flex flex-col rounded-xl border border-slate-200 bg-white p-5 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl hover:border-blue-300">
+                <!-- Top: Badges -->
+                <div class="mb-4 flex items-start justify-between gap-2">
+                    <span class="inline-flex items-center rounded-md bg-slate-100 px-2 py-1 text-xs font-semibold text-slate-700">
                         <?php echo htmlspecialchars((string) $ucsNews['category_name']); ?>
                     </span>
                     <?php if ($ucsNewsStatus === 'Published'): ?>
-                        <span class="inline-flex shrink-0 items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-green-700">Published</span>
+                        <span class="inline-flex items-center rounded-full bg-green-50 px-2.5 py-0.5 text-xs font-semibold text-green-700 ring-1 ring-inset ring-green-600/20">Published</span>
                     <?php elseif ($ucsNewsStatus === 'Expired'): ?>
-                        <span class="inline-flex shrink-0 items-center rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-amber-700">Expired</span>
+                        <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700 ring-1 ring-inset ring-amber-600/20">Expired</span>
                     <?php else: ?>
-                        <span class="inline-flex shrink-0 items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-wide text-gray-500">Draft</span>
+                        <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-500/20">Draft</span>
                     <?php endif; ?>
                 </div>
 
-                <div class="flex flex-1 flex-col px-5 pt-3">
-                    <h3 class="text-base font-bold leading-snug text-gray-900"><?php echo htmlspecialchars($ucsNewsTitle); ?></h3>
+                <!-- Main: Info -->
+                <div class="mb-5 flex-1">
+                    <h3 class="text-lg font-bold tracking-tight text-slate-900 leading-snug"><?php echo htmlspecialchars($ucsNewsTitle); ?></h3>
                     <?php if ($ucsExcerpt !== ''): ?>
-                        <p class="mt-2 text-sm leading-relaxed text-gray-500"><?php echo htmlspecialchars($ucsExcerpt); ?></p>
+                        <p class="mt-2 text-sm leading-relaxed text-slate-500"><?php echo htmlspecialchars($ucsExcerpt); ?></p>
                     <?php endif; ?>
-                </div>
-
-                <?php if ($ucsCover !== ''): ?>
-                    <div class="px-5 pt-4">
-                        <div class="flex items-center gap-3 rounded-xl bg-gray-50 p-3 ring-1 ring-gray-100">
-                            <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-gray-100 ring-1 ring-gray-200" aria-hidden="true">
-                                <?php if (preg_match('/\.(jpe?g|png|gif|webp)$/i', $ucsCoverName)): ?>
-                                    <img src="<?php echo htmlspecialchars(ROOT_URL . '/assets/' . ltrim($ucsCover, '/')); ?>" alt="" class="h-full w-full object-cover">
-                                <?php else: ?>
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"></path>
-                                    </svg>
-                                <?php endif; ?>
+                    
+                    <div class="mt-4 flex flex-col gap-2 text-sm">
+                        <div class="flex items-center justify-between border-b border-slate-50 pb-2">
+                            <span class="text-slate-500">Published</span>
+                            <span class="font-medium text-slate-900 text-right">
+                                <?php echo $ucsPublishedAt !== '' ? date('M j, Y g:i A', strtotime($ucsPublishedAt)) : '—'; ?>
                             </span>
-                            <div class="min-w-0">
-                                <p class="truncate text-xs font-semibold text-gray-700"><?php echo htmlspecialchars($ucsCoverName); ?></p>
-                                <p class="text-[11px] text-gray-400">Attachment</p>
-                            </div>
                         </div>
+                        <div class="flex items-center justify-between border-b border-slate-50 pb-2">
+                            <span class="text-slate-500">Author</span>
+                            <span class="font-medium text-slate-900 text-right"><?php echo htmlspecialchars((string) $ucsNews['admin_name']); ?></span>
+                        </div>
+                        <?php if ($ucsCover !== ''): ?>
+                        <div class="flex items-center justify-between border-b border-slate-50 pb-2">
+                            <span class="text-slate-500">Attachment</span>
+                            <span class="font-medium text-slate-900 text-right truncate max-w-[150px]"><?php echo htmlspecialchars($ucsCoverName); ?></span>
+                        </div>
+                        <?php endif; ?>
                     </div>
-                <?php endif; ?>
-
-                <div class="flex flex-wrap items-center gap-x-4 gap-y-2 px-5 pt-4 text-xs text-gray-500">
-                    <span class="inline-flex items-center gap-1.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <circle cx="12" cy="12" r="10"></circle>
-                            <polyline points="12 6 12 12 16 14"></polyline>
-                        </svg>
-                        <?php echo $ucsPublishedAt !== '' ? date('j M Y g:i A', strtotime($ucsPublishedAt)) : 'Not published'; ?>
-                    </span>
-                    <span class="inline-flex items-center gap-1.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
-                            <circle cx="12" cy="7" r="4"></circle>
-                        </svg>
-                        <?php echo htmlspecialchars((string) $ucsNews['admin_name']); ?>
-                    </span>
-                    <span class="inline-flex items-center gap-1.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                        —
-                    </span>
-                    <span class="inline-flex items-center gap-1.5">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                        —
-                    </span>
                 </div>
 
-                <div class="mt-4 flex items-center gap-1 border-t border-gray-100 px-5 py-3">
-                    <a href="<?php echo htmlspecialchars($ucsArticleUrl); ?>" target="_blank" rel="noopener" title="View <?php echo htmlspecialchars($ucsNewsTitle); ?>"
-                       class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:bg-blue-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
-                        View
-                    </a>
-                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/edit.php?id=' . (int) $ucsNews['id']); ?>" title="Edit <?php echo htmlspecialchars($ucsNewsTitle); ?>"
-                       class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold text-amber-600 transition-colors duration-150 hover:bg-amber-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-                            <path d="m15 5 4 4"></path>
-                        </svg>
-                        Edit
-                    </a>
-                    <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/news-delete.php'); ?>" class="inline-flex"
-                          onsubmit="return confirm('Delete news article &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;? This cannot be undone.');">
-                        <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
-                        <input type="hidden" name="id" value="<?php echo (int) $ucsNews['id']; ?>">
-                        <button type="submit" title="Delete <?php echo htmlspecialchars($ucsNewsTitle); ?>"
-                                class="inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-sm font-semibold text-red-600 transition-colors duration-150 hover:bg-red-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M3 6h18"></path>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path>
-                                <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            </svg>
-                            Delete
-                        </button>
-                    </form>
+                <!-- Bottom: Actions -->
+                <div class="mt-auto flex flex-col gap-2 border-t border-slate-100 pt-4">
+                    <div class="grid grid-cols-2 gap-2">
+                        <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/view.php?id=' . (int) $ucsNews['id']); ?>" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-sky-50 px-2 py-2 text-[11px] font-semibold text-sky-600 transition-colors hover:bg-sky-100 hover:text-sky-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                            View
+                        </a>
+                        <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/edit.php?id=' . (int) $ucsNews['id']); ?>" class="inline-flex items-center justify-center gap-1.5 rounded-lg bg-amber-50 px-2 py-2 text-[11px] font-semibold text-amber-600 transition-colors hover:bg-amber-100 hover:text-amber-700">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path><path d="m15 5 4 4"></path></svg>
+                            Edit
+                        </a>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 gap-2">
+                        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/news-delete.php'); ?>" class="flex" onsubmit="return confirm('Delete news article &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;? This cannot be undone.');">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
+                            <input type="hidden" name="id" value="<?php echo (int) $ucsNews['id']; ?>">
+                            <button type="submit" class="inline-flex w-full items-center justify-center gap-1.5 rounded-lg bg-rose-50 px-2 py-2 text-[11px] font-semibold text-rose-600 transition-colors hover:bg-rose-100 hover:text-rose-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                                Delete
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </article>
         <?php endforeach; ?>

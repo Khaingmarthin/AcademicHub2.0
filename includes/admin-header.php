@@ -31,7 +31,7 @@ if (isset($pdo) && $pdo instanceof PDO) {
     }
 }
 ?>
-<header class="sticky top-0 z-20 flex h-14 shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-4 sm:px-5">
+<header class="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-4 border-b border-slate-200/80 bg-white/90 backdrop-blur-md px-4 sm:px-6 shadow-sm">
     <!-- Mobile menu toggle -->
     <button type="button" id="admin-sidebar-toggle" class="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-slate-500 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-700 lg:hidden focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" aria-label="Open menu" aria-expanded="false" aria-controls="admin-sidebar">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
@@ -39,13 +39,21 @@ if (isset($pdo) && $pdo instanceof PDO) {
         </svg>
     </button>
 
-    <!-- Title + active academic year -->
+    <!-- Title + Greeting + active academic year -->
     <div class="flex min-w-0 flex-1 items-center gap-3">
-        <p class="truncate text-sm font-semibold text-slate-800">
-            UCSMTLA Academic Hub
-        </p>
+        <div class="hidden sm:block">
+            <h2 class="text-sm font-medium text-slate-500">
+                Welcome back, <span class="font-semibold text-slate-800"><?php echo htmlspecialchars($ucsAdminName ?: 'Admin'); ?></span> 👋
+            </h2>
+        </div>
+        <div class="block sm:hidden">
+            <p class="truncate text-sm font-semibold text-slate-800">
+                UCSMTLA
+            </p>
+        </div>
+
         <?php if ($ucsHeaderActiveYear !== null && $ucsHeaderActiveYear !== ''): ?>
-            <span class="hidden shrink-0 items-center gap-1.5 rounded-md bg-blue-50 px-2.5 py-1 text-[11px] font-semibold text-blue-700 sm:inline-flex">
+            <span class="hidden shrink-0 items-center gap-1.5 rounded-full bg-blue-50 border border-blue-100 px-3 py-1 text-[11px] font-semibold text-blue-700 sm:inline-flex shadow-sm">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                     <rect x="3" y="4" width="18" height="18" rx="2"></rect>
                     <line x1="16" y1="2" x2="16" y2="6"></line>
