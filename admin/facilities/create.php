@@ -6,6 +6,8 @@ require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
+require_once __DIR__ . '/../../includes/helpers/ucs-upload.php';
+
 admin_require_login();
 
 $pageTitle    = 'Add Facility';
@@ -44,7 +46,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             <p class="mt-1 text-sm text-gray-500">The image, description and location are optional. Leave the image blank unless you have a path such as <span class="font-medium text-gray-700">images/canteen.jpg</span>.</p>
         </div>
 
-        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/facility-create.php'); ?>" novalidate>
+        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/facility-create.php'); ?>" enctype="multipart/form-data" novalidate>
             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
 
             <div class="space-y-6 px-6 py-6">
@@ -56,9 +58,10 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
 
                 <div class="grid gap-6 sm:grid-cols-2">
                     <div>
-                        <label for="image" class="block text-sm font-medium text-gray-700">Image Path</label>
-                        <input type="text" id="image" name="image" value="<?php echo htmlspecialchars($ucsOld['image'] ?? ''); ?>" placeholder="e.g. images/canteen.jpg" maxlength="255"
-                               class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        <label for="image" class="block text-sm font-medium text-gray-700">Facility Image <span class="text-gray-400">(optional)</span></label>
+                        <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.gif,.webp"
+                               class="mt-2 block w-full text-sm text-gray-500 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-blue-700 transition-colors hover:file:bg-blue-100 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        <p class="mt-2 text-xs text-gray-500">JPG, PNG, GIF or WebP. Maximum size 5 MB.</p>
                     </div>
                     <div>
                         <label for="location" class="block text-sm font-medium text-gray-700">Location</label>

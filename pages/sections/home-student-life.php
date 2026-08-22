@@ -2,8 +2,8 @@
 /**
  * Homepage Student Life section.
  *
- * Simplified institutional layout showing student activities.
- * Clean typography, minimal visual elements.
+ * Clean editorial layout showing student activities.
+ * Structured bordered list with clear hierarchy.
  */
 
 if (!defined('BASE_URL')) {
@@ -29,30 +29,29 @@ $ucsStudentLifeItems = [
     ],
 ];
 ?>
-<section class="border-t border-gray-200 bg-gray-50 py-20 sm:py-24" aria-labelledby="student-life-heading">
+<section class="border-t border-slate-200 bg-slate-50 py-20 sm:py-24" aria-labelledby="student-life-heading">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         <!-- Section header -->
         <div class="mx-auto max-w-2xl text-center">
-            <div class="flex items-center justify-center gap-3">
-                <span class="h-px w-8 bg-blue-600" aria-hidden="true"></span>
-                <span class="text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-blue-600">Beyond the Classroom</span>
-                <span class="h-px w-8 bg-blue-600" aria-hidden="true"></span>
-            </div>
-            <h2 id="student-life-heading" class="mt-4 scroll-mt-24 text-3xl font-bold tracking-[-0.02em] text-gray-900 sm:text-4xl">Student Life at UCSMTLA</h2>
-            <p class="mt-4 text-base leading-7 text-gray-600">
+            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Beyond the Classroom</p>
+            <h2 id="student-life-heading" class="mt-3 scroll-mt-24 text-3xl font-bold tracking-[-0.02em] text-slate-900 sm:text-4xl">Student Life at UCSMTLA</h2>
+            <p class="mt-4 text-base leading-relaxed text-slate-600">
                 Discover the activities, events, and experiences that make student life at UCSMTLA engaging and memorable.
             </p>
         </div>
 
         <div class="mx-auto mt-12 max-w-4xl">
-            <div class="grid grid-cols-1 gap-8 sm:grid-cols-2">
-                <?php foreach ($ucsStudentLifeItems as $ucsItem): ?>
-                    <article class="flex flex-col gap-3">
-                        <h3 class="text-lg font-semibold tracking-tight text-gray-900">
-                            <?php echo htmlspecialchars($ucsItem['title']); ?>
-                        </h3>
-                        <p class="text-sm leading-6 text-gray-500">
+            <div class="border border-slate-200 bg-white">
+                <?php foreach ($ucsStudentLifeItems as $ucsIdx => $ucsItem): ?>
+                    <?php $ucsIsFirst = $ucsIdx === 0; ?>
+                    <article class="group px-6 py-5 sm:px-8 sm:py-6 <?php echo !$ucsIsFirst ? 'border-t border-slate-200' : ''; ?> transition-colors duration-150 hover:bg-slate-50/60">
+                        <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                            <h3 class="text-base font-semibold tracking-tight text-slate-900">
+                                <?php echo htmlspecialchars($ucsItem['title']); ?>
+                            </h3>
+                        </div>
+                        <p class="mt-1.5 text-sm leading-relaxed text-slate-500">
                             <?php echo htmlspecialchars($ucsItem['description']); ?>
                         </p>
                     </article>

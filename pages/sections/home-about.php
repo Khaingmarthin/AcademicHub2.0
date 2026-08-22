@@ -50,26 +50,23 @@ if (!preg_match('~^https?://~i', $ucsAboutMedia)) {
             <div class="relative">
                 <img src="<?php echo htmlspecialchars($ucsAboutMedia); ?>" alt="<?php echo htmlspecialchars($ucsShortName); ?> main campus" class="aspect-[4/3] w-full rounded-lg object-cover">
                 <?php if ($ucsAddress !== ''): ?>
-                    <div class="absolute bottom-4 left-4 rounded-lg bg-white px-4 py-2.5 shadow-sm ring-1 ring-gray-900/5">
-                        <p class="text-[0.6875rem] font-semibold uppercase tracking-wide text-gray-500">Main Campus</p>
-                        <p class="mt-0.5 text-sm font-medium text-gray-900"><?php echo htmlspecialchars($ucsAddress); ?></p>
+                    <div class="absolute bottom-4 left-4 rounded-lg bg-white px-4 py-2.5 shadow-sm ring-1 ring-slate-900/5">
+                        <p class="text-[0.6875rem] font-semibold uppercase tracking-wide text-slate-400">Main Campus</p>
+                        <p class="mt-0.5 text-sm font-medium text-slate-900"><?php echo htmlspecialchars($ucsAddress); ?></p>
                     </div>
                 <?php endif; ?>
             </div>
 
             <!-- Introduction -->
             <div>
-                <div class="flex items-center gap-3">
-                    <span class="h-px w-8 bg-blue-600" aria-hidden="true"></span>
-                    <span class="text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-blue-600">About the University</span>
-                </div>
-                <h2 id="about-heading" class="mt-4 scroll-mt-24 text-3xl font-bold tracking-[-0.02em] text-gray-900 sm:text-4xl">About <?php echo htmlspecialchars($ucsShortName); ?></h2>
-                <p class="mt-5 text-base leading-7 text-gray-600">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">About the University</p>
+                <h2 id="about-heading" class="mt-3 scroll-mt-24 text-3xl font-bold tracking-[-0.02em] text-slate-900 sm:text-4xl">About <?php echo htmlspecialchars($ucsShortName); ?></h2>
+                <p class="mt-4 text-base leading-7 text-slate-600">
                     <?php echo htmlspecialchars($ucsFullName); ?> is dedicated to computing and technology education,
                     offering undergraduate programmes in computer science and computer technology alongside a strong
                     foundation in modern digital disciplines.
                 </p>
-                <p class="mt-3 text-base leading-7 text-gray-600">
+                <p class="mt-3 text-base leading-7 text-slate-600">
                     Through a student-centred curriculum, hands-on practical work and continuous academic development,
                     UCSMTLA nurtures every student's knowledge and skills — preparing capable, innovative graduates
                     ready for the digital future.

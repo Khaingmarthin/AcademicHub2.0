@@ -18,7 +18,7 @@ $ucsId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
 
 try {
     $ucsStmt = $pdo->prepare(
-        "SELECT id, category_id, title, content, cover_image, status
+        "SELECT id, category_id, title, content, cover_image, published_at, expired_at, status
          FROM news
          WHERE id = :id
          LIMIT 1"
@@ -45,7 +45,8 @@ $ucsForm = [
     'category_id' => $ucsOld['category_id'] ?? (int) $ucsNews['category_id'],
     'title'       => $ucsOld['title'] ?? $ucsNews['title'],
     'content'     => $ucsOld['content'] ?? $ucsNews['content'],
-    'status'      => $ucsOld['status'] ?? $ucsNews['status'],
+    'publish_at'  => $ucsOld['publish_at'] ?? (!empty($ucsNews['published_at']) ? date('Y-m-d\TH:i', strtotime($ucsNews['published_at'])) : ''),
+    'expired_at'  => $ucsOld['expired_at'] ?? (!empty($ucsNews['expired_at']) ? date('Y-m-d\TH:i', strtotime($ucsNews['expired_at'])) : ''),
 ];
 
 $ucsCategories  = ucs_admin_categories($pdo);
@@ -112,13 +113,36 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                         </select>
                     </div>
                     <div>
-                        <label for="status" class="block text-sm font-medium text-gray-700">Status <span class="text-red-500">*</span></label>
-                        <select id="status" name="status" required
-                                class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                            <?php foreach (NEWS_STATUSES as $ucsStatus): ?>
-                                <option value="<?php echo $ucsStatus; ?>" <?php echo $ucsForm['status'] === $ucsStatus ? 'selected' : ''; ?>><?php echo $ucsStatus; ?></option>
-                            <?php endforeach; ?>
-                        </select>
+                        <label class="block text-sm font-medium text-gray-700">Current Status</label>
+                        <div class="mt-2 flex items-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-700">
+                            <?php
+                            $ucsCurrentStatus = $ucsNews['status'];
+                            $ucsStatusColors  = [
+                                'Draft'     => 'bg-yellow-50 text-yellow-700 ring-1 ring-yellow-200',
+                                'Published' => 'bg-green-50 text-green-700 ring-1 ring-green-200',
+                                'Expired'   => 'bg-red-50 text-red-700 ring-1 ring-red-200',
+                            ];
+                            ?>
+                            <span class="inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide <?php echo $ucsStatusColors[$ucsCurrentStatus] ?? 'bg-gray-100 text-gray-500'; ?>">
+                                <?php echo htmlspecialchars($ucsCurrentStatus); ?>
+                            </span>
+                            <span class="text-xs text-gray-500">Automatically derived from dates.</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid gap-6 sm:grid-cols-2">
+                    <div>
+                        <label for="publish_at" class="block text-sm font-medium text-gray-700">Publish Date <span class="text-gray-400">(optional)</span></label>
+                        <input type="datetime-local" id="publish_at" name="publish_at" value="<?php echo htmlspecialchars($ucsForm['publish_at']); ?>"
+                               class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        <p class="mt-1.5 text-xs text-gray-500">Status updates automatically based on dates.</p>
+                    </div>
+                    <div>
+                        <label for="expired_at" class="block text-sm font-medium text-gray-700">Expired Date <span class="text-gray-400">(optional)</span></label>
+                        <input type="datetime-local" id="expired_at" name="expired_at" value="<?php echo htmlspecialchars($ucsForm['expired_at']); ?>"
+                               class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        <p class="mt-1.5 text-xs text-gray-500">When this date passes, the announcement is automatically marked as expired.</p>
                     </div>
                 </div>
 

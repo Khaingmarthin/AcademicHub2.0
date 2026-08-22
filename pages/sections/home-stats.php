@@ -59,16 +59,16 @@ $ucsStats = [
     ['label' => 'Faculties', 'value' => ($ucsFacultiesCount !== null) ? number_format($ucsFacultiesCount) : null],
 ];
 ?>
-<section class="border-y border-gray-200 bg-gray-50 py-12 sm:py-16" aria-labelledby="stats-heading">
+<section class="border-y border-slate-200 bg-slate-50 py-12 sm:py-16" aria-labelledby="stats-heading">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <h2 id="stats-heading" class="sr-only">University Statistics</h2>
         <dl class="grid grid-cols-2 gap-8 sm:grid-cols-4">
             <?php foreach ($ucsStats as $ucsStat): ?>
                 <div class="text-center">
-                    <dd class="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl"<?php echo $ucsStat['value'] === null ? ' title="Information unavailable"' : ''; ?>>
+                    <dd class="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl"<?php echo $ucsStat['value'] === null ? ' title="Information unavailable"' : ''; ?>>
                         <?php echo $ucsStat['value'] === null ? '—' : htmlspecialchars($ucsStat['value']); ?>
                     </dd>
-                    <dt class="mt-1 text-sm font-medium text-gray-500"><?php echo htmlspecialchars($ucsStat['label']); ?></dt>
+                    <dt class="mt-1 text-sm font-medium text-slate-500"><?php echo htmlspecialchars($ucsStat['label']); ?></dt>
                 </div>
             <?php endforeach; ?>
         </dl>

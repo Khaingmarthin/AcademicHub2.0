@@ -117,9 +117,10 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                         </select>
                     </div>
                     <div>
-                        <label for="section" class="block text-sm font-medium text-gray-700">Section <span class="text-red-500">*</span></label>
-                        <input type="text" id="section" name="section" value="<?php echo htmlspecialchars($ucsForm['section']); ?>" placeholder="e.g. A" required maxlength="10"
+                        <label for="section" class="block text-sm font-medium text-gray-700">Section</label>
+                        <input type="text" id="section" name="section" value="<?php echo htmlspecialchars($ucsForm['section']); ?>" placeholder="e.g. A (optional)" maxlength="10"
                                class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        <p class="mt-1.5 text-xs text-gray-500">Leave empty for a single section classroom.</p>
                     </div>
                     <div>
                         <label for="classroom_name" class="block text-sm font-medium text-gray-700">Classroom Name <span class="text-red-500">*</span></label>

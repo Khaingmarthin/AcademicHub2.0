@@ -1,10 +1,9 @@
 <?php
 /**
- * Public News Details page.
+ * Public News Details page — advanced editorial article layout.
  *
- * Shows the full content of a single published news article selected by slug.
- * The record is read from the news table joined with its category — nothing
- * is invented or hard-coded.
+ * Professional university article page with strong typography,
+ * comfortable reading width, and institutional publication feel.
  */
 require_once '../config/app.php';
 require_once '../config/database.php';
@@ -47,6 +46,28 @@ if ($ucsArticle !== null) {
     $pageTitle = $ucsArticle['title'] ?? 'News Details';
 }
 
+// Related articles (same category, excluding current).
+$ucsRelated = [];
+if ($ucsArticle !== null && isset($pdo)) {
+    try {
+        $ucsRelatedStmt = $pdo->prepare(
+            "SELECT n.title, n.slug, n.published_at, c.name AS category
+             FROM news n
+             LEFT JOIN categories c ON c.id = n.category_id
+             WHERE n.status = 'Published'
+               AND (n.published_at IS NULL OR n.published_at <= NOW())
+               AND n.id != :current_id
+               AND n.category_id = (SELECT category_id FROM news WHERE id = :current_id2)
+             ORDER BY n.published_at DESC
+             LIMIT 4"
+        );
+        $ucsRelatedStmt->execute([':current_id' => $ucsArticle['id'], ':current_id2' => $ucsArticle['id']]);
+        $ucsRelated = $ucsRelatedStmt->fetchAll() ?: [];
+    } catch (PDOException $e) {
+        $ucsRelated = [];
+    }
+}
+
 if (!preg_match('~^https?://~i', $ucsHeroMedia)) {
     $ucsHeroMedia = ROOT_URL . '/assets/' . ltrim($ucsHeroMedia, '/');
 }
@@ -71,98 +92,151 @@ require_once '../includes/header.php';
             : ($ucsArticle['created_at'] ?? null);
         ?>
 
-        <!-- Page hero -->
-        <section class="relative overflow-hidden bg-gray-900" aria-labelledby="news-details-heading">
-            <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?php echo htmlspecialchars($ucsHeroMedia); ?>');" aria-hidden="true"></div>
-            <div class="absolute inset-0 bg-slate-900/50" aria-hidden="true"></div>
-            <div class="relative z-10 mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 sm:py-20 lg:py-24">
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300">
-                    <?php echo htmlspecialchars($ucsArticle['category'] ?? 'News'); ?>
-                </p>
-                <h1 id="news-details-heading" class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">
+        <!-- Article header -->
+        <section class="border-b border-slate-200 bg-white" aria-labelledby="news-details-heading">
+            <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+
+                <!-- Back navigation -->
+                <nav class="mb-8 text-xs font-medium text-slate-400" aria-label="Breadcrumb">
+                    <ol class="flex items-center gap-1.5">
+                        <li><a href="<?php echo htmlspecialchars(BASE_URL . '/index.php'); ?>" class="transition-colors hover:text-slate-600">Home</a></li>
+                        <li aria-hidden="true"><svg class="h-3 w-3 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg></li>
+                        <li><a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="transition-colors hover:text-slate-600">News</a></li>
+                        <li aria-hidden="true"><svg class="h-3 w-3 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg></li>
+                        <li class="text-slate-600">Article</li>
+                    </ol>
+                </nav>
+
+                <!-- Category -->
+                <div class="mt-8">
+                    <span class="text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-blue-600">
+                        <?php echo htmlspecialchars($ucsArticle['category'] ?? 'News'); ?>
+                    </span>
+                </div>
+
+                <!-- Title -->
+                <h1 id="news-details-heading" class="mt-3 scroll-mt-24 text-2xl font-extrabold tracking-[-0.025em] text-slate-900 sm:text-3xl lg:text-[2.25rem] lg:leading-[1.15]">
                     <?php echo htmlspecialchars($ucsArticle['title']); ?>
                 </h1>
-                <?php if ($ucsArticleDate !== null): ?>
-                    <p class="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-gray-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-blue-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M8 2v4M16 2v4M3 10h18"></path>
-                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                        </svg>
-                        <?php echo htmlspecialchars(date('F j, Y', strtotime($ucsArticleDate))); ?>
-                    </p>
-                <?php endif; ?>
+
+                <!-- Publication metadata -->
+                <div class="mt-5 flex items-center gap-4 border-t border-slate-200 pt-5">
+                    <?php if ($ucsArticleDate !== null): ?>
+                        <div class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                <line x1="16" y1="2" x2="16" y2="6"></line>
+                                <line x1="8" y1="2" x2="8" y2="6"></line>
+                                <line x1="3" y1="10" x2="21" y2="10"></line>
+                            </svg>
+                            <time class="text-sm text-slate-600" datetime="<?php echo htmlspecialchars($ucsArticleDate); ?>">
+                                <?php echo htmlspecialchars(date('F j, Y', strtotime($ucsArticleDate))); ?>
+                            </time>
+                        </div>
+                    <?php endif; ?>
+                </div>
             </div>
         </section>
 
-        <!-- Article content -->
-        <section class="bg-slate-50 py-16 sm:py-20" aria-labelledby="news-article-heading">
-            <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-                <article class="overflow-hidden rounded-3xl bg-white shadow-lg shadow-gray-900/5 ring-1 ring-gray-100">
-                    <?php if ($ucsHasCover): ?>
-                        <img src="<?php echo htmlspecialchars($ucsCoverUrl); ?>" alt="<?php echo htmlspecialchars($ucsArticle['title']); ?>" class="aspect-[21/9] w-full object-cover">
+        <!-- Cover image (full-width) -->
+        <?php if ($ucsHasCover): ?>
+            <section class="bg-white" aria-hidden="true">
+                <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+                    <img src="<?php echo htmlspecialchars($ucsCoverUrl); ?>" alt="<?php echo htmlspecialchars($ucsArticle['title']); ?>" class="w-full rounded-lg object-cover" style="max-height: 32rem;">
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <!-- Article content — reading width -->
+        <section class="bg-white py-10 sm:py-14" aria-labelledby="news-article-heading">
+            <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+
+                <article>
+                    <h2 id="news-article-heading" class="sr-only">Article Content</h2>
+
+                    <?php if (trim((string) ($ucsArticle['content'] ?? '')) !== ''): ?>
+                        <div class="text-[0.9375rem] leading-[1.85] text-slate-700 [&_p]:mb-5">
+                            <?php echo nl2br(htmlspecialchars($ucsArticle['content'])); ?>
+                        </div>
                     <?php else: ?>
-                        <div class="flex aspect-[21/9] w-full items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50">
-                            <span class="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-blue-600 shadow-md ring-1 ring-gray-100" aria-hidden="true">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
-                                    <path d="M18 14h-8M15 18h-5M10 6h8v4h-8V6z"></path>
-                                </svg>
-                            </span>
-                        </div>
+                        <p class="text-[0.9375rem] leading-[1.85] text-slate-400 italic">The full article content is not available yet.</p>
                     <?php endif; ?>
-
-                    <div class="p-6 sm:p-10">
-                        <div class="flex flex-wrap items-center gap-x-4 gap-y-2">
-                            <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100">
-                                <?php echo htmlspecialchars($ucsArticle['category'] ?? 'News'); ?>
-                            </span>
-                            <?php if ($ucsArticleDate !== null): ?>
-                                <span class="inline-flex items-center gap-1.5 text-xs font-medium text-gray-500">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <path d="M8 2v4M16 2v4M3 10h18"></path>
-                                        <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                                    </svg>
-                                    <?php echo htmlspecialchars(date('F j, Y', strtotime($ucsArticleDate))); ?>
-                                </span>
-                            <?php endif; ?>
-                        </div>
-
-                        <h2 id="news-article-heading" class="mt-5 text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">
-                            <?php echo htmlspecialchars($ucsArticle['title']); ?>
-                        </h2>
-
-                        <?php if (trim((string) ($ucsArticle['content'] ?? '')) !== ''): ?>
-                            <div class="mt-6 space-y-5 text-base leading-7 text-gray-600 sm:text-lg sm:leading-8">
-                                <?php echo nl2br(htmlspecialchars($ucsArticle['content'])); ?>
-                            </div>
-                        <?php else: ?>
-                            <p class="mt-6 text-base leading-7 text-gray-600">The full article content is not available yet.</p>
-                        <?php endif; ?>
-                    </div>
                 </article>
 
-                <div class="mt-8 text-center">
-                    <a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="group inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transition-transform duration-150 group-hover:-translate-x-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <!-- Article footer actions -->
+                <div class="mt-12 flex items-center justify-between border-t border-slate-200 pt-8">
+                    <a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                             <path d="M19 12H5M12 19l-7-7 7-7"></path>
                         </svg>
                         Back to News
                     </a>
                 </div>
+
+                <!-- Related announcements -->
+                <?php if (count($ucsRelated) > 0): ?>
+                    <div class="mt-12 border-t border-slate-200 pt-10">
+                        <h3 class="text-lg font-bold tracking-tight text-slate-900">Related Announcements</h3>
+                        <div class="mt-6 divide-y divide-slate-200">
+                            <?php foreach ($ucsRelated as $ucsRelatedItem): ?>
+                                <?php
+                                $ucsRelatedUrl = BASE_URL . '/news-details.php?slug=' . urlencode($ucsRelatedItem['slug']);
+                                $ucsRelatedDate = !empty($ucsRelatedItem['published_at'])
+                                    ? $ucsRelatedItem['published_at']
+                                    : null;
+                                ?>
+                                <article class="py-4 first:pt-0 last:pb-0">
+                                    <a href="<?php echo htmlspecialchars($ucsRelatedUrl); ?>" class="group flex items-start gap-4">
+                                        <!-- Date -->
+                                        <div class="hidden w-12 shrink-0 text-right sm:block">
+                                            <?php if ($ucsRelatedDate !== null): ?>
+                                                <div class="text-[0.625rem] font-semibold uppercase tracking-wide text-slate-400"><?php echo htmlspecialchars(date('M', strtotime($ucsRelatedDate))); ?></div>
+                                                <div class="text-lg font-bold leading-none text-slate-900"><?php echo htmlspecialchars(date('j', strtotime($ucsRelatedDate))); ?></div>
+                                            <?php endif; ?>
+                                        </div>
+                                        <!-- Content -->
+                                        <div class="flex-1">
+                                            <span class="text-[0.625rem] font-semibold uppercase tracking-wider text-blue-600">
+                                                <?php echo htmlspecialchars($ucsRelatedItem['category'] ?? 'News'); ?>
+                                            </span>
+                                            <h4 class="mt-1 text-base font-semibold tracking-tight text-slate-900 transition-colors duration-150 group-hover:text-blue-700">
+                                                <?php echo htmlspecialchars($ucsRelatedItem['title']); ?>
+                                            </h4>
+                                        </div>
+                                        <!-- Arrow -->
+                                        <div class="mt-1 shrink-0 text-slate-300 transition-colors duration-150 group-hover:text-blue-600">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                <path d="M5 12h14M12 5l7 7-7 7"></path>
+                                            </svg>
+                                        </div>
+                                    </a>
+                                </article>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+                <?php endif; ?>
             </div>
         </section>
+
     <?php else: ?>
         <!-- Not found -->
-        <section class="bg-slate-50 py-20 sm:py-24" aria-labelledby="news-not-found-heading">
-            <div class="mx-auto max-w-2xl px-4 text-center sm:px-6">
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">News &amp; Updates</p>
-                <h1 id="news-not-found-heading" class="mt-3 text-3xl font-extrabold tracking-tight text-gray-900 sm:text-4xl">Article Not Found</h1>
-                <p class="mt-4 text-base leading-7 text-gray-600">
-                    The requested article could not be found or is no longer available.
-                </p>
-                <a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="mt-8 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-xl hover:shadow-blue-600/25 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                    Browse News
-                </a>
+        <section class="bg-white py-20 sm:py-24" aria-labelledby="news-not-found-heading">
+            <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+                <div class="max-w-3xl">
+                    <span class="text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-blue-600">News &amp; Updates</span>
+                    <h1 id="news-not-found-heading" class="mt-3 text-3xl font-extrabold tracking-[-0.025em] text-slate-900 sm:text-4xl">Article Not Found</h1>
+                    <p class="mt-4 text-[0.9375rem] leading-[1.85] text-slate-500">
+                        The requested article could not be found or is no longer available.
+                    </p>
+                    <div class="mt-8">
+                        <a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700">
+                            Browse News
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M5 12h14M12 5l7 7-7 7"></path>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
             </div>
         </section>
     <?php endif; ?>

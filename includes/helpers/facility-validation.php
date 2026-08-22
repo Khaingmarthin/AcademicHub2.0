@@ -7,6 +7,10 @@ if (!defined('BASE_URL')) {
     require_once __DIR__ . '/../../config/app.php';
 }
 
+require_once __DIR__ . '/ucs-upload.php';
+
+const FACILITY_IMAGE_MAX_BYTES = 5242880; // 5 MB
+
 /**
  * Validate and normalise facility form input.
  *
@@ -20,7 +24,6 @@ function facility_validate_input($input, $pdo = null, $excludeId = null)
     $errors = [];
 
     $name        = trim((string) ($input['name'] ?? ''));
-    $image       = trim((string) ($input['image'] ?? ''));
     $description = trim((string) ($input['description'] ?? ''));
     $location    = trim((string) ($input['location'] ?? ''));
     $status      = $input['status'] ?? 1;
@@ -31,10 +34,6 @@ function facility_validate_input($input, $pdo = null, $excludeId = null)
         $errors[] = 'Facility name must be 255 characters or fewer.';
     }
 
-    if (mb_strlen($image) > 255) {
-        $errors[] = 'Image path must be 255 characters or fewer.';
-    }
-
     if (mb_strlen($location) > 255) {
         $errors[] = 'Location must be 255 characters or fewer.';
     }
@@ -43,10 +42,18 @@ function facility_validate_input($input, $pdo = null, $excludeId = null)
         $errors[] = 'Invalid status selected.';
     }
 
+    // ---- Image upload (optional) ----------------------------------------
+    $ucsImage = null;
+    try {
+        $ucsImage = ucs_handle_upload('image', ['jpg', 'jpeg', 'png', 'gif', 'webp'], FACILITY_IMAGE_MAX_BYTES);
+    } catch (RuntimeException $e) {
+        $errors[] = $e->getMessage();
+    }
+
     return [
         'clean' => [
             'name'        => $name,
-            'image'       => $image === '' ? null : $image,
+            'image'       => $ucsImage,
             'description' => $description === '' ? null : $description,
             'location'    => $location === '' ? null : $location,
             'status'      => in_array($status, [1, '1'], true) ? 1 : 0,

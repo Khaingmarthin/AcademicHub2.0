@@ -68,7 +68,7 @@ if ($ucsProfile === null) {
     <main class="flex-1 bg-blue-50">
         <section class="py-12 sm:py-16" aria-labelledby="alumni-dashboard-heading">
             <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-                <div class="relative overflow-hidden rounded-2xl border border-blue-100 bg-white px-6 py-8 shadow-sm sm:px-8">
+                <div class="relative overflow-hidden rounded-lg border border-blue-100 bg-white px-6 py-8 shadow-sm sm:px-8">
                     <span class="absolute inset-y-0 left-0 w-1 bg-blue-600" aria-hidden="true"></span>
                     <span class="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-blue-50" aria-hidden="true"></span>
                     <p class="relative text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">Alumni &amp; Career Community</p>
@@ -95,7 +95,7 @@ if ($ucsProfile === null) {
                                     Create Your Alumni Profile
                                 </a>
                                 <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-overview.php'); ?>"
-                                   class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                   class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400">
                                     Learn About the Community
                                 </a>
                             </div>
@@ -117,11 +117,11 @@ if ($ucsProfile === null) {
                             </p>
                             <div class="mt-6 flex flex-wrap gap-3">
                                 <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-overview.php'); ?>"
-                                   class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                   class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400">
                                     Explore the Community
                                 </a>
                                 <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>"
-                                   class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                                   class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400">
                                     Browse Career Discussions
                                 </a>
                             </div>
@@ -260,7 +260,7 @@ require_once __DIR__ . '/../includes/header.php';
             <?php endif; ?>
 
             <!-- Welcome -->
-            <div class="relative overflow-hidden rounded-2xl border border-blue-100 bg-white px-6 py-6 shadow-sm sm:px-8">
+            <div class="relative overflow-hidden rounded-lg border border-blue-100 bg-white px-6 py-6 shadow-sm sm:px-8">
                 <span class="absolute inset-y-0 left-0 w-1 bg-blue-600" aria-hidden="true"></span>
                 <span class="pointer-events-none absolute -right-10 -top-12 h-32 w-32 rounded-full bg-blue-50" aria-hidden="true"></span>
                 <p class="relative text-xs font-semibold uppercase tracking-[0.2em] text-blue-700">Alumni &amp; Career Community</p>
@@ -279,7 +279,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <span class="text-sm font-medium text-slate-600"><?php echo htmlspecialchars($ucsMajorName); ?></span>
                     <?php endif; ?>
                     <?php if ($ucsGraduationYear !== ''): ?>
-                        <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700 ring-1 ring-gray-200">Class of <?php echo htmlspecialchars($ucsGraduationYear); ?></span>
+                        <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700 ring-1 ring-slate-200">Class of <?php echo htmlspecialchars($ucsGraduationYear); ?></span>
                     <?php endif; ?>
                 </div>
                 <p class="relative mt-3 text-sm leading-6 text-slate-500">
@@ -296,7 +296,7 @@ require_once __DIR__ . '/../includes/header.php';
                 </div>
 
                 <div class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-edit.php'); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-edit.php'); ?>" class="group rounded-lg border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                         <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50 text-blue-600 ring-1 ring-blue-100 transition-colors duration-150 group-hover:bg-blue-600 group-hover:text-white" aria-hidden="true">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z"></path><path d="M22 10v6"></path><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"></path></svg>
                         </span>
@@ -304,7 +304,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <span class="mt-0.5 block text-sm text-slate-500">Update your alumni profile details</span>
                     </a>
 
-                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-details.php?id=' . (int) $ucsProfile['id']); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-details.php?id=' . (int) $ucsProfile['id']); ?>" class="group rounded-lg border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                         <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-emerald-50 text-emerald-600 ring-1 ring-emerald-100 transition-colors duration-150 group-hover:bg-emerald-600 group-hover:text-white" aria-hidden="true">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
                         </span>
@@ -312,7 +312,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <span class="mt-0.5 block text-sm text-slate-500">See how others see you</span>
                     </a>
 
-                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-story-create.php'); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-story-create.php'); ?>" class="group rounded-lg border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                         <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100 transition-colors duration-150 group-hover:bg-indigo-500 group-hover:text-white" aria-hidden="true">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                         </span>
@@ -320,7 +320,7 @@ require_once __DIR__ . '/../includes/header.php';
                         <span class="mt-0.5 block text-sm text-slate-500">Write about your career journey</span>
                     </a>
 
-                    <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="group rounded-2xl border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                    <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="group rounded-lg border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                         <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-violet-50 text-violet-600 ring-1 ring-violet-100 transition-colors duration-150 group-hover:bg-violet-600 group-hover:text-white" aria-hidden="true">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
                         </span>
@@ -339,11 +339,11 @@ require_once __DIR__ . '/../includes/header.php';
                 </div>
 
                 <dl class="mt-5 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <div class="rounded-2xl border border-blue-100 bg-white px-5 py-5 shadow-sm">
+                    <div class="rounded-lg border border-blue-100 bg-white px-5 py-5 shadow-sm">
                         <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Discussions Started</dt>
                         <dd class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900"><?php echo $ucsDiscussionCount; ?></dd>
                     </div>
-                    <div class="rounded-2xl border border-blue-100 bg-white px-5 py-5 shadow-sm">
+                    <div class="rounded-lg border border-blue-100 bg-white px-5 py-5 shadow-sm">
                         <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Profile Completion</dt>
                         <dd class="mt-1 text-2xl font-extrabold tracking-tight text-slate-900"><?php echo $ucsProfileCompletion; ?>%</dd>
                     </div>
@@ -363,7 +363,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-edit.php'); ?>" class="shrink-0 text-xs font-semibold text-blue-700 transition-colors duration-150 hover:text-blue-800">Edit</a>
                         </div>
 
-                        <div class="mt-4 overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm">
+                        <div class="mt-4 overflow-hidden rounded-lg border border-blue-100 bg-white shadow-sm">
                             <?php $ucsHasProfileContent = false; ?>
                             <?php if (!empty($ucsProfile['current_job']) || !empty($ucsProfile['company'])): ?>
                                 <?php $ucsHasProfileContent = true; ?>
@@ -402,7 +402,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="shrink-0 text-xs font-semibold text-blue-700 transition-colors duration-150 hover:text-blue-800">Browse</a>
                         </div>
 
-                        <div class="mt-4 rounded-2xl border border-blue-100 bg-white p-6 shadow-sm">
+                        <div class="mt-4 rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
                             <p class="text-sm leading-6 text-slate-600">
                                 You have started
                                 <span class="font-bold text-slate-900"><?php echo $ucsDiscussionCount; ?></span>
@@ -426,11 +426,11 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
 
                         <?php if (empty($ucsLatestStories)): ?>
-                            <div class="mt-4 rounded-2xl border border-blue-100 bg-white px-6 py-8 text-center shadow-sm">
+                            <div class="mt-4 rounded-lg border border-blue-100 bg-white px-6 py-8 text-center shadow-sm">
                                 <p class="text-sm leading-6 text-slate-500">No alumni stories have been published yet.</p>
                             </div>
                         <?php else: ?>
-                            <div class="mt-4 overflow-hidden rounded-2xl border border-blue-100 bg-white shadow-sm">
+                            <div class="mt-4 overflow-hidden rounded-lg border border-blue-100 bg-white shadow-sm">
                                 <ul class="divide-y divide-blue-100">
                                     <?php foreach ($ucsLatestStories as $ucsStory): ?>
                                         <li>

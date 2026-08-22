@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/helpers/facility-validation.php';
+require_once __DIR__ . '/../../includes/helpers/ucs-upload.php';
 
 admin_require_login();
 
@@ -21,7 +22,7 @@ $ucsId = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
 
 try {
     $ucsStmt = $pdo->prepare(
-        "SELECT id, name FROM facilities WHERE id = :id LIMIT 1"
+        "SELECT id, name, image FROM facilities WHERE id = :id LIMIT 1"
     );
     $ucsStmt->execute([':id' => $ucsId]);
     $ucsExisting = $ucsStmt->fetch() ?: null;
@@ -47,6 +48,11 @@ if (!empty($ucsErrors)) {
 }
 
 try {
+    $ucsRemoveImage = isset($_POST['remove_image']) && (string) $_POST['remove_image'] === '1';
+    $ucsNewImage = $ucsClean['image'] !== null
+        ? $ucsClean['image']
+        : ($ucsRemoveImage ? null : $ucsExisting['image']);
+
     $ucsStmt = $pdo->prepare(
         "UPDATE facilities
          SET name = :name,
@@ -58,12 +64,17 @@ try {
     );
     $ucsStmt->execute([
         ':name'        => $ucsClean['name'],
-        ':image'       => $ucsClean['image'],
+        ':image'       => $ucsNewImage,
         ':description' => $ucsClean['description'],
         ':location'    => $ucsClean['location'],
         ':status'      => $ucsClean['status'],
         ':id'          => $ucsId,
     ]);
+
+    // Delete the old image if replaced or removed.
+    if ($ucsClean['image'] !== null || $ucsRemoveImage) {
+        ucs_delete_upload($ucsExisting['image'] ?? null);
+    }
 
     facility_flash('success', 'Facility "' . $ucsClean['name'] . '" updated successfully.');
 } catch (Throwable $e) {

@@ -55,7 +55,7 @@ function ucs_avatar_initial($name)
     <meta name="description" content="UCSMTLA Academic Hub - University information, academic programmes, admissions, news, and campus life.">
     <link rel="stylesheet" href="<?php echo htmlspecialchars(ROOT_URL); ?>/assets/css/style.css">
 </head>
-<body class="flex min-h-screen flex-col bg-gray-50 font-sans text-gray-900 antialiased">
+<body class="flex min-h-screen flex-col bg-slate-50 font-sans text-slate-900 antialiased">
     <header id="site-header" class="sticky top-0 z-50 border-b border-blue-100/80 bg-white/95 backdrop-blur-sm transition-all duration-200">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div class="header-inner flex h-[4.25rem] items-center justify-between gap-5">

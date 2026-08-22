@@ -3,8 +3,8 @@
  * Shared validation helpers for the Admin News module.
  *
  * Used by both the create and update handlers so the news input rules live
- * in exactly one place. Returns clean, normalised values plus a list of
- * human-readable validation errors.
+ * in exactly one place. Returns clean, normalised values plus a list
+ * of human-readable validation errors.
  */
 
 if (!defined('BASE_URL')) {
@@ -58,6 +58,45 @@ function news_unique_slug($pdo, $slug, $excludeId = null)
 }
 
 /**
+ * Derive the announcement status from publish_at and expired_at dates.
+ *
+ * Logic:
+ *   - Expired  : expired_at is set and has passed
+ *   - Published: publish_at is set and has arrived (and not expired)
+ *   - Draft    : otherwise (not yet published)
+ *
+ * @param string|null $publishAt Datetime string or null.
+ * @param string|null $expiredAt Datetime string or null.
+ * @return string One of 'Draft', 'Published', 'Expired'.
+ */
+function news_derive_status($publishAt, $expiredAt)
+{
+    $now = new DateTime('now');
+
+    if ($expiredAt !== null && $expiredAt !== '') {
+        $exp = DateTime::createFromFormat('Y-m-d\TH:i', $expiredAt);
+        if ($exp === false) {
+            $exp = DateTime::createFromFormat('Y-m-d H:i:s', $expiredAt);
+        }
+        if ($exp !== false && $exp <= $now) {
+            return 'Expired';
+        }
+    }
+
+    if ($publishAt !== null && $publishAt !== '') {
+        $pub = DateTime::createFromFormat('Y-m-d\TH:i', $publishAt);
+        if ($pub === false) {
+            $pub = DateTime::createFromFormat('Y-m-d H:i:s', $publishAt);
+        }
+        if ($pub !== false && $pub <= $now) {
+            return 'Published';
+        }
+    }
+
+    return 'Draft';
+}
+
+/**
  * Validate and normalise news form input.
  *
  * @param array    $input     Raw form values (e.g. $_POST).
@@ -72,11 +111,55 @@ function news_validate_input($input, $pdo, $excludeId = null)
     $categoryId  = filter_var($input['category_id'] ?? null, FILTER_VALIDATE_INT);
     $title       = trim((string) ($input['title'] ?? ''));
     $content     = trim((string) ($input['content'] ?? ''));
-    $status      = (string) ($input['status'] ?? 'Draft');
     $yearLevels  = $input['target_year_level'] ?? [];
     $sections    = $input['target_section'] ?? [];
     $targetYears = $input['target_academic_year_id'] ?? [];
     $targetMajors = $input['target_major_id'] ?? [];
+
+    // ---- Publish / Expired dates -------------------------------------------
+    $publishAt = trim((string) ($input['publish_at'] ?? ''));
+    $expiredAt = trim((string) ($input['expired_at'] ?? ''));
+
+    // Normalise empty to null.
+    if ($publishAt === '') {
+        $publishAt = null;
+    }
+    if ($expiredAt === '') {
+        $expiredAt = null;
+    }
+
+    // Validate datetime format when provided.
+    if ($publishAt !== null) {
+        $pubDt = DateTime::createFromFormat('Y-m-d\TH:i', $publishAt);
+        if ($pubDt === false) {
+            $pubDt = DateTime::createFromFormat('Y-m-d H:i:s', $publishAt);
+        }
+        if ($pubDt === false) {
+            $errors[] = 'Publish date format is invalid.';
+        }
+    }
+
+    if ($expiredAt !== null) {
+        $expDt = DateTime::createFromFormat('Y-m-d\TH:i', $expiredAt);
+        if ($expDt === false) {
+            $expDt = DateTime::createFromFormat('Y-m-d H:i:s', $expiredAt);
+        }
+        if ($expDt === false) {
+            $errors[] = 'Expired date format is invalid.';
+        }
+    }
+
+    // Expired must be after publish if both are set.
+    if ($publishAt !== null && $expiredAt !== null && empty($errors)) {
+        $pubDt = DateTime::createFromFormat('Y-m-d\TH:i', $publishAt) ?: DateTime::createFromFormat('Y-m-d H:i:s', $publishAt);
+        $expDt = DateTime::createFromFormat('Y-m-d\TH:i', $expiredAt) ?: DateTime::createFromFormat('Y-m-d H:i:s', $expiredAt);
+        if ($pubDt && $expDt && $expDt <= $pubDt) {
+            $errors[] = 'Expired date must be after the publish date.';
+        }
+    }
+
+    // Auto-derive status from dates.
+    $status = news_derive_status($publishAt, $expiredAt);
 
     // ---- Foreign keys ---------------------------------------------------
     if ($categoryId === false || $categoryId < 1) {
@@ -102,11 +185,6 @@ function news_validate_input($input, $pdo, $excludeId = null)
 
     if ($content === '') {
         $errors[] = 'Content is required.';
-    }
-
-    // ---- Status ----------------------------------------------------------
-    if (!in_array($status, NEWS_STATUSES, true)) {
-        $errors[] = 'Invalid status selected.';
     }
 
     // ---- Cover image (optional) ------------------------------------------
@@ -157,6 +235,8 @@ function news_validate_input($input, $pdo, $excludeId = null)
             'title'        => $title,
             'content'      => $content,
             'status'       => $status,
+            'publish_at'   => $publishAt,
+            'expired_at'   => $expiredAt,
             'cover_image'  => $ucsCoverImage,
             'targets'      => $ucsTargets,
         ],

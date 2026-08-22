@@ -46,9 +46,9 @@ require_once __DIR__ . '/../includes/header.php';
             <div class="flex flex-wrap items-end justify-between gap-4">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Student Portal</p>
-                    <h1 id="student-profile-heading" class="mt-2 text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">My Profile</h1>
+                    <h1 id="student-profile-heading" class="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">My Profile</h1>
                 </div>
-                <a href="<?php echo htmlspecialchars(BASE_URL . '/student-dashboard.php'); ?>" class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                <a href="<?php echo htmlspecialchars(BASE_URL . '/student-dashboard.php'); ?>" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M19 12H5M12 19l-7-7 7-7"></path>
                     </svg>
@@ -58,15 +58,15 @@ require_once __DIR__ . '/../includes/header.php';
 
             <?php if ($ucsDetails !== null): ?>
                 <!-- Identity -->
-                <div class="mt-8 rounded-2xl bg-white px-6 py-8 shadow-sm ring-1 ring-gray-100 sm:px-8">
+                <div class="mt-8 rounded-lg border border-slate-200 bg-white px-6 py-8 sm:px-8">
                     <div class="flex flex-col items-center gap-5 sm:flex-row sm:items-center">
-                        <span class="inline-flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-2xl font-bold text-white" aria-hidden="true">
+                        <span class="inline-flex h-20 w-20 shrink-0 items-center justify-center rounded-lg bg-blue-600 text-2xl font-bold text-white" aria-hidden="true">
                             <?php echo htmlspecialchars(strtoupper(substr(trim((string) $ucsDetails['name']), 0, 1))); ?>
                         </span>
                         <div class="text-center sm:text-left">
-                            <h2 class="text-xl font-bold tracking-tight text-gray-900"><?php echo htmlspecialchars($ucsDetails['name']); ?></h2>
-                            <p class="mt-1 text-sm text-gray-500"><?php echo htmlspecialchars($ucsDetails['email']); ?></p>
-                            <span class="mt-3 inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700 ring-1 ring-blue-100">
+                            <h2 class="text-xl font-bold tracking-tight text-slate-900"><?php echo htmlspecialchars($ucsDetails['name']); ?></h2>
+                            <p class="mt-1 text-sm text-slate-500"><?php echo htmlspecialchars($ucsDetails['email']); ?></p>
+                            <span class="mt-3 inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-blue-700 ring-1 ring-blue-200">
                                 <?php echo htmlspecialchars($ucsAccountStatus); ?>
                             </span>
                         </div>
@@ -74,38 +74,38 @@ require_once __DIR__ . '/../includes/header.php';
                 </div>
 
                 <!-- Details -->
-                <div class="mt-6 rounded-2xl bg-white px-6 py-8 shadow-sm ring-1 ring-gray-100 sm:px-8">
-                    <h2 class="text-lg font-semibold tracking-tight text-gray-900">Academic Information</h2>
+                <div class="mt-6 rounded-lg border border-slate-200 bg-white px-6 py-8 sm:px-8">
+                    <h2 class="text-lg font-semibold tracking-tight text-slate-900">Academic Information</h2>
                     <dl class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2">
                         <div>
-                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Student ID</dt>
-                            <dd class="mt-1 text-base font-semibold text-gray-900"><?php echo htmlspecialchars($ucsDetails['student_id']); ?></dd>
+                            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Student ID</dt>
+                            <dd class="mt-1 text-base font-semibold text-slate-900"><?php echo htmlspecialchars($ucsDetails['student_id']); ?></dd>
                         </div>
                         <div>
-                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Classroom</dt>
-                            <dd class="mt-1 text-base font-semibold text-gray-900"><?php echo htmlspecialchars($ucsDetails['classroom_name']); ?></dd>
+                            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Classroom</dt>
+                            <dd class="mt-1 text-base font-semibold text-slate-900"><?php echo htmlspecialchars($ucsDetails['classroom_name']); ?></dd>
                         </div>
                         <div>
-                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Year Level</dt>
-                            <dd class="mt-1 text-base font-semibold text-gray-900"><?php echo htmlspecialchars($ucsDetails['year_level']); ?></dd>
+                            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Year Level</dt>
+                            <dd class="mt-1 text-base font-semibold text-slate-900"><?php echo htmlspecialchars($ucsDetails['year_level']); ?></dd>
                         </div>
                         <div>
-                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Section</dt>
-                            <dd class="mt-1 text-base font-semibold text-gray-900"><?php echo htmlspecialchars($ucsDetails['section'] !== '' && $ucsDetails['section'] !== null ? $ucsDetails['section'] : '—'); ?></dd>
+                            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Section</dt>
+                            <dd class="mt-1 text-base font-semibold text-slate-900"><?php echo htmlspecialchars($ucsDetails['section'] !== '' && $ucsDetails['section'] !== null ? $ucsDetails['section'] : '\u2014'); ?></dd>
                         </div>
                         <div>
-                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Major</dt>
-                            <dd class="mt-1 text-base font-semibold text-gray-900"><?php echo htmlspecialchars($ucsDetails['major_name']); ?></dd>
+                            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Major</dt>
+                            <dd class="mt-1 text-base font-semibold text-slate-900"><?php echo htmlspecialchars($ucsDetails['major_name']); ?></dd>
                         </div>
                         <div>
-                            <dt class="text-xs font-semibold uppercase tracking-wide text-gray-400">Academic Year</dt>
-                            <dd class="mt-1 text-base font-semibold text-gray-900"><?php echo htmlspecialchars($ucsDetails['academic_year']); ?></dd>
+                            <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Academic Year</dt>
+                            <dd class="mt-1 text-base font-semibold text-slate-900"><?php echo htmlspecialchars($ucsDetails['academic_year']); ?></dd>
                         </div>
                     </dl>
                 </div>
             <?php else: ?>
-                <div class="mt-8 rounded-2xl bg-white px-6 py-10 text-center shadow-sm ring-1 ring-gray-100 sm:px-8">
-                    <p class="text-base text-gray-600">Your profile details could not be loaded at this time. Please try again later.</p>
+                <div class="mt-8 rounded-lg border border-slate-200 bg-white px-6 py-10 text-center sm:px-8">
+                    <p class="text-base text-slate-600">Your profile details could not be loaded at this time. Please try again later.</p>
                 </div>
             <?php endif; ?>
         </div>

@@ -6,6 +6,8 @@ require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../includes/auth.php';
 
+require_once __DIR__ . '/../../includes/helpers/ucs-upload.php';
+
 admin_require_login();
 
 $pageTitle    = 'Edit Facility';
@@ -67,7 +69,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             <p class="mt-1 text-sm text-gray-500">The image, description and location are optional.</p>
         </div>
 
-        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/facility-update.php'); ?>" novalidate>
+        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/facility-update.php'); ?>" enctype="multipart/form-data" novalidate>
             <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
             <input type="hidden" name="id" value="<?php echo (int) $ucsFacility['id']; ?>">
 
@@ -80,9 +82,22 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
 
                 <div class="grid gap-6 sm:grid-cols-2">
                     <div>
-                        <label for="image" class="block text-sm font-medium text-gray-700">Image Path</label>
-                        <input type="text" id="image" name="image" value="<?php echo htmlspecialchars($ucsForm['image']); ?>" placeholder="e.g. images/canteen.jpg" maxlength="255"
-                               class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        <?php if (!empty($ucsForm['image'])): ?>
+                            <label class="block text-sm font-medium text-gray-700">Current Image</label>
+                            <div class="mt-2 flex flex-wrap items-center gap-3">
+                                <span class="inline-flex h-20 w-32 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gray-100 ring-1 ring-gray-200" aria-hidden="true">
+                                    <img src="<?php echo htmlspecialchars(ROOT_URL . '/assets/' . ltrim($ucsForm['image'], '/')); ?>" alt="" class="h-full w-full object-cover">
+                                </span>
+                                <label class="inline-flex cursor-pointer items-center gap-2 text-sm font-medium text-red-600">
+                                    <input type="checkbox" name="remove_image" value="1" class="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-100">
+                                    Remove this image
+                                </label>
+                            </div>
+                        <?php endif; ?>
+                        <label for="image" class="mt-3 block text-sm font-medium text-gray-700"><?php echo !empty($ucsForm['image']) ? 'Replace Image' : 'Facility Image'; ?> <span class="text-gray-400">(optional)</span></label>
+                        <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.gif,.webp"
+                               class="mt-2 block w-full text-sm text-gray-500 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-blue-700 transition-colors hover:file:bg-blue-100 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        <p class="mt-2 text-xs text-gray-500">JPG, PNG, GIF or WebP. Maximum size 5 MB. Leave empty to keep the current image.</p>
                     </div>
                     <div>
                         <label for="location" class="block text-sm font-medium text-gray-700">Location</label>

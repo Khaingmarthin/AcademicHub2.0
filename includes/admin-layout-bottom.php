@@ -10,8 +10,8 @@
                 </div>
             </main>
 
-            <footer class="shrink-0 border-t border-gray-200 bg-white px-4 py-4 sm:px-6">
-                <div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-2 text-xs text-gray-500 sm:flex-row">
+            <footer class="shrink-0 border-t border-slate-200 bg-white px-4 py-3 sm:px-5">
+                <div class="mx-auto flex w-full max-w-7xl flex-col items-center justify-between gap-1 text-[11px] text-slate-400 sm:flex-row">
                     <p>&copy; <?php echo date('Y'); ?> <?php echo htmlspecialchars(APP_NAME); ?> &middot; Admin Panel</p>
                     <p>UCSMTLA University Administration</p>
                 </div>

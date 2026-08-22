@@ -132,17 +132,17 @@ html {
     box-shadow: 0 1px 3px rgb(15 23 42 / 0.04), 0 4px 16px -4px rgb(15 23 42 / 0.08);
   }
 
-  /* Faculties/Departments tab switcher (aria-selected driven) */
+  /* Faculties/Departments tab switcher — underline style (aria-selected driven) */
   .ucs-tab {
-    @apply inline-flex items-center justify-center gap-2 rounded-lg px-5 py-3 text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600;
+    @apply inline-flex items-center justify-center gap-1.5 border-b-2 px-4 py-3 text-sm font-semibold transition-all duration-150 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600;
   }
 
   .ucs-tab[aria-selected="true"] {
-    @apply bg-blue-600 text-white shadow-sm;
+    @apply border-blue-600 text-blue-600;
   }
 
   .ucs-tab[aria-selected="false"] {
-    @apply border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50;
+    @apply border-transparent text-slate-500 hover:border-slate-300 hover:text-slate-700;
   }
 
   .ucs-tab-count {
@@ -150,7 +150,7 @@ html {
   }
 
   .ucs-tab[aria-selected="true"] .ucs-tab-count {
-    @apply bg-white/25 text-white;
+    @apply bg-blue-50 text-blue-600;
   }
 
   .ucs-tab[aria-selected="false"] .ucs-tab-count {

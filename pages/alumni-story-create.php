@@ -81,12 +81,12 @@ require_once __DIR__ . '/../includes/header.php';
             <div class="flex flex-wrap items-end justify-between gap-4">
                 <div>
                     <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Alumni Stories</p>
-                    <h1 id="alumni-story-create-heading" class="mt-2 text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">Share Your Story</h1>
-                    <p class="mt-2 max-w-xl text-sm leading-6 text-gray-600">
+                    <h1 id="alumni-story-create-heading" class="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">Share Your Story</h1>
+                    <p class="mt-2 max-w-xl text-sm leading-6 text-slate-600">
                         Write about your university experience, career journey, internship, first job, skills learned, challenges after graduation or advice for current students.
                     </p>
                 </div>
-                <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="inline-flex items-center gap-2 rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M19 12H5M12 19l-7-7 7-7"></path>
                     </svg>
@@ -94,55 +94,55 @@ require_once __DIR__ . '/../includes/header.php';
                 </a>
             </div>
 
-            <div class="mt-8 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
+            <div class="mt-8 overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-slate-100">
                 <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/alumni/story-submit.php'); ?>" enctype="multipart/form-data" novalidate>
                     <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(student_csrf_token()); ?>">
 
-                    <div class="border-b border-gray-100 px-6 py-6 sm:px-8">
-                        <h2 class="text-base font-semibold text-gray-900">Story Details</h2>
-                        <p class="mt-1 text-sm text-gray-500">Your story will be reviewed by the university office before publication.</p>
+                    <div class="border-b border-slate-100 px-6 py-6 sm:px-8">
+                        <h2 class="text-base font-semibold text-slate-900">Story Details</h2>
+                        <p class="mt-1 text-sm text-slate-500">Your story will be reviewed by the university office before publication.</p>
 
                         <div class="mt-5 space-y-5">
                             <div>
-                                <label for="title" class="block text-sm font-medium text-gray-700">Title <span class="text-red-500">*</span></label>
+                                <label for="title" class="block text-sm font-medium text-slate-700">Title <span class="text-red-500">*</span></label>
                                 <input type="text" id="title" name="title" value="<?php echo htmlspecialchars($ucsForm['title']); ?>" maxlength="255" placeholder="e.g. From UCSMTLA Student to Software Developer" required
-                                       class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                                       class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                             </div>
 
                             <div>
-                                <label for="career_field" class="block text-sm font-medium text-gray-700">Career Field <span class="text-gray-400">(optional)</span></label>
+                                <label for="career_field" class="block text-sm font-medium text-slate-700">Career Field <span class="text-slate-400">(optional)</span></label>
                                 <input type="text" id="career_field" name="career_field" value="<?php echo htmlspecialchars($ucsForm['career_field']); ?>" maxlength="255" placeholder="e.g. Software Development"
-                                       class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                                       class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                             </div>
 
                             <div>
-                                <label for="summary" class="block text-sm font-medium text-gray-700">Short Summary <span class="text-red-500">*</span></label>
+                                <label for="summary" class="block text-sm font-medium text-slate-700">Short Summary <span class="text-red-500">*</span></label>
                                 <textarea id="summary" name="summary" rows="3" maxlength="500" placeholder="A short preview shown on the story card…" required
-                                          class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"><?php echo htmlspecialchars($ucsForm['summary']); ?></textarea>
-                                <p class="mt-1.5 text-xs text-gray-500">Maximum 500 characters.</p>
+                                          class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"><?php echo htmlspecialchars($ucsForm['summary']); ?></textarea>
+                                <p class="mt-1.5 text-xs text-slate-500">Maximum 500 characters.</p>
                             </div>
 
                             <div>
-                                <label for="content" class="block text-sm font-medium text-gray-700">Story Content <span class="text-red-500">*</span></label>
+                                <label for="content" class="block text-sm font-medium text-slate-700">Story Content <span class="text-red-500">*</span></label>
                                 <textarea id="content" name="content" rows="12" placeholder="Write your career journey — skills learned, internships, professional advice and lessons learned…" required
-                                          class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"><?php echo htmlspecialchars($ucsForm['content']); ?></textarea>
+                                          class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"><?php echo htmlspecialchars($ucsForm['content']); ?></textarea>
                             </div>
 
                             <div>
-                                <label for="cover_image" class="block text-sm font-medium text-gray-700">Cover Image <span class="text-gray-400">(optional)</span></label>
+                                <label for="cover_image" class="block text-sm font-medium text-slate-700">Cover Image <span class="text-slate-400">(optional)</span></label>
                                 <input type="file" id="cover_image" name="cover_image" accept=".jpg,.jpeg,.png,.gif,.webp"
-                                       class="mt-2 block w-full text-sm text-gray-500 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-blue-700 transition-colors hover:file:bg-blue-100 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                <p class="mt-2 text-xs text-gray-500">JPG, PNG, GIF or WebP. Maximum size 5 MB.</p>
+                                       class="mt-2 block w-full text-sm text-slate-500 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-blue-700 transition-colors hover:file:bg-blue-100 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                <p class="mt-2 text-xs text-slate-500">JPG, PNG, GIF or WebP. Maximum size 5 MB.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div class="flex flex-col-reverse gap-3 border-t border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-                        <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                    <div class="flex flex-col-reverse gap-3 border-t border-slate-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+                        <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400">
                             Cancel
                         </a>
                         <button type="submit"
-                                class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M22 2 11 13"></path>
                                 <path d="M22 2 15 22l-4-9-9-4Z"></path>

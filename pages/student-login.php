@@ -43,19 +43,19 @@ require_once '../includes/header.php';
 ?>
 <main class="flex flex-1 items-center justify-center bg-slate-50 px-4 py-16 sm:px-6 sm:py-20">
     <div class="w-full max-w-md">
-        <div class="rounded-2xl bg-white px-6 py-10 shadow-sm ring-1 ring-gray-100 sm:px-10">
+        <div class="rounded-lg bg-white px-6 py-10 ring-1 ring-slate-200 sm:px-10">
             <!-- University logo -->
             <div class="text-center">
                 <img src="<?php echo htmlspecialchars($ucsLoginLogo); ?>" alt="UCSMTLA logo" class="mx-auto h-16 w-16 object-contain">
                 <p class="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Student Portal</p>
-                <h1 id="student-login-heading" class="mt-2 text-2xl font-extrabold tracking-tight text-gray-900 sm:text-3xl">Student Login</h1>
-                <p class="mt-3 text-sm leading-6 text-gray-500">
+                <h1 id="student-login-heading" class="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">Student Login</h1>
+                <p class="mt-3 text-sm leading-6 text-slate-500">
                     Access your personalized academic information.
                 </p>
             </div>
 
             <?php if (!empty($ucsLoginErrors)): ?>
-                <div class="mt-6 rounded-xl bg-red-50 px-4 py-3 ring-1 ring-red-100" role="alert">
+                <div class="mt-6 rounded-lg bg-red-50 px-4 py-3 ring-1 ring-red-200" role="alert">
                     <ul class="space-y-1">
                         <?php foreach ($ucsLoginErrors as $ucsLoginError): ?>
                             <li class="text-sm font-medium text-red-700"><?php echo htmlspecialchars($ucsLoginError); ?></li>
@@ -66,19 +66,19 @@ require_once '../includes/header.php';
 
             <form action="<?php echo htmlspecialchars(ROOT_URL . '/actions/student/login.php'); ?>" method="post" class="mt-8 space-y-5" novalidate>
                 <div>
-                    <label for="student-login-email" class="block text-sm font-semibold text-gray-700">Email</label>
+                    <label for="student-login-email" class="block text-sm font-semibold text-slate-700">Email</label>
                     <input type="email" id="student-login-email" name="email" value="<?php echo htmlspecialchars($ucsLoginEmail); ?>" required autocomplete="email" placeholder="student@example.com"
-                           class="mt-2 block w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                           class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
                 </div>
 
                 <div>
                     <div class="flex items-center justify-between">
-                        <label for="student-login-password" class="block text-sm font-semibold text-gray-700">Password</label>
+                        <label for="student-login-password" class="block text-sm font-semibold text-slate-700">Password</label>
                     </div>
                     <div class="relative mt-2">
                         <input type="password" id="student-login-password" name="password" required autocomplete="current-password" placeholder="Enter your password"
-                               class="block w-full rounded-xl border border-gray-200 bg-white px-4 py-2.5 pr-11 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                        <button type="button" id="student-password-toggle" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-gray-400 transition-colors hover:text-gray-600 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" aria-label="Show password" aria-pressed="false">
+                               class="block w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 pr-11 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        <button type="button" id="student-password-toggle" class="absolute inset-y-0 right-0 flex w-11 items-center justify-center text-slate-400 transition-colors hover:text-slate-600 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600" aria-label="Show password" aria-pressed="false">
                             <!-- Eye -->
                             <svg id="student-eye-open" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path>
@@ -95,7 +95,7 @@ require_once '../includes/header.php';
                     </div>
                 </div>
 
-                <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-sm shadow-blue-600/20 transition-all duration-200 hover:bg-blue-700 hover:shadow-md hover:shadow-blue-600/25 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-colors duration-150 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                     Login
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <path d="M5 12h14M12 5l7 7-7 7"></path>

@@ -66,10 +66,14 @@ function classroom_validate_input($input, $pdo, $excludeId = null)
         $errors[] = 'Invalid year level selected.';
     }
 
-    if ($section === '') {
-        $errors[] = 'Section is required.';
-    } elseif (mb_strlen($section) > 10) {
+    if ($section !== '' && mb_strlen($section) > 10) {
         $errors[] = 'Section must be 10 characters or fewer.';
+    }
+
+    // Auto-generate a default section if left empty, so the NOT NULL column
+    // is satisfied and the unique constraint works correctly.
+    if ($section === '') {
+        $section = '-';
     }
 
     if ($classroomName === '') {

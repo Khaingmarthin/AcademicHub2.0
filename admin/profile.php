@@ -11,7 +11,7 @@ admin_require_login();
 
 $pageTitle    = 'Profile';
 $pageSubtitle = 'Manage your admin account details.';
-$activeNav    = 'profile';
+$activeNav    = 'dashboard';
 
 require_once __DIR__ . '/../includes/admin-layout-top.php';
 ?>

@@ -45,9 +45,9 @@ $hidePageHeader = (bool) ($hidePageHeader ?? false);
     <title><?php echo htmlspecialchars($pageTitle); ?> - <?php echo htmlspecialchars(APP_NAME); ?></title>
     <link rel="stylesheet" href="<?php echo htmlspecialchars(ROOT_URL); ?>/assets/css/style.css">
 </head>
-<body class="min-h-screen bg-slate-50 font-sans text-gray-900 antialiased">
+<body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased">
     <!-- Mobile drawer backdrop -->
-    <div id="admin-sidebar-backdrop" class="fixed inset-0 z-30 hidden bg-gray-900/50 backdrop-blur-sm lg:hidden" aria-hidden="true"></div>
+    <div id="admin-sidebar-backdrop" class="fixed inset-0 z-30 hidden bg-slate-900/50 backdrop-blur-sm lg:hidden" aria-hidden="true"></div>
 
     <div class="min-h-screen lg:flex">
         <?php include __DIR__ . '/admin-sidebar.php'; ?>
@@ -55,17 +55,17 @@ $hidePageHeader = (bool) ($hidePageHeader ?? false);
         <div class="flex min-w-0 flex-1 flex-col">
             <?php include __DIR__ . '/admin-header.php'; ?>
 
-            <main class="flex-1 p-4 sm:p-6 lg:p-8">
+            <main class="flex-1 p-4 sm:p-5 lg:p-6">
                 <div class="mx-auto w-full max-w-7xl">
                     <?php if (!$hidePageHeader): ?>
                     <!-- Page header -->
-                    <header class="mb-6">
-                        <p class="text-sm font-medium text-gray-500"><?php echo htmlspecialchars($adminBreadcrumb); ?></p>
-                        <h1 class="mt-1 text-2xl font-bold tracking-tight text-gray-900 sm:text-3xl">
+                    <header class="mb-5">
+                        <p class="text-[11px] font-semibold uppercase tracking-wider text-slate-400"><?php echo htmlspecialchars($adminBreadcrumb); ?></p>
+                        <h1 class="mt-1 text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
                             <?php echo htmlspecialchars($pageTitle); ?>
                         </h1>
                         <?php if ($pageSubtitle !== ''): ?>
-                            <p class="mt-1 text-sm text-gray-500"><?php echo htmlspecialchars($pageSubtitle); ?></p>
+                            <p class="mt-0.5 text-sm text-slate-500"><?php echo htmlspecialchars($pageSubtitle); ?></p>
                         <?php endif; ?>
                     </header>
                     <?php endif; ?>

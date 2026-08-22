@@ -21,7 +21,7 @@ $ucsId = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
 
 try {
     $ucsStmt = $pdo->prepare(
-        "SELECT id, title, slug, cover_image, status FROM news WHERE id = :id LIMIT 1"
+        "SELECT id, title, slug, cover_image, expired_at, status FROM news WHERE id = :id LIMIT 1"
     );
     $ucsStmt->execute([':id' => $ucsId]);
     $ucsExisting = $ucsStmt->fetch() ?: null;
@@ -55,10 +55,8 @@ try {
         ? $ucsClean['cover_image']
         : ($ucsRemoveCover ? null : $ucsExisting['cover_image']);
 
-    $ucsPublishedAtSql = "published_at = CASE
-                              WHEN :status = 'Published' AND (published_at IS NULL OR status <> 'Published') THEN NOW()
-                              ELSE published_at
-                          END";
+    $ucsPublishAt = $ucsClean['publish_at'];
+    $ucsExpiredAt = $ucsClean['expired_at'];
 
     $pdo->beginTransaction();
 
@@ -69,7 +67,8 @@ try {
              slug = :slug,
              content = :content,
              cover_image = :cover_image,
-             {$ucsPublishedAtSql},
+             published_at = :published_at,
+             expired_at = :expired_at,
              status = :status
          WHERE id = :id"
     );
@@ -79,6 +78,8 @@ try {
         ':slug'        => $ucsSlug,
         ':content'     => $ucsClean['content'],
         ':cover_image' => $ucsCoverImage,
+        ':published_at' => $ucsPublishAt,
+        ':expired_at'  => $ucsExpiredAt,
         ':status'      => $ucsClean['status'],
         ':id'          => $ucsId,
     ]);

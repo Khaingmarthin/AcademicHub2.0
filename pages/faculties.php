@@ -7,13 +7,13 @@
  * (includes/helpers/ucs-faculties-directory.php) so the design is consistent across
  * the website.
  *
- * Layout: page heading in the hero, then the shared tabbed directory —
+ * Layout: editorial page header, then the shared tabbed directory —
  *
  *   Faculties & Departments
  *       ↓
  *   [ Faculties ] [ Departments ]
  *       ↓
- *   Selected content/cards
+ *   Structured editorial list
  *
  * All data is read from the database only — nothing is hard-coded. Full
  * descriptions remain available on the existing detail pages.
@@ -47,21 +47,31 @@ if (!preg_match('~^https?://~i', $ucsHeroMedia)) {
 require_once '../includes/header.php';
 ?>
 <main class="flex-1">
-    <!-- Page hero -->
-    <section class="relative overflow-hidden bg-gray-900" aria-labelledby="faculties-page-heading">
-        <div class="absolute inset-0 bg-cover bg-center" style="background-image: url('<?php echo htmlspecialchars($ucsHeroMedia); ?>');" aria-hidden="true"></div>
-        <div class="absolute inset-0 bg-slate-900/50" aria-hidden="true"></div>
-        <div class="relative z-10 mx-auto max-w-7xl px-4 py-20 text-center sm:px-6 sm:py-24 lg:py-28">
-            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300">Academic Structure</p>
-            <h1 id="faculties-page-heading" class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">Faculties &amp; Departments</h1>
-            <p class="mx-auto mt-4 max-w-2xl text-base leading-7 text-gray-200 sm:text-lg sm:leading-8">
-                Explore our academic community — the faculties and departments that support teaching, learning, and academic development at <?php echo htmlspecialchars($ucsShortName); ?>.
-            </p>
+    <!-- Page header -->
+    <section class="border-b border-slate-200 bg-white" aria-labelledby="faculties-page-heading">
+        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
+            <div class="max-w-3xl">
+                <nav class="mb-6 text-xs font-medium text-slate-400" aria-label="Breadcrumb">
+                    <ol class="flex items-center gap-1.5">
+                        <li><a href="<?php echo htmlspecialchars(BASE_URL . '/index.php'); ?>" class="transition-colors hover:text-slate-600">Home</a></li>
+                        <li aria-hidden="true"><svg class="h-3 w-3 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"></path></svg></li>
+                        <li class="text-slate-600">Faculties &amp; Departments</li>
+                    </ol>
+                </nav>
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Academic Structure</p>
+                <h1 id="faculties-page-heading" class="mt-3 text-3xl font-extrabold tracking-[-0.025em] text-slate-900 sm:text-4xl lg:text-[2.75rem] leading-[1.1]">
+                    Faculties &amp; Departments
+                </h1>
+                <p class="mt-4 max-w-2xl text-base leading-relaxed text-slate-600">
+                    Explore our academic community — the faculties and departments that support
+                    teaching, learning, and academic development at <?php echo htmlspecialchars($ucsShortName); ?>.
+                </p>
+            </div>
         </div>
     </section>
 
-    <!-- Shared tabbed directory (tabs on top, content below) -->
-    <section class="bg-slate-50 py-16 sm:py-20" aria-labelledby="directory-heading">
+    <!-- Shared tabbed directory -->
+    <section class="bg-slate-50 py-12 sm:py-16 lg:py-20" aria-labelledby="directory-heading">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <h2 id="directory-heading" class="sr-only">Academic directory</h2>
             <?php include __DIR__ . '/../includes/helpers/ucs-faculties-directory.php'; ?>

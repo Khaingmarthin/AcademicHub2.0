@@ -57,17 +57,16 @@ if (function_exists('mb_strlen')) {
 $ucsFeatured = $ucsAnnouncements[0] ?? null;
 $ucsSupporting = array_slice($ucsAnnouncements, 1, 3);
 ?>
-<section class="border-t border-gray-200 bg-gray-50 py-20 sm:py-24" aria-labelledby="announcements-heading">
+<section class="border-t border-slate-200 bg-slate-50 py-20 sm:py-24" aria-labelledby="announcements-heading">
     <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
 
         <!-- Section header -->
         <div class="flex items-end justify-between">
             <div>
                 <div class="flex items-center gap-3">
-                    <span class="h-px w-8 bg-blue-600" aria-hidden="true"></span>
                     <span class="text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-blue-600">News &amp; Updates</span>
                 </div>
-                <h2 id="announcements-heading" class="mt-4 scroll-mt-24 text-3xl font-bold tracking-[-0.02em] text-gray-900 sm:text-4xl">Latest Announcements</h2>
+                <h2 id="announcements-heading" class="mt-4 scroll-mt-24 text-3xl font-bold tracking-[-0.02em] text-slate-900 sm:text-4xl">Latest Announcements</h2>
             </div>
             <a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="hidden items-center gap-2 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600 sm:inline-flex">
                 View all
@@ -87,15 +86,15 @@ $ucsSupporting = array_slice($ucsAnnouncements, 1, 3);
                             <?php echo htmlspecialchars($ucsFeatured['category'] ?? 'Announcement'); ?>
                         </span>
                         <?php if (!empty($ucsFeatured['published_at'])): ?>
-                            <time class="text-xs text-gray-500" datetime="<?php echo htmlspecialchars($ucsFeatured['published_at']); ?>">
+                            <time class="text-xs text-slate-400" datetime="<?php echo htmlspecialchars($ucsFeatured['published_at']); ?>">
                                 <?php echo htmlspecialchars(date('F j, Y', strtotime($ucsFeatured['published_at']))); ?>
                             </time>
                         <?php endif; ?>
                     </div>
-                    <h3 class="mt-4 text-2xl font-bold tracking-[-0.01em] text-gray-900 sm:text-3xl">
+                    <h3 class="mt-4 text-2xl font-bold tracking-[-0.01em] text-slate-900 sm:text-3xl">
                         <?php echo htmlspecialchars($ucsFeatured['title']); ?>
                     </h3>
-                    <p class="mt-3 text-base leading-7 text-gray-600">
+                    <p class="mt-3 text-base leading-7 text-slate-600">
                         <?php echo htmlspecialchars($ucsExcerpt($ucsFeatured['content'], 280)); ?>
                     </p>
                     <a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
@@ -108,23 +107,23 @@ $ucsSupporting = array_slice($ucsAnnouncements, 1, 3);
 
                 <!-- Supporting announcements -->
                 <div class="lg:col-span-2">
-                    <div class="divide-y divide-gray-200 border-t border-gray-200 lg:border-t-0">
+                    <div class="divide-y divide-slate-200 border-t border-slate-200 lg:border-t-0">
                         <?php foreach ($ucsSupporting as $ucsAnnouncement): ?>
                             <article class="py-5 first:pt-0 lg:first:pt-0">
                                 <div class="flex items-center gap-3">
-                                    <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-[0.6875rem] font-medium text-gray-600">
+                                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-[0.6875rem] font-medium text-slate-600">
                                         <?php echo htmlspecialchars($ucsAnnouncement['category'] ?? 'Announcement'); ?>
                                     </span>
                                     <?php if (!empty($ucsAnnouncement['published_at'])): ?>
-                                        <time class="text-xs text-gray-400" datetime="<?php echo htmlspecialchars($ucsAnnouncement['published_at']); ?>">
+                                        <time class="text-xs text-slate-400" datetime="<?php echo htmlspecialchars($ucsAnnouncement['published_at']); ?>">
                                             <?php echo htmlspecialchars(date('M j, Y', strtotime($ucsAnnouncement['published_at']))); ?>
                                         </time>
                                     <?php endif; ?>
                                 </div>
-                                <h3 class="mt-2 text-base font-semibold tracking-tight text-gray-900">
+                                <h3 class="mt-2 text-base font-semibold tracking-tight text-slate-900">
                                     <?php echo htmlspecialchars($ucsAnnouncement['title']); ?>
                                 </h3>
-                                <p class="mt-1 text-sm leading-6 text-gray-500 line-clamp-2">
+                                <p class="mt-1 text-sm leading-6 text-slate-500 line-clamp-2">
                                     <?php echo htmlspecialchars($ucsExcerpt($ucsAnnouncement['content'], 140)); ?>
                                 </p>
                                 <a href="<?php echo htmlspecialchars(BASE_URL . '/news.php'); ?>" class="mt-2 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700">
@@ -149,7 +148,7 @@ $ucsSupporting = array_slice($ucsAnnouncements, 1, 3);
                 </a>
             </div>
         <?php else: ?>
-            <p class="mt-12 text-center text-sm text-gray-500">No announcements right now. Please check back soon.</p>
+            <p class="mt-12 text-center text-sm text-slate-500">No announcements right now. Please check back soon.</p>
         <?php endif; ?>
     </div>
 </section>
