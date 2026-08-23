@@ -51,7 +51,7 @@ CREATE TABLE faculties (
     name VARCHAR(255) NOT NULL,
     description TEXT NULL,
 
-    status BOOLEAN NOT NULL DEFAULT TRUE,
+    status BOOLEAN NULL DEFAULT TRUE,
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -174,7 +174,7 @@ CREATE TABLE courses (
     semester ENUM(
         'First Semester',
         'Second Semester'
-    ) NOT NULL,
+    ) NULL,
 
     credit_hours INT UNSIGNED NULL,
     description TEXT NULL,
@@ -210,7 +210,7 @@ CREATE TABLE classrooms (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 
     academic_year_id BIGINT UNSIGNED NOT NULL,
-    major_id BIGINT UNSIGNED NOT NULL,
+    major_id BIGINT UNSIGNED NULL,
 
     year_level ENUM(
         'First Year',
@@ -220,7 +220,7 @@ CREATE TABLE classrooms (
         'Fifth Year'
     ) NOT NULL,
 
-    section VARCHAR(10) NOT NULL,
+    section VARCHAR(10) NULL,
 
     classroom_name VARCHAR(100) NOT NULL,
 

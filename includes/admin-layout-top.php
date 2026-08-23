@@ -45,7 +45,7 @@ $hidePageHeader = (bool) ($hidePageHeader ?? false);
     <title><?php echo htmlspecialchars($pageTitle); ?> - <?php echo htmlspecialchars(APP_NAME); ?></title>
     <link rel="stylesheet" href="<?php echo htmlspecialchars(ROOT_URL); ?>/assets/css/style.css">
 </head>
-<body class="min-h-screen bg-slate-50 font-sans text-slate-900 antialiased">
+<body class="min-h-screen bg-[#f5f6fa] font-sans text-slate-900 antialiased">
     <!-- Mobile drawer backdrop -->
     <div id="admin-sidebar-backdrop" class="fixed inset-0 z-30 hidden bg-slate-900/50 backdrop-blur-sm lg:hidden" aria-hidden="true"></div>
 

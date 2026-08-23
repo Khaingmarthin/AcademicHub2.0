@@ -71,9 +71,6 @@ try {
     $ucsRecentNews = [];
 }
 
-// ---------------------------------------------------------------------
-// Presentation helpers.
-// ---------------------------------------------------------------------
 $ucsFmtDate = function ($value) {
     if (empty($value)) {
         return null;
@@ -82,45 +79,78 @@ $ucsFmtDate = function ($value) {
     return $ts !== false ? date('j M Y', $ts) : (string) $value;
 };
 
-$ucsStatIcons = [
-    'Faculties'   => '<line x1="3" y1="22" x2="21" y2="22"></line><line x1="6" y1="18" x2="6" y2="11"></line><line x1="10" y1="18" x2="10" y2="11"></line><line x1="14" y1="18" x2="14" y2="11"></line><line x1="18" y1="18" x2="18" y2="11"></line><polygon points="12 2 20 7 4 7"></polygon>',
-    'Departments' => '<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>',
-    'Majors'      => '<circle cx="12" cy="8" r="6"></circle><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path>',
-    'Courses'     => '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>',
-    'Classrooms'  => '<path d="M22 9 12 5 2 9l10 4 10-4z"></path><path d="M6 11.5V15c0 1.66 2.69 3 6 3s6-1.34 6-3v-3.5"></path><path d="M2 9v5"></path>',
-    'Students'    => '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>',
+// Statistics cards data
+$ucsStatCards = [
+    [
+        'label'   => 'Faculties',
+        'value'   => $ucsStats['Faculties'] ?? 0,
+        'url'     => '/admin/faculties/index.php',
+        'icon'    => '<path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path>',
+        'gradient' => 'from-blue-500 to-blue-600',
+        'borderColor' => '#3b82f6',
+        'textColor' => 'text-blue-600',
+    ],
+    [
+        'label'   => 'Departments',
+        'value'   => $ucsStats['Departments'] ?? 0,
+        'url'     => '/admin/departments/index.php',
+        'icon'    => '<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>',
+        'gradient' => 'from-indigo-500 to-indigo-600',
+        'borderColor' => '#6366f1',
+        'textColor' => 'text-indigo-600',
+    ],
+    [
+        'label'   => 'Courses',
+        'value'   => $ucsStats['Courses'] ?? 0,
+        'url'     => '/admin/courses/index.php',
+        'icon'    => '<path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path>',
+        'gradient' => 'from-emerald-500 to-emerald-600',
+        'borderColor' => '#10b981',
+        'textColor' => 'text-emerald-600',
+    ],
+    [
+        'label'   => 'Students',
+        'value'   => $ucsStats['Students'] ?? 0,
+        'url'     => '/admin/students/index.php',
+        'icon'    => '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>',
+        'gradient' => 'from-violet-500 to-purple-600',
+        'borderColor' => '#8b5cf6',
+        'textColor' => 'text-violet-600',
+    ],
 ];
 
 $ucsQuickActions = [
     [
-        'label'   => 'Add Faculty',
-        'subtext' => 'Manage university faculties',
-        'url'     => '/admin/faculties/index.php',
-        'icon'    => '<line x1="3" y1="22" x2="21" y2="22"></line><line x1="6" y1="18" x2="6" y2="11"></line><line x1="10" y1="18" x2="10" y2="11"></line><line x1="14" y1="18" x2="14" y2="11"></line><line x1="18" y1="18" x2="18" y2="11"></line><polygon points="12 2 20 7 4 7"></polygon>',
-    ],
-    [
-        'label'   => 'Add Department',
-        'subtext' => 'Organize academic departments',
-        'url'     => '/admin/departments/index.php',
-        'icon'    => '<polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline>',
-    ],
-    [
-        'label'   => 'Add Course',
-        'subtext' => 'Manage academic courses',
-        'url'     => '/admin/courses/index.php',
-        'icon'    => '<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>',
-    ],
-    [
-        'label'   => 'Add Student',
-        'subtext' => 'Manage students and groups',
-        'url'     => '/admin/students/index.php',
-        'icon'    => '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line>',
-    ],
-    [
-        'label'   => 'Add News',
-        'subtext' => 'Post new announcements',
+        'label'   => 'Create Announcement',
+        'subtext' => 'Post new news',
         'url'     => '/admin/news/index.php',
-        'icon'    => '<path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><path d="M18 14h-8"></path><path d="M15 18h-5"></path><path d="M10 6h8v4h-8V6Z"></path>',
+        'icon'    => '<path d="m3 11 18-5v12L3 13v-2z"></path><path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"></path>',
+        'bgColor' => 'bg-violet-50',
+        'textColor' => 'text-violet-600',
+    ],
+    [
+        'label'   => 'Upload Timetable',
+        'subtext' => 'Upload PDF classes',
+        'url'     => '/admin/timetables/index.php',
+        'icon'    => '<path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path><path d="M10 14h1"></path><path d="M14 14h1"></path>',
+        'bgColor' => 'bg-blue-50',
+        'textColor' => 'text-blue-600',
+    ],
+    [
+        'label'   => 'Manage Alumni',
+        'subtext' => 'Alumni network & records',
+        'url'     => '/admin/alumni/index.php',
+        'icon'    => '<path d="M18 21a8 8 0 0 0-16 0"></path><circle cx="10" cy="8" r="5"></circle><path d="M22 20c0-3.37-2-6.5-4-8a5 5 0 0 0-.45-8.3"></path>',
+        'bgColor' => 'bg-amber-50',
+        'textColor' => 'text-amber-600',
+    ],
+    [
+        'label'   => 'Student Management',
+        'subtext' => 'Rosters & groups',
+        'url'     => '/admin/students/index.php',
+        'icon'    => '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>',
+        'bgColor' => 'bg-teal-50',
+        'textColor' => 'text-teal-600',
     ],
 ];
 
@@ -148,23 +178,20 @@ $ucsToday     = date('l, d F Y');
 require_once __DIR__ . '/../includes/admin-layout-top.php';
 ?>
 
-<!-- Welcome / Hero -->
-<section class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 p-4 shadow-lg shadow-blue-900/20 sm:p-6" aria-label="Welcome">
-    <div class="pointer-events-none absolute -right-16 -top-16 h-32 w-32 rounded-full bg-white/10 blur-3xl" aria-hidden="true"></div>
-    <div class="pointer-events-none absolute -bottom-16 right-16 h-32 w-32 rounded-full bg-purple-400/20 blur-3xl" aria-hidden="true"></div>
-    <div class="relative z-10 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div class="max-w-2xl">
-            <p class="text-[11px] font-semibold uppercase tracking-[0.2em] text-blue-200">Academic Hub</p>
-            <h1 class="mt-1 text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
-                <?php echo htmlspecialchars($ucsGreeting . ', ' . $ucsAdminName . ' 👋'); ?>
+<!-- Welcome / Hero Section -->
+<section class="relative overflow-hidden rounded-xl bg-gradient-to-br from-blue-600 via-blue-700 to-indigo-800 p-6 shadow-lg shadow-blue-600/20 sm:p-7" aria-label="Welcome">
+    <div class="pointer-events-none absolute -right-12 -top-12 h-32 w-32 rounded-full bg-white/10 blur-2xl" aria-hidden="true"></div>
+    <div class="pointer-events-none absolute bottom-0 left-1/4 h-24 w-24 rounded-full bg-indigo-400/20 blur-2xl" aria-hidden="true"></div>
+    <div class="relative z-10 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="max-w-xl">
+            <p class="text-[10px] font-semibold uppercase tracking-[0.2em] text-blue-200/80 mb-1">Welcome to UCSMTLA</p>
+            <h1 class="text-2xl font-extrabold tracking-tight text-white sm:text-3xl">
+                <?php echo htmlspecialchars($ucsGreeting . ', ' . $ucsAdminName); ?> <span class="inline-block" aria-hidden="true">&#x1F44B;</span>
             </h1>
-            <p class="mt-1.5 text-sm font-medium text-blue-100 sm:text-base">Academic Hub – UCSMTLA</p>
-            <p class="mt-1.5 max-w-xl text-sm leading-relaxed text-blue-100 sm:text-base">
-                Manage university announcements, students, academic information and timetables efficiently.
-            </p>
+            <p class="mt-1.5 text-sm font-medium text-blue-100">Academic Hub &ndash; UCSMTLA</p>
             <?php if ($ucsYearLabel !== null): ?>
-                <p class="mt-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3 py-1 text-xs font-semibold text-white ring-1 ring-white/25">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <p class="mt-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-[11px] font-semibold text-white ring-1 ring-white/20 backdrop-blur-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                         <rect x="3" y="4" width="18" height="18" rx="2"></rect>
                         <line x1="16" y1="2" x2="16" y2="6"></line>
                         <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -174,102 +201,95 @@ require_once __DIR__ . '/../includes/admin-layout-top.php';
                 </p>
             <?php endif; ?>
         </div>
-
         <div class="shrink-0">
-            <div class="rounded-2xl bg-white/10 px-5 py-3 ring-1 ring-white/25 backdrop-blur-sm">
-                <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-blue-200">Today's Date</p>
-                <p class="mt-1 text-base font-bold text-white sm:text-lg"><?php echo htmlspecialchars($ucsToday); ?></p>
-                <p class="mt-0.5 text-xs font-medium text-blue-100">Current server time</p>
+            <div class="rounded-xl bg-white/15 px-5 py-3 text-right ring-1 ring-white/15 backdrop-blur-md">
+                <p class="text-[9px] font-bold uppercase tracking-[0.2em] text-blue-200/80">Today's Date</p>
+                <p class="mt-1 text-base font-bold text-white"><?php echo htmlspecialchars($ucsToday); ?></p>
             </div>
         </div>
     </div>
 </section>
 
 <!-- Quick Actions -->
-<section class="mt-8" aria-labelledby="quick-actions-heading">
-    <div class="mb-4 flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"></path>
-        </svg>
-        <h2 id="quick-actions-heading" class="text-base font-semibold text-gray-900">Quick Actions</h2>
-    </div>
-
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+<section class="mt-5" aria-labelledby="quick-actions-heading">
+    <h2 id="quick-actions-heading" class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Quick Actions</h2>
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <?php foreach ($ucsQuickActions as $ucsAction): ?>
-            <a href="<?php echo htmlspecialchars(ROOT_URL . $ucsAction['url']); ?>" class="group rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-900/5 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600 ring-1 ring-blue-100 transition-colors duration-200 group-hover:bg-blue-600 group-hover:text-white" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <?php echo $ucsAction['icon']; ?>
+            <a href="<?php echo htmlspecialchars(ROOT_URL . $ucsAction['url']); ?>" class="group relative overflow-hidden rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200/60 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/8 hover:ring-blue-200 focus:outline-none">
+                <div class="absolute -right-4 -top-4 h-20 w-20 rounded-full <?php echo $ucsAction['bgColor']; ?> opacity-0 transition-all duration-300 group-hover:scale-150 group-hover:opacity-100" aria-hidden="true"></div>
+                <div class="relative z-10 flex flex-col items-start gap-3">
+                    <span class="inline-flex h-11 w-11 items-center justify-center rounded-xl <?php echo $ucsAction['bgColor']; ?> <?php echo $ucsAction['textColor']; ?> ring-1 ring-inset ring-current/5 transition-all duration-200 group-hover:scale-110 group-hover:shadow-md" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <?php echo $ucsAction['icon']; ?>
+                        </svg>
+                    </span>
+                    <div class="min-w-0">
+                        <p class="text-[13px] font-bold text-slate-800 group-hover:text-slate-900 transition-colors"><?php echo htmlspecialchars($ucsAction['label']); ?></p>
+                        <p class="mt-0.5 text-[11px] text-slate-400 group-hover:text-slate-500 transition-colors"><?php echo htmlspecialchars($ucsAction['subtext']); ?></p>
+                    </div>
+                </div>
+                <div class="absolute bottom-3 right-3 opacity-0 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 <?php echo $ucsAction['textColor']; ?>" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m9 18 6-6-6-6"></path>
                     </svg>
-                </span>
-                <p class="mt-4 text-sm font-semibold text-gray-900"><?php echo htmlspecialchars($ucsAction['label']); ?></p>
-                <p class="mt-1 text-xs text-gray-500"><?php echo htmlspecialchars($ucsAction['subtext']); ?></p>
+                </div>
             </a>
         <?php endforeach; ?>
     </div>
 </section>
 
-<!-- Academic Overview -->
-<section class="mt-8" aria-labelledby="academic-overview-heading">
-    <div class="mb-4 flex items-center gap-2">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <line x1="12" y1="20" x2="12" y2="10"></line>
-            <line x1="18" y1="20" x2="18" y2="4"></line>
-            <line x1="6" y1="20" x2="6" y2="16"></line>
-        </svg>
-        <h2 id="academic-overview-heading" class="text-base font-semibold text-gray-900">Academic Overview</h2>
-    </div>
-
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <?php foreach ($ucsStats as $ucsLabel => $ucsCount): ?>
-            <div class="flex items-center gap-4 rounded-2xl bg-white p-5 shadow-sm ring-1 ring-gray-100 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-900/5">
-                <span class="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 text-white shadow-sm shadow-blue-600/20" aria-hidden="true">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <?php echo $ucsStatIcons[$ucsLabel] ?? ''; ?>
-                    </svg>
-                </span>
-                <div class="min-w-0">
-                    <p class="text-2xl font-extrabold tracking-tight text-gray-900"><?php echo htmlspecialchars(number_format($ucsCount)); ?></p>
-                    <p class="truncate text-sm font-medium text-gray-500"><?php echo htmlspecialchars($ucsLabel); ?></p>
+<!-- Statistics Overview -->
+<section class="mt-5" aria-labelledby="stats-heading">
+    <h2 id="stats-heading" class="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-3">Statistics Overview</h2>
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <?php foreach ($ucsStatCards as $ucsStat): ?>
+            <a href="<?php echo htmlspecialchars(ROOT_URL . $ucsStat['url']); ?>" class="group relative overflow-hidden rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200/60 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg hover:shadow-slate-900/8 focus:outline-none" style="border-left: 4px solid <?php echo $ucsStat['borderColor']; ?>">
+                <div class="relative z-10 flex items-start justify-between">
+                    <div>
+                        <p class="text-2xl font-extrabold tracking-tight text-slate-800 group-hover:text-slate-900 transition-colors"><?php echo htmlspecialchars(number_format($ucsStat['value'])); ?></p>
+                        <p class="mt-1 text-[12px] font-medium text-slate-400 group-hover:text-slate-500 transition-colors"><?php echo htmlspecialchars($ucsStat['label']); ?></p>
+                    </div>
+                    <span class="inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br <?php echo $ucsStat['gradient']; ?> text-white shadow-md transition-all duration-200 group-hover:scale-110 group-hover:shadow-lg" aria-hidden="true">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <?php echo $ucsStat['icon']; ?>
+                        </svg>
+                    </span>
                 </div>
-            </div>
+                <div class="absolute bottom-3 right-3 opacity-0 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0 -translate-x-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 <?php echo $ucsStat['textColor']; ?>" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m9 18 6-6-6-6"></path>
+                    </svg>
+                </div>
+            </a>
         <?php endforeach; ?>
     </div>
 </section>
 
 <!-- Recent Content -->
-<section class="mt-8" aria-labelledby="recent-content-heading">
-    <div class="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
-        <div class="flex items-center justify-between gap-3">
-            <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
-                    <path d="M18 14h-8"></path>
-                    <path d="M15 18h-5"></path>
-                    <path d="M10 6h8v4h-8V6Z"></path>
-                </svg>
-                <h2 id="recent-content-heading" class="text-base font-semibold text-gray-900">Recent Content</h2>
-            </div>
-            <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/index.php'); ?>" class="text-sm font-medium text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                View all
+<section class="mt-5" aria-labelledby="recent-content-heading">
+    <div class="rounded-xl bg-white shadow-sm ring-1 ring-slate-200/60 overflow-hidden">
+        <div class="flex items-center justify-between gap-3 px-5 py-3.5 border-b border-slate-100">
+            <h2 id="recent-content-heading" class="text-xs font-semibold uppercase tracking-wider text-slate-400">Recent Content</h2>
+            <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/news/index.php'); ?>" class="text-[11px] font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700">
+                View all &rarr;
             </a>
         </div>
 
         <?php if (!empty($ucsRecentNews)): ?>
-            <ul class="mt-3 divide-y divide-gray-100">
+            <ul class="divide-y divide-slate-100">
                 <?php foreach ($ucsRecentNews as $ucsNews): ?>
                     <?php $ucsPublished = $ucsFmtDate($ucsNews['published_at'] ?? null); ?>
-                    <li class="py-3">
-                        <div class="flex items-start justify-between gap-3">
+                    <li class="px-5 py-3 transition-colors hover:bg-slate-50/50">
+                        <div class="flex items-center justify-between gap-3">
                             <div class="min-w-0">
-                                <p class="truncate text-sm font-semibold text-gray-800"><?php echo htmlspecialchars($ucsNews['title']); ?></p>
-                                <div class="mt-1.5 flex flex-wrap items-center gap-2">
-                                    <span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-blue-700 ring-1 ring-blue-100">
+                                <p class="truncate text-sm font-medium text-slate-700"><?php echo htmlspecialchars($ucsNews['title']); ?></p>
+                                <div class="mt-1 flex flex-wrap items-center gap-2">
+                                    <span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-medium text-blue-600">
                                         <?php echo htmlspecialchars($ucsNews['category']); ?>
                                     </span>
                                     <?php if ($ucsPublished !== null): ?>
-                                        <span class="inline-flex items-center gap-1 text-xs text-gray-500">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <span class="inline-flex items-center gap-1 text-[11px] text-slate-400">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                                 <rect x="3" y="4" width="18" height="18" rx="2"></rect>
                                                 <line x1="16" y1="2" x2="16" y2="6"></line>
                                                 <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -285,7 +305,7 @@ require_once __DIR__ . '/../includes/admin-layout-top.php';
                 <?php endforeach; ?>
             </ul>
         <?php else: ?>
-            <p class="mt-6 rounded-xl bg-gray-50 px-4 py-8 text-center text-sm text-gray-500">
+            <p class="px-5 py-8 text-center text-xs text-slate-400">
                 No published news yet.
             </p>
         <?php endif; ?>
