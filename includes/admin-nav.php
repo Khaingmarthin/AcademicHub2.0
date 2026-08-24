@@ -40,13 +40,6 @@ $ucsAdminNavItems = [
         'color' => ['iconBg' => 'bg-indigo-50', 'iconText' => 'text-indigo-500', 'activeBg' => 'bg-indigo-50', 'activeText' => 'text-indigo-600', 'activeRing' => 'ring-indigo-200', 'activeDot' => 'bg-indigo-500'],
     ],
     [
-        'key'   => 'facilities',
-        'label' => 'Facilities',
-        'url'   => '/admin/facilities/index.php',
-        'icon'  => '<path d="M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z"></path><path d="M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2"></path><path d="M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2"></path><path d="M10 6h4"></path><path d="M10 10h4"></path><path d="M10 14h4"></path><path d="M10 18h4"></path>',
-        'color' => ['iconBg' => 'bg-teal-50', 'iconText' => 'text-teal-500', 'activeBg' => 'bg-teal-50', 'activeText' => 'text-teal-600', 'activeRing' => 'ring-teal-200', 'activeDot' => 'bg-teal-500'],
-    ],
-    [
         'key'   => 'courses',
         'label' => 'Courses',
         'url'   => '/admin/courses/index.php',
@@ -88,21 +81,7 @@ $ucsAdminNavItems = [
         'icon'  => '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>',
         'color' => ['iconBg' => 'bg-sky-50', 'iconText' => 'text-sky-500', 'activeBg' => 'bg-sky-50', 'activeText' => 'text-sky-600', 'activeRing' => 'ring-sky-200', 'activeDot' => 'bg-sky-500'],
     ],
-    [
-        'key'   => 'discussion-reports',
-        'label' => 'Discussion Reports',
-        'url'   => '/admin/discussions/reports.php',
-        'icon'  => '<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path><line x1="4" y1="22" x2="4" y2="15"></line>',
-        'color' => ['iconBg' => 'bg-rose-50', 'iconText' => 'text-rose-500', 'activeBg' => 'bg-rose-50', 'activeText' => 'text-rose-600', 'activeRing' => 'ring-rose-200', 'activeDot' => 'bg-rose-500'],
-    ],
 
-    [
-        'key'   => 'admission',
-        'label' => 'Admission',
-        'url'   => '/admin/admission/index.php',
-        'icon'  => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line>',
-        'color' => ['iconBg' => 'bg-slate-100', 'iconText' => 'text-slate-600', 'activeBg' => 'bg-slate-100', 'activeText' => 'text-slate-700', 'activeRing' => 'ring-slate-200', 'activeDot' => 'bg-slate-500'],
-    ],
     [
         'key'   => 'academic-years',
         'label' => 'Academic Years',

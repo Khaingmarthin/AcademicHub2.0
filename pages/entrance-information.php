@@ -17,7 +17,9 @@ $ucsYearName   = '';
 
 try {
     $ucsProfileStmt = $pdo->query(
-        "SELECT short_name, hero_media
+        "SELECT short_name, hero_media,
+                admission_title, admission_description, admission_requirements,
+                admission_important_dates, admission_application_info
          FROM university_profile
          ORDER BY id ASC
          LIMIT 1"
@@ -25,39 +27,14 @@ try {
     $ucsProfileRow = $ucsProfileStmt->fetch() ?: null;
     $ucsHeroMedia  = $ucsProfileRow['hero_media'] ?? 'images/front_view.jpg';
 
-    // Fetch admission for the Active academic year; fall back to the latest record.
-    $ucsStmt = $pdo->prepare(
-        "SELECT a.id, a.title, a.description, a.requirements,
-                a.important_dates, a.application_info,
-                a.document_title, a.document_path, a.document_type,
-                ay.year_name, ay.status AS year_status
-         FROM admissions a
-         JOIN academic_years ay ON ay.id = a.academic_year_id
-         WHERE a.status = 1 AND ay.status = 'Active'
-         ORDER BY a.id DESC
-         LIMIT 1"
-    );
-    $ucsStmt->execute();
-    $ucsAdmission = $ucsStmt->fetch() ?: null;
-
-    if ($ucsAdmission === null) {
-        $ucsStmt = $pdo->prepare(
-            "SELECT a.id, a.title, a.description, a.requirements,
-                    a.important_dates, a.application_info,
-                    a.document_title, a.document_path, a.document_type,
-                    ay.year_name, ay.status AS year_status
-             FROM admissions a
-             JOIN academic_years ay ON ay.id = a.academic_year_id
-             WHERE a.status = 1
-             ORDER BY a.id DESC
-             LIMIT 1"
-        );
-        $ucsStmt->execute();
-        $ucsAdmission = $ucsStmt->fetch() ?: null;
-    }
-
-    if ($ucsAdmission !== null) {
-        $ucsYearName = $ucsAdmission['year_name'] ?? '';
+    if ($ucsProfileRow !== null) {
+        $ucsAdmission = [
+            'title'           => $ucsProfileRow['admission_title'] ?? '',
+            'description'     => $ucsProfileRow['admission_description'] ?? '',
+            'requirements'    => $ucsProfileRow['admission_requirements'] ?? '',
+            'important_dates' => $ucsProfileRow['admission_important_dates'] ?? '',
+            'application_info'=> $ucsProfileRow['admission_application_info'] ?? '',
+        ];
     }
 } catch (PDOException $e) {
     $ucsAdmission = null;
@@ -88,15 +65,6 @@ require_once '../includes/header.php';
                 <p class="mt-4 max-w-2xl text-base leading-relaxed text-slate-600">
                     Find important information about university entrance admission, requirements, and application procedures.
                 </p>
-                <?php if ($ucsYearName !== ''): ?>
-                    <div class="mt-5 inline-flex items-center gap-2 rounded-md bg-blue-50 px-3.5 py-2 text-sm font-semibold text-blue-700 ring-1 ring-blue-100">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M8 2v4M16 2v4M3 10h18"></path>
-                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                        </svg>
-                        Academic Year <?php echo htmlspecialchars($ucsYearName); ?>
-                    </div>
-                <?php endif; ?>
             </div>
         </div>
     </section>

@@ -2,9 +2,9 @@
 /**
  * Admin Alumni - Update handler.
  *
- * Edits the alumni-specific profile fields. Student identity, academic
- * status and verification status are managed by their own workflows and
- * are never modified here.
+ * Edits the alumni-specific profile fields and verification status.
+ * Student identity and academic status are managed by their own
+ * workflows and are never modified here.
  */
 require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
@@ -46,7 +46,7 @@ try {
              linkedin_url = :linkedin_url,
              github_url = :github_url,
              website_url = :website_url,
-             visibility = :visibility
+             verification_status = :verification_status
          WHERE id = :id"
     );
     $ucsStmt->execute([
@@ -59,7 +59,7 @@ try {
         ':linkedin_url'         => $ucsClean['linkedin_url'],
         ':github_url'           => $ucsClean['github_url'],
         ':website_url'          => $ucsClean['website_url'],
-        ':visibility'           => $ucsClean['visibility'],
+        ':verification_status'  => $ucsClean['verification_status'],
         ':id'                   => $ucsClean['id'],
     ]);
 

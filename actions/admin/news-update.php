@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/helpers/news-validation.php';
+require_once __DIR__ . '/../../includes/helpers/notification-helper.php';
 
 admin_require_login();
 
@@ -86,17 +87,17 @@ try {
     if (!empty($ucsClean['targets'])) {
         $ucsStmt = $pdo->prepare(
             "INSERT INTO news_targets
-                (news_id, academic_year_id, major_id, year_level, section)
+                (news_id, classroom_id, major_id, year_level, section)
              VALUES
-                (:news_id, :academic_year_id, :major_id, :year_level, :section)"
+                (:news_id, :classroom_id, :major_id, :year_level, :section)"
         );
         foreach ($ucsClean['targets'] as $ucsTarget) {
             $ucsStmt->execute([
-                ':news_id'          => $ucsId,
-                ':academic_year_id' => $ucsTarget['academic_year_id'],
-                ':major_id'         => $ucsTarget['major_id'],
-                ':year_level'       => $ucsTarget['year_level'],
-                ':section'          => $ucsTarget['section'],
+                ':news_id'       => $ucsId,
+                ':classroom_id'  => $ucsTarget['classroom_id'],
+                ':major_id'      => $ucsTarget['major_id'],
+                ':year_level'    => $ucsTarget['year_level'],
+                ':section'       => $ucsTarget['section'],
             ]);
         }
     }
@@ -105,6 +106,10 @@ try {
 
     if ($ucsClean['cover_image'] !== null || $ucsRemoveCover) {
         ucs_delete_upload($ucsExisting['cover_image'] ?? null);
+    }
+
+    if ($ucsClean['status'] === 'Published' && $ucsExisting['status'] !== 'Published') {
+        ucs_send_news_notification($pdo, $ucsId, $ucsClean['title'], $ucsClean['content'], $ucsSlug);
     }
 
     news_flash('success', 'News article "' . $ucsClean['title'] . '" updated successfully.');

@@ -13,7 +13,15 @@ INSERT INTO university_profile
     hero_media,
     address,
     phone,
-    email
+    email,
+    admission_title,
+    admission_description,
+    admission_requirements,
+    admission_important_dates,
+    admission_application_info,
+    admission_document_title,
+    admission_document_path,
+    admission_document_type
 )
 VALUES
 (
@@ -44,7 +52,15 @@ To send qualified candidates abroad for advanced university studies.',
     'images/ucsmtla.jpg',
     'Meiktila, Myanmar',
     '09-123 456 789',
-    'info@ucsmta.edu.mm'
+    'info@ucsmta.edu.mm',
+    'Admission Information 2025-2026',
+    'Information regarding entrance admission and enrollment for the academic year 2025-2026.',
+    'Applicants must satisfy the university entrance requirements and provide the required documents.',
+    'Entrance information and important dates will be announced by the university.',
+    'Applicants should follow the official admission instructions provided by the university.',
+    'Admitted Students 2025-2026',
+    'admissions/admitted-students-2025-2026.pdf',
+    'PDF'
 );
 
 INSERT INTO faculties
@@ -117,44 +133,7 @@ VALUES
     TRUE
 );
 
-INSERT INTO facilities
-(name, image, description, location, status)
-VALUES
-(
-    'Canteen',
-    'images/canteen.jpg',
-    'A campus dining area providing food and refreshments for students and staff.',
-    'Main Campus',
-    TRUE
-),
-(
-    'Football Field',
-    'images/football-field.jpg',
-    'A sports facility available for student recreational and sporting activities.',
-    'Main Campus',
-    TRUE
-),
-(
-    'Computer Laboratory',
-    'images/computer-lab.jpg',
-    'Computer laboratory equipped for practical academic activities.',
-    'Academic Building',
-    TRUE
-),
-(
-    'ATM',
-    'images/atm.jpg',
-    'ATM facility available for students and staff.',
-    'Main Campus',
-    TRUE
-),
-(
-    'Student Hostel',
-    'images/hostel.png',
-    'Accommodation facility available for eligible students.',
-    'Campus Area',
-    TRUE
-);
+-- Facilities table removed. Campus life content is no longer managed via database.
 
 INSERT INTO academic_years
 (year_name, start_date, end_date, status)
@@ -179,9 +158,10 @@ VALUES
 );
 
 INSERT INTO majors
-(name, short_name, degree_name, description, status)
+(faculty_id, name, short_name, degree_name, description, status)
 VALUES
 (
+    NULL,
     'Computer Science',
     'CS',
     'B.C.Sc.',
@@ -189,6 +169,7 @@ VALUES
     TRUE
 ),
 (
+    NULL,
     'Computer Technology',
     'CT',
     'B.C.Tech.',
@@ -196,6 +177,7 @@ VALUES
     TRUE
 ),
 (
+    NULL,
     'Computer Science & Technology',
     'CST',
     'Common Major',
@@ -1414,40 +1396,7 @@ VALUES
     TRUE
 );
 
-INSERT INTO admissions
-(
-    academic_year_id,
-    title,
-    description,
-    requirements,
-    important_dates,
-    application_info,
-    document_title,
-    document_path,
-    document_type,
-    status
-)
-VALUES
-(
-    1,
-    'Admission Information 2025-2026',
-
-    'Information regarding entrance admission and enrollment for the academic year 2025-2026.',
-
-    'Applicants must satisfy the university entrance requirements and provide the required documents.',
-
-    'Entrance information and important dates will be announced by the university.',
-
-    'Applicants should follow the official admission instructions provided by the university.',
-
-    'Admitted Students 2025-2026',
-
-    'admissions/admitted-students-2025-2026.pdf',
-
-    'PDF',
-
-    TRUE
-);
+-- Admissions data is now stored in university_profile admission_* columns.
 
 INSERT INTO categories
 (name, description, status)

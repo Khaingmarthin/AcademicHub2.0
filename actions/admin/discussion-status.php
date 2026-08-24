@@ -5,9 +5,6 @@
  * action = 'open'   -> restore / reopen a discussion
  * action = 'closed' -> lock a discussion (no new replies)
  * action = 'hidden' -> remove a discussion from the public site
- *
- * Hiding a discussion also resolves any open reports filed against it so
- * the moderation queue stays clean.
  */
 require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
@@ -17,10 +14,6 @@ require_once __DIR__ . '/../../includes/helpers/discussion-validation.php';
 admin_require_login();
 
 $ucsReturnUrl = ROOT_URL . '/admin/discussions/index.php';
-$ucsFromReports = isset($_POST['from_reports']) && (int) $_POST['from_reports'] === 1;
-if ($ucsFromReports) {
-    $ucsReturnUrl = ROOT_URL . '/admin/discussions/reports.php';
-}
 
 if (!admin_csrf_verify((string) ($_POST['csrf_token'] ?? ''))) {
     discussion_flash('error', 'Your session has expired. Please try again.');
@@ -48,18 +41,6 @@ try {
     } else {
         $ucsStmt = $pdo->prepare("UPDATE discussions SET status = :status WHERE id = :id");
         $ucsStmt->execute([':status' => $ucsAction, ':id' => $ucsDiscussionId]);
-
-        if ($ucsAction === 'hidden') {
-            $ucsResolveStmt = $pdo->prepare(
-                "UPDATE discussion_reports
-                 SET status = 'resolved', resolved_by_admin_id = :admin_id, resolved_at = NOW()
-                 WHERE content_type = 'discussion' AND content_id = :id AND status = 'open'"
-            );
-            $ucsResolveStmt->execute([
-                ':admin_id' => (int) $_SESSION['admin_id'],
-                ':id'       => $ucsDiscussionId,
-            ]);
-        }
 
         $ucsMessages = [
             'open'   => 'Discussion "' . $ucsDiscussion['title'] . '" has been reopened.',

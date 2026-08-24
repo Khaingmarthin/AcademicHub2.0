@@ -77,57 +77,51 @@ require_once '../includes/header.php';
     <!-- Programme directory -->
     <section class="bg-slate-50 py-12 sm:py-16 lg:py-20" aria-labelledby="programmes-directory-heading">
         <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <div class="mx-auto max-w-3xl">
-                <div class="border-b border-slate-200 pb-3">
-                    <h2 id="programmes-directory-heading" class="text-lg font-semibold tracking-tight text-slate-900">Undergraduate Programmes</h2>
-                    <p class="mt-1 text-sm text-slate-500">
-                        <?php echo count($ucsProgrammes); ?> programme<?php echo count($ucsProgrammes) !== 1 ? 's' : ''; ?> offered by <?php echo htmlspecialchars($ucsShortName); ?>
-                    </p>
-                </div>
-
-                <?php if (count($ucsProgrammes) > 0): ?>
-                    <div class="mt-0 border border-slate-200 bg-white">
-                        <?php foreach ($ucsProgrammes as $ucsProgramme): ?>
-                            <article class="flex flex-col gap-3 px-6 py-5 sm:px-8 sm:py-6 border-t border-slate-200 first:border-t-0 transition-colors duration-150 hover:bg-slate-50/60">
-                                <div class="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-                                    <div class="min-w-0 flex-1">
-                                        <h3 class="text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
-                                            <?php echo htmlspecialchars($ucsProgramme['name']); ?>
-                                        </h3>
-                                        <div class="mt-1 flex items-center gap-3">
-                                            <span class="text-xs font-medium text-slate-400">
-                                                <?php echo htmlspecialchars($ucsProgramme['short_name']); ?>
-                                            </span>
-                                            <span class="inline-flex items-center rounded-md bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-blue-700">
-                                                <?php echo htmlspecialchars($ucsProgramme['degree_name']); ?>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <?php if (!empty($ucsProgramme['description'])): ?>
-                                    <p class="text-sm leading-relaxed text-slate-500">
-                                        <?php echo htmlspecialchars($ucsProgramme['description']); ?>
-                                    </p>
-                                <?php endif; ?>
-                                <div class="flex items-center gap-4">
-                                    <?php if (!empty($ucsProgramme['id'])): ?>
-                                        <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni.php?major=' . (int) $ucsProgramme['id']); ?>" class="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                            View Alumni
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                                <path d="M5 12h14M12 5l7 7-7 7"></path>
-                                            </svg>
-                                        </a>
-                                    <?php endif; ?>
-                                </div>
-                            </article>
-                        <?php endforeach; ?>
-                    </div>
-                <?php else: ?>
-                    <div class="mt-8 border border-slate-200 bg-white px-6 py-12 text-center sm:px-8">
-                        <p class="text-sm text-slate-500">No degree programme information is currently available.</p>
-                    </div>
-                <?php endif; ?>
+            <div class="mx-auto max-w-2xl text-center mb-12">
+                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Degrees &amp; Majors</p>
+                <h2 id="programmes-directory-heading" class="mt-3 scroll-mt-24 text-3xl font-bold tracking-[-0.02em] text-slate-900 sm:text-4xl">Academic Programmes</h2>
+                <p class="mt-4 text-base leading-relaxed text-slate-600">
+                    Explore the academic programmes offered by the University of Computer Studies, Meiktila.
+                </p>
             </div>
+
+            <?php if (count($ucsProgrammes) > 0): ?>
+                <div class="mx-auto grid max-w-5xl gap-8 sm:grid-cols-2">
+                    <?php foreach ($ucsProgrammes as $ucsProgramme): ?>
+                        <article class="group relative flex flex-col rounded-2xl border border-slate-200 bg-white p-8 transition-all duration-200 hover:shadow-lg hover:border-slate-300">
+                            <div class="flex items-start justify-between mb-6">
+                                <span class="inline-flex items-center rounded-lg bg-blue-50 px-3 py-1.5 text-sm font-semibold text-blue-700">
+                                    <?php echo htmlspecialchars($ucsProgramme['degree_name']); ?>
+                                </span>
+                                <span class="text-sm font-medium text-slate-400">
+                                    <?php echo htmlspecialchars($ucsProgramme['short_name']); ?>
+                                </span>
+                            </div>
+
+                            <h3 class="text-2xl font-bold tracking-tight text-slate-900 mb-4">
+                                <?php echo htmlspecialchars($ucsProgramme['name']); ?>
+                            </h3>
+
+                            <p class="text-sm leading-relaxed text-slate-500 mb-8 flex-1">
+                                An undergraduate major focusing on <?php echo strtolower(htmlspecialchars($ucsProgramme['name'])); ?>, software development, algorithms and computing concepts.
+                            </p>
+
+                            <div class="flex items-center gap-4">
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/degree-detail.php?id=' . (int) $ucsProgramme['id']); ?>" class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-3.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-blue-700 hover:shadow-md focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                    Explore Programme
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M5 12h14M12 5l7 7-7 7"></path>
+                                    </svg>
+                                </a>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <div class="mx-auto max-w-3xl border border-slate-200 bg-white px-6 py-12 text-center sm:px-8 rounded-2xl">
+                    <p class="text-sm text-slate-500">No degree programme information is currently available.</p>
+                </div>
+            <?php endif; ?>
         </div>
     </section>
 </main>

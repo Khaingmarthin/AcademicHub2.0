@@ -195,38 +195,6 @@ require_once '../includes/header.php';
                             <div class="mt-4 space-y-4 text-base leading-7 text-slate-600">
                                 <?php echo nl2br(htmlspecialchars((string) $ucsDiscussion['content'])); ?>
                             </div>
-                            <?php if ($ucsUser !== null): ?>
-                                <div class="mt-4 border-t border-slate-100 pt-4">
-                                    <details class="group">
-                                        <summary class="inline-flex cursor-pointer list-none items-center gap-1.5 text-xs font-semibold text-slate-500 transition-colors duration-150 hover:text-red-600 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                                                <line x1="4" y1="22" x2="4" y2="15"></line>
-                                            </svg>
-                                            Report this discussion
-                                        </summary>
-                                        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/discussion/report.php'); ?>" class="mt-3 space-y-3 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-100">
-                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(student_csrf_token()); ?>">
-                                            <input type="hidden" name="content_type" value="discussion">
-                                            <input type="hidden" name="content_id" value="<?php echo (int) $ucsDiscussion['id']; ?>">
-                                            <label for="report-reason-<?php echo (int) $ucsDiscussion['id']; ?>" class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Reason</label>
-                                            <select id="report-reason-<?php echo (int) $ucsDiscussion['id']; ?>" name="reason" required
-                                                    class="mt-1 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 transition-colors focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100">
-                                                <?php foreach (DISCUSSION_REPORT_REASONS as $ucsReason): ?>
-                                                    <option value="<?php echo htmlspecialchars($ucsReason); ?>"><?php echo htmlspecialchars($ucsReason); ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                            <label for="report-details-<?php echo (int) $ucsDiscussion['id']; ?>" class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Additional details (optional)</label>
-                                            <textarea id="report-details-<?php echo (int) $ucsDiscussion['id']; ?>" name="details" rows="2" maxlength="1000" placeholder="Anything the moderators should know?"
-                                                      class="mt-1 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100"></textarea>
-                                            <button type="submit"
-                                                    class="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-150 hover:bg-red-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
-                                                Submit Report
-                                            </button>
-                                        </form>
-                                    </details>
-                                </div>
-                            <?php endif; ?>
                         </div>
                     </div>
                 </article>
@@ -262,38 +230,6 @@ require_once '../includes/header.php';
                                             <div class="mt-3 space-y-3 text-sm leading-6 text-slate-600 sm:text-base sm:leading-7">
                                                 <?php echo nl2br(htmlspecialchars((string) $ucsReply['content'])); ?>
                                             </div>
-                                            <?php if ($ucsUser !== null): ?>
-                                                <div class="mt-3 border-t border-slate-100 pt-3">
-                                                    <details class="group">
-                                                        <summary class="inline-flex cursor-pointer list-none items-center gap-1.5 text-xs font-semibold text-slate-500 transition-colors duration-150 hover:text-red-600 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
-                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                                                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                                                                <line x1="4" y1="22" x2="4" y2="15"></line>
-                                                            </svg>
-                                                            Report
-                                                        </summary>
-                                                        <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/discussion/report.php'); ?>" class="mt-3 space-y-3 rounded-xl bg-slate-50 p-4 ring-1 ring-slate-100">
-                                                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(student_csrf_token()); ?>">
-                                                            <input type="hidden" name="content_type" value="reply">
-                                                            <input type="hidden" name="content_id" value="<?php echo (int) $ucsReply['id']; ?>">
-                                                            <label for="report-reason-r<?php echo (int) $ucsReply['id']; ?>" class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Reason</label>
-                                                            <select id="report-reason-r<?php echo (int) $ucsReply['id']; ?>" name="reason" required
-                                                                    class="mt-1 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 transition-colors focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100">
-                                                                <?php foreach (DISCUSSION_REPORT_REASONS as $ucsReason): ?>
-                                                                    <option value="<?php echo htmlspecialchars($ucsReason); ?>"><?php echo htmlspecialchars($ucsReason); ?></option>
-                                                                <?php endforeach; ?>
-                                                            </select>
-                                                            <label for="report-details-r<?php echo (int) $ucsReply['id']; ?>" class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Additional details (optional)</label>
-                                                            <textarea id="report-details-r<?php echo (int) $ucsReply['id']; ?>" name="details" rows="2" maxlength="1000" placeholder="Anything the moderators should know?"
-                                                                      class="mt-1 block w-full rounded-xl border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100"></textarea>
-                                                            <button type="submit"
-                                                                    class="inline-flex items-center gap-1.5 rounded-xl bg-red-600 px-4 py-2 text-sm font-semibold text-white transition-colors duration-150 hover:bg-red-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
-                                                                Submit Report
-                                                            </button>
-                                                        </form>
-                                                    </details>
-                                                </div>
-                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </li>

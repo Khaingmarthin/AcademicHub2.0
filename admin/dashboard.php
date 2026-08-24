@@ -189,16 +189,14 @@ require_once __DIR__ . '/../includes/admin-layout-top.php';
                 <?php echo htmlspecialchars($ucsGreeting . ', ' . $ucsAdminName); ?> <span class="inline-block" aria-hidden="true">&#x1F44B;</span>
             </h1>
             <p class="mt-1.5 text-sm font-medium text-blue-100">Academic Hub &ndash; UCSMTLA</p>
-            <?php if ($ucsYearLabel !== null): ?>
-                <p class="mt-3 inline-flex items-center gap-2 rounded-full bg-white/15 px-3.5 py-1.5 text-[11px] font-semibold text-white ring-1 ring-white/20 backdrop-blur-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                        <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
+            <?php if ($ucsYearLabel): ?>
+                <div class="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-white/15 px-3 py-1 ring-1 ring-white/15 backdrop-blur-md">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-blue-200/80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M8 2v4"></path><path d="M16 2v4"></path><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M3 10h18"></path>
                     </svg>
-                    Academic Year: <?php echo htmlspecialchars($ucsYearLabel); ?> (Active)
-                </p>
+                    <span class="text-xs font-semibold text-blue-100"><?php echo htmlspecialchars($ucsYearLabel); ?></span>
+                    <span class="rounded bg-emerald-400/25 px-1.5 py-px text-[9px] font-bold uppercase tracking-wider text-emerald-200">Active</span>
+                </div>
             <?php endif; ?>
         </div>
         <div class="shrink-0">

@@ -21,15 +21,14 @@ $ucsAdmissionTitle = '';
 if (isset($pdo)) {
     try {
         $ucsStmt = $pdo->query(
-            "SELECT title
-             FROM admissions
-             WHERE status = 1
+            "SELECT admission_title
+             FROM university_profile
              ORDER BY id ASC
              LIMIT 1"
         );
-        $ucsAdmission = $ucsStmt->fetch();
-        if ($ucsAdmission) {
-            $ucsAdmissionTitle = $ucsAdmission['title'];
+        $ucsProfile = $ucsStmt->fetch();
+        if ($ucsProfile && !empty($ucsProfile['admission_title'])) {
+            $ucsAdmissionTitle = $ucsProfile['admission_title'];
         }
     } catch (PDOException $e) {
         $ucsAdmissionTitle = '';

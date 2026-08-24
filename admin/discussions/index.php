@@ -103,15 +103,6 @@ try {
     $ucsTotalPages  = 1;
 }
 
-$ucsOpenReports = 0;
-try {
-    $ucsOpenReports = (int) $pdo->query(
-        "SELECT COUNT(*) FROM discussion_reports WHERE status = 'open'"
-    )->fetchColumn();
-} catch (PDOException $e) {
-    $ucsOpenReports = 0;
-}
-
 require_once __DIR__ . '/../../includes/admin-layout-top.php';
 ?>
 <?php if ($ucsFlash !== null): ?>
@@ -152,17 +143,6 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
     </form>
 
     <div class="flex shrink-0 items-center gap-2">
-        <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/discussions/reports.php'); ?>"
-           class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
-                <line x1="4" y1="22" x2="4" y2="15"></line>
-            </svg>
-            Reports
-            <?php if ($ucsOpenReports > 0): ?>
-                <span class="inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-[11px] font-bold text-white"><?php echo $ucsOpenReports; ?></span>
-            <?php endif; ?>
-        </a>
         <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/discussions/categories/index.php'); ?>"
            class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
             Categories

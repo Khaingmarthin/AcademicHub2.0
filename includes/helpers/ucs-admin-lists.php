@@ -120,7 +120,7 @@ function ucs_admin_active_year_classrooms($pdo)
              FROM classrooms cl
              JOIN majors m ON m.id = cl.major_id
              JOIN academic_years ay ON ay.id = cl.academic_year_id
-             WHERE ay.status = 'Active'
+             WHERE ay.status = 'Active' AND cl.status = 1
              ORDER BY cl.year_level ASC, (cl.section IS NULL) ASC, cl.section ASC, cl.classroom_name ASC"
         );
         return $ucsStmt->fetchAll();

@@ -51,7 +51,7 @@ $ucsStatus     = trim((string) ($_GET['status'] ?? ''));
 if (!in_array($ucsYearLevel, CLASSROOM_YEAR_LEVELS, true)) {
     $ucsYearLevel = '';
 }
-if (!in_array($ucsStatus, ['', '1', '0'], true)) {
+if (!in_array($ucsStatus, ['', 'active', 'graduated'], true)) {
     $ucsStatus = '';
 }
 
@@ -70,16 +70,18 @@ if ($ucsClassroomId === false || !in_array($ucsClassroomId, $ucsClassroomIds, tr
 $ucsHasFilters = $ucsQuery !== '' || $ucsYearLevel !== '' || $ucsMajorId > 0 || $ucsClassroomId > 0 || $ucsStatus !== '' || $ucsYearId > 0;
 
 // Summary counts.
-$ucsSummary = ['active' => 0];
+$ucsSummary = ['active' => 0, 'graduated' => 0];
 try {
     $ucsStmt = $pdo->query(
         "SELECT
-            COALESCE(SUM(st.student_status = 'active'), 0) AS active
+            COALESCE(SUM(st.student_status = 'active'), 0) AS active,
+            COALESCE(SUM(st.student_status = 'graduated'), 0) AS graduated
          FROM students st"
     );
     $ucsRow = $ucsStmt->fetch() ?: [];
     $ucsSummary = [
-        'active' => (int) ($ucsRow['active'] ?? 0),
+        'active'    => (int) ($ucsRow['active'] ?? 0),
+        'graduated' => (int) ($ucsRow['graduated'] ?? 0),
     ];
 } catch (PDOException $e) {
 }
@@ -115,12 +117,12 @@ try {
         $ucsParams[':classroom_id'] = $ucsClassroomId;
     }
     if ($ucsStatus !== '') {
-        $ucsConditions[] = 'st.status = :status';
-        $ucsParams[':status'] = (int) $ucsStatus;
+        $ucsConditions[] = 'st.student_status = :status';
+        $ucsParams[':status'] = $ucsStatus;
     }
 
-    // Exclude graduated (alumni) students.
-    $ucsConditions[] = "st.student_status != 'graduated'";
+    // Show all student statuses (active and graduated).
+    // Previously excluded graduated students, but now they are visible in the list.
 
     $ucsWhereSql = count($ucsConditions) > 0 ? ' WHERE ' . implode(' AND ', $ucsConditions) : '';
     $ucsStmt = $pdo->prepare(
@@ -171,6 +173,17 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             <div>
                 <p class="text-2xl font-bold text-emerald-700"><?php echo number_format($ucsSummary['active']); ?></p>
                 <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Active Students</p>
+            </div>
+        </div>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+        <div class="flex items-center gap-3">
+            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"></path><path d="M6 12v5c3 3 6 3 12 0v-5"></path></svg>
+            </div>
+            <div>
+                <p class="text-2xl font-bold text-blue-700"><?php echo number_format($ucsSummary['graduated']); ?></p>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-500">Graduated</p>
             </div>
         </div>
     </div>
@@ -279,8 +292,8 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                 <select id="status-filter" name="status" onchange="this.form.submit()" aria-label="Filter by status"
                         class="block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-1 focus:ring-blue-500">
                     <option value="">All Statuses</option>
-                    <option value="1" <?php echo $ucsStatus === '1' ? 'selected' : ''; ?>>Active</option>
-                    <option value="0" <?php echo $ucsStatus === '0' ? 'selected' : ''; ?>>Inactive</option>
+                    <option value="active" <?php echo $ucsStatus === 'active' ? 'selected' : ''; ?>>Active</option>
+                    <option value="graduated" <?php echo $ucsStatus === 'graduated' ? 'selected' : ''; ?>>Graduated</option>
                 </select>
             </div>
         </div>
@@ -358,7 +371,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                             'year_level'     => $ucsStudent['year_level'],
                             'section'        => $ucsStudent['section'] ?? '',
                             'classroom'      => $ucsStudent['classroom_name'] ?? '',
-                            'status'         => $ucsStudent['status'] == 1 ? 'Active' : 'Inactive',
+                            'status'         => $ucsStudent['student_status'] === 'active' ? 'Active' : 'Graduated',
                             'student_status' => ucfirst($ucsStudent['student_status']),
                             'graduation_year'=> $ucsStudent['graduation_year'] ?? '',
                         ], JSON_UNESCAPED_SLASHES));
@@ -389,10 +402,10 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                                 <?php endif; ?>
                             </td>
                             <td class="px-3 py-2">
-                                <?php if ($ucsStudent['status'] == 1): ?>
+                                <?php if ($ucsStudent['student_status'] === 'active'): ?>
                                     <span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Active</span>
-                                <?php else: ?>
-                                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-semibold text-slate-600 ring-1 ring-inset ring-slate-500/20">Inactive</span>
+                                <?php elseif ($ucsStudent['student_status'] === 'graduated'): ?>
+                                    <span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-semibold text-blue-700 ring-1 ring-inset ring-blue-600/20">Graduated</span>
                                 <?php endif; ?>
                             </td>
                             <td class="px-3 py-2 text-right">
@@ -569,14 +582,14 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
         if (data.status === 'Active') {
             statusEl.innerHTML = '<span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Active</span>';
         } else {
-            statusEl.innerHTML = '<span class="inline-flex items-center rounded-full bg-slate-100 px-2 py-0.5 text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-500/20">Inactive</span>';
+            statusEl.innerHTML = '<span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-inset ring-blue-600/20">Graduated</span>';
         }
 
         var studentStatusEl = document.getElementById('modalStudentStatus');
         if (data.student_status === 'Active') {
             studentStatusEl.innerHTML = '<span class="inline-flex items-center rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-semibold text-emerald-700 ring-1 ring-inset ring-emerald-600/20">Active</span>';
         } else {
-            studentStatusEl.innerHTML = '<span class="inline-flex items-center rounded-full bg-violet-50 px-2 py-0.5 text-xs font-semibold text-violet-700 ring-1 ring-inset ring-violet-600/20">' + (data.student_status || 'Graduated') + '</span>';
+            studentStatusEl.innerHTML = '<span class="inline-flex items-center rounded-full bg-blue-50 px-2 py-0.5 text-xs font-semibold text-blue-700 ring-1 ring-inset ring-blue-600/20">' + (data.student_status || 'Graduated') + '</span>';
         }
 
         var gradWrap = document.getElementById('modalGraduationYearWrap');

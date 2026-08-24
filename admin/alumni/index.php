@@ -29,7 +29,6 @@ $ucsQuery          = trim((string) ($_GET['q'] ?? ''));
 $ucsGraduationYear = filter_var($_GET['graduation_year'] ?? '', FILTER_VALIDATE_INT);
 $ucsMajorId        = filter_var($_GET['major'] ?? '', FILTER_VALIDATE_INT);
 $ucsStatus         = in_array((string) ($_GET['status'] ?? ''), ALUMNI_VERIFICATION_STATUSES, true) ? (string) $_GET['status'] : '';
-$ucsVisibility     = in_array((string) ($_GET['visibility'] ?? ''), ['public', 'private'], true) ? (string) $_GET['visibility'] : '';
 $ucsShow           = in_array((string) ($_GET['show'] ?? ''), ['10', '25', '50'], true) ? (int) $_GET['show'] : 10;
 $ucsPage           = max(1, (int) ($_GET['page'] ?? 1));
 
@@ -57,7 +56,7 @@ if ($ucsGraduationYear === false || !in_array($ucsGraduationYear, $ucsGraduation
     $ucsGraduationYear = 0;
 }
 
-$ucsHasFilters = $ucsQuery !== '' || $ucsGraduationYear > 0 || $ucsMajorId > 0 || $ucsStatus !== '' || $ucsVisibility !== '';
+$ucsHasFilters = $ucsQuery !== '' || $ucsGraduationYear > 0 || $ucsMajorId > 0 || $ucsStatus !== '';
 
 // ---------------------------------------------------------------------
 // WHERE clause
@@ -81,10 +80,6 @@ if ($ucsMajorId > 0) {
 if ($ucsStatus !== '') {
     $ucsWhere[] = 'ap.verification_status = :status';
     $ucsParams[':status'] = $ucsStatus;
-}
-if ($ucsVisibility !== '') {
-    $ucsWhere[] = 'ap.visibility = :visibility';
-    $ucsParams[':visibility'] = $ucsVisibility;
 }
 
 $ucsWhereSql = count($ucsWhere) > 0 ? ' WHERE ' . implode(' AND ', $ucsWhere) : '';
@@ -135,7 +130,7 @@ try {
 
     $ucsStmt = $pdo->prepare(
         "SELECT ap.id, ap.current_job, ap.company, ap.verification_status,
-                ap.visibility, ap.created_at,
+                ap.created_at,
                 s.id AS student_id, s.name AS student_name,
                 s.student_id AS student_code, s.roll_number,
                 s.status AS account_status, s.student_status, s.graduation_year,
@@ -241,16 +236,6 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                 </select>
             </div>
 
-            <div>
-                <label for="visibility-filter" class="block text-xs font-semibold uppercase tracking-wider text-gray-500">Visibility</label>
-                <select id="visibility-filter" name="visibility" onchange="this.form.submit()" aria-label="Filter by profile visibility"
-                        class="mt-1.5 block w-full rounded-xl border border-gray-300 bg-white px-3.5 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                    <option value="">All Visibility</option>
-                    <option value="public" <?php echo $ucsVisibility === 'public' ? 'selected' : ''; ?>>Public</option>
-                    <option value="private" <?php echo $ucsVisibility === 'private' ? 'selected' : ''; ?>>Private</option>
-                </select>
-            </div>
-
             <div class="flex items-end">
                 <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/index.php'); ?>" class="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400 sm:w-auto">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -334,7 +319,6 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                 if ($ucsGraduationYear > 0)    { $ucsPerPageParams['graduation_year'] = $ucsGraduationYear; }
                 if ($ucsMajorId > 0)           { $ucsPerPageParams['major'] = $ucsMajorId; }
                 if ($ucsStatus !== '')         { $ucsPerPageParams['status'] = $ucsStatus; }
-                if ($ucsVisibility !== '')     { $ucsPerPageParams['visibility'] = $ucsVisibility; }
                 ?>
                 <?php foreach ($ucsPerPageParams as $ucsKey => $ucsVal): ?>
                     <input type="hidden" name="<?php echo htmlspecialchars($ucsKey); ?>" value="<?php echo htmlspecialchars((string) $ucsVal); ?>">
@@ -385,7 +369,6 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                         <th scope="col" class="w-[10%] px-4 py-3">Class of</th>
                         <th scope="col" class="w-1/5 px-4 py-3">Occupation</th>
                         <th scope="col" class="w-[10%] px-4 py-3 text-center">Status</th>
-                        <th scope="col" class="w-[10%] px-4 py-3 text-center">Vis</th>
                         <th scope="col" class="w-[10%] px-4 py-3 text-right">Actions</th>
                     </tr>
                 </thead>
@@ -436,17 +419,6 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                                     <span class="inline-flex items-center rounded bg-amber-50 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-amber-700 ring-1 ring-amber-200">Pending</span>
                                 <?php endif; ?>
                             </td>
-                            <td class="px-4 py-3 text-center">
-                                <?php if ($ucsProfile['visibility'] === 'public'): ?>
-                                    <span class="inline-flex items-center justify-center rounded text-blue-600" title="Public">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path></svg>
-                                    </span>
-                                <?php else: ?>
-                                    <span class="inline-flex items-center justify-center rounded text-gray-400" title="Private">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"></path><line x1="2" y1="2" x2="22" y2="22"></line></svg>
-                                    </span>
-                                <?php endif; ?>
-                            </td>
                             <td class="px-4 py-3 text-right">
                                 <div class="flex items-center justify-end gap-1.5">
                                     <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/view.php?id=' . (int) $ucsProfile['id']); ?>" title="View <?php echo htmlspecialchars($ucsProfileName); ?>"
@@ -492,7 +464,6 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
     if ($ucsGraduationYear > 0)    { $ucsFilterParams['graduation_year'] = $ucsGraduationYear; }
     if ($ucsMajorId > 0)           { $ucsFilterParams['major'] = $ucsMajorId; }
     if ($ucsStatus !== '')         { $ucsFilterParams['status'] = $ucsStatus; }
-    if ($ucsVisibility !== '')     { $ucsFilterParams['visibility'] = $ucsVisibility; }
     $ucsFilterParams['show'] = $ucsShow;
 
     $ucsPageLinks = [];

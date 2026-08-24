@@ -29,12 +29,13 @@ $ucsActiveYearName = $ucsActiveYear !== null ? (string) $ucsActiveYear['year_nam
 $ucsClassrooms = ucs_admin_active_year_classrooms($pdo);
 
 $ucsForm = [
-    'student_id'   => $ucsOld['student_id'] ?? '',
-    'roll_number'  => $ucsOld['roll_number'] ?? '',
-    'name'         => $ucsOld['name'] ?? '',
-    'email'        => $ucsOld['email'] ?? '',
-    'classroom_id' => $ucsOld['classroom_id'] ?? '',
-    'status'       => $ucsOld['status'] ?? 1,
+    'student_id'          => $ucsOld['student_id'] ?? '',
+    'roll_number'         => $ucsOld['roll_number'] ?? '',
+    'name'                => $ucsOld['name'] ?? '',
+    'email'               => $ucsOld['email'] ?? '',
+    'classroom_id'        => $ucsOld['classroom_id'] ?? '',
+    'status'              => $ucsOld['status'] ?? 'active',
+    'email_notifications' => $ucsOld['email_notifications'] ?? '1',
 ];
 
 $hidePageHeader = true;
@@ -146,9 +147,19 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                     <label for="status" class="block text-sm font-medium text-slate-700">Status</label>
                     <select id="status" name="status" required
                             class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                        <option value="1" <?php echo (int) $ucsForm['status'] === 1 ? 'selected' : ''; ?>>Active</option>
-                        <option value="0" <?php echo (int) $ucsForm['status'] === 0 ? 'selected' : ''; ?>>Inactive</option>
+                        <option value="active" <?php echo ($ucsForm['status'] ?? '') === 'active' ? 'selected' : ''; ?>>Active</option>
+                        <option value="graduated" <?php echo ($ucsForm['status'] ?? '') === 'graduated' ? 'selected' : ''; ?>>Graduated</option>
                     </select>
+                </div>
+
+                <div>
+                    <label for="email_notifications" class="block text-sm font-medium text-slate-700">Email Notifications</label>
+                    <select id="email_notifications" name="email_notifications" required
+                            class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        <option value="1" <?php echo (int) ($ucsForm['email_notifications'] ?? 1) === 1 ? 'selected' : ''; ?>>Enabled</option>
+                        <option value="0" <?php echo (int) ($ucsForm['email_notifications'] ?? 1) === 0 ? 'selected' : ''; ?>>Disabled</option>
+                    </select>
+                    <p class="mt-1.5 text-xs text-slate-500">Whether this student receives email notifications about news and announcements.</p>
                 </div>
             </div>
 

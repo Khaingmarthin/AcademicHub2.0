@@ -48,10 +48,10 @@ $ucsForm = [
     'publish_at'  => $ucsOld['publish_at'] ?? (!empty($ucsNews['published_at']) ? date('Y-m-d\TH:i', strtotime($ucsNews['published_at'])) : ''),
 ];
 
-$ucsCategories  = ucs_admin_categories($pdo);
-$ucsMajors      = ucs_admin_majors($pdo);
-$ucsYearLevels  = NEWS_YEAR_LEVELS;
-$ucsAcademicYears = ucs_admin_academic_years($pdo);
+$ucsCategories = ucs_admin_categories($pdo);
+$ucsMajors     = ucs_admin_majors($pdo);
+$ucsYearLevels = NEWS_YEAR_LEVELS;
+$ucsClassrooms = ucs_admin_active_year_classrooms($pdo);
 
 $ucsTargets = [];
 if (is_array($ucsOld['targets'] ?? null)) {
@@ -59,7 +59,7 @@ if (is_array($ucsOld['targets'] ?? null)) {
 } else {
     try {
         $ucsStmt = $pdo->prepare(
-            "SELECT academic_year_id, major_id, year_level, section
+            "SELECT classroom_id, major_id, year_level, section
              FROM news_targets
              WHERE news_id = :news_id
              ORDER BY id ASC"
@@ -194,10 +194,10 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                             <div class="ucs-target-row rounded-xl border border-dashed border-gray-300 bg-gray-50/50 p-4">
                                 <div class="grid gap-3 sm:grid-cols-4">
                                     <div>
-                                        <select name="target_academic_year_id[]" class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                                            <option value="">Any year</option>
-                                            <?php foreach ($ucsAcademicYears as $ucsYear): ?>
-                                                <option value="<?php echo (int) $ucsYear['id']; ?>"><?php echo htmlspecialchars($ucsYear['year_name']); ?></option>
+                                        <select name="target_classroom_id[]" class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                                            <option value="">Any classroom</option>
+                                            <?php foreach ($ucsClassrooms as $ucsCl): ?>
+                                                <option value="<?php echo (int) $ucsCl['id']; ?>"><?php echo htmlspecialchars($ucsCl['class_name']); ?> (<?php echo htmlspecialchars($ucsCl['year_level']); ?> - <?php echo htmlspecialchars($ucsCl['section']); ?>)</option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
@@ -234,10 +234,10 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                                 <div class="ucs-target-row rounded-xl border border-dashed border-gray-300 bg-gray-50/50 p-4">
                                     <div class="grid gap-3 sm:grid-cols-4">
                                         <div>
-                                            <select name="target_academic_year_id[]" class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                                                <option value="">Any year</option>
-                                                <?php foreach ($ucsAcademicYears as $ucsYear): ?>
-                                                    <option value="<?php echo (int) $ucsYear['id']; ?>" <?php echo (int) ($ucsTarget['academic_year_id'] ?? 0) === (int) $ucsYear['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($ucsYear['year_name']); ?></option>
+                                            <select name="target_classroom_id[]" class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                                                <option value="">Any classroom</option>
+                                                <?php foreach ($ucsClassrooms as $ucsCl): ?>
+                                                    <option value="<?php echo (int) $ucsCl['id']; ?>" <?php echo (int) ($ucsTarget['classroom_id'] ?? 0) === (int) $ucsCl['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars($ucsCl['class_name']); ?> (<?php echo htmlspecialchars($ucsCl['year_level']); ?> - <?php echo htmlspecialchars($ucsCl['section']); ?>)</option>
                                                 <?php endforeach; ?>
                                             </select>
                                         </div>
@@ -291,7 +291,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
 <script>
 (function () {
     var yearLevels = <?php echo json_encode($ucsYearLevels); ?>;
-    var academicYears = <?php echo json_encode($ucsAcademicYears); ?>;
+    var classrooms = <?php echo json_encode($ucsClassrooms); ?>;
     var majors = <?php echo json_encode($ucsMajors); ?>;
 
     function yearLevelOptions(selected) {
@@ -302,10 +302,10 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
         return html;
     }
 
-    function yearOptions(selected) {
-        var html = '<option value="">Any year</option>';
-        academicYears.forEach(function (year) {
-            html += '<option value="' + year.id + '"' + (String(selected) === String(year.id) ? ' selected' : '') + '>' + year.year_name + '</option>';
+    function classroomOptions(selected) {
+        var html = '<option value="">Any classroom</option>';
+        classrooms.forEach(function (cl) {
+            html += '<option value="' + cl.id + '"' + (String(selected) === String(cl.id) ? ' selected' : '') + '>' + cl.class_name + ' (' + cl.year_level + ' - ' + cl.section + ')</option>';
         });
         return html;
     }
@@ -324,7 +324,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
         div.className = 'ucs-target-row rounded-xl border border-dashed border-gray-300 bg-gray-50/50 p-4';
         div.innerHTML =
             '<div class="grid gap-3 sm:grid-cols-4">' +
-                '<div><select name="target_academic_year_id[]" class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">' + yearOptions(selected.academic_year_id) + '</select></div>' +
+                '<div><select name="target_classroom_id[]" class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">' + classroomOptions(selected.classroom_id) + '</select></div>' +
                 '<div><select name="target_major_id[]" class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">' + majorOptions(selected.major_id) + '</select></div>' +
                 '<div><select name="target_year_level[]" class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">' + yearLevelOptions(selected.year_level) + '</select></div>' +
                 '<div class="flex gap-2">' +

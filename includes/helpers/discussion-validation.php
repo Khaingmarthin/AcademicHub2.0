@@ -4,8 +4,8 @@
  *
  * Career Discussions is a moderated, forum-style community where logged-in
  * students (including verified alumni) ask career questions and alumni share
- * experience. Input rules for categories, discussions, replies and reports
- * live here so the create/update/report handlers reuse exactly one copy.
+ * experience. Input rules for categories, discussions and replies live here
+ * so the create/update handlers reuse exactly one copy.
  */
 
 if (!defined('BASE_URL')) {
@@ -14,19 +14,10 @@ if (!defined('BASE_URL')) {
 
 const DISCUSSION_STATUSES        = ['open', 'closed', 'hidden'];
 const DISCUSSION_REPLY_STATUSES  = ['visible', 'hidden'];
-const DISCUSSION_REPORT_REASONS  = [
-    'Inappropriate content',
-    'Spam',
-    'Harassment',
-    'Misinformation',
-    'Other',
-];
 const DISCUSSION_CATEGORY_STATUSES = ['active', 'inactive'];
 const DISCUSSION_TITLE_MAX       = 255;
 const DISCUSSION_CONTENT_MAX     = 100000;
 const DISCUSSION_REPLY_MAX       = 10000;
-const DISCUSSION_REASON_MAX      = 50;
-const DISCUSSION_DETAILS_MAX     = 1000;
 const DISCUSSION_CATEGORY_NAME_MAX = 191;
 const DISCUSSION_CATEGORY_DESC_MAX = 1000;
 
@@ -228,57 +219,6 @@ function discussion_validate_reply_input($input)
     return [
         'clean' => [
             'content' => $content,
-        ],
-        'errors' => $errors,
-    ];
-}
-
-/**
- * Validate and normalise a report of a discussion or reply.
- *
- * @param array $input Raw form values (e.g. $_POST).
- * @param PDO   $pdo   Database connection used to confirm the content exists.
- * @return array{clean:array, errors:array}
- */
-function discussion_validate_report_input($input, $pdo)
-{
-    $errors        = [];
-    $contentType   = (string) ($input['content_type'] ?? '');
-    $contentId     = filter_var($input['content_id'] ?? null, FILTER_VALIDATE_INT);
-    $reason        = trim((string) ($input['reason'] ?? ''));
-    $details       = trim((string) ($input['details'] ?? ''));
-
-    if (!in_array($contentType, ['discussion', 'reply'], true)) {
-        $errors[] = 'Invalid report target.';
-    } elseif ($contentId === false || $contentId < 1) {
-        $errors[] = 'Invalid report target.';
-    } else {
-        try {
-            $ucsTable = $contentType === 'discussion' ? 'discussions' : 'discussion_replies';
-            $ucsStmt  = $pdo->prepare("SELECT id FROM {$ucsTable} WHERE id = :id LIMIT 1");
-            $ucsStmt->execute([':id' => $contentId]);
-            if ($ucsStmt->fetchColumn() === false) {
-                $errors[] = 'The content you tried to report no longer exists.';
-            }
-        } catch (PDOException $e) {
-            $errors[] = 'Unable to validate the report target. Please try again.';
-        }
-    }
-
-    if ($reason === '' || mb_strlen($reason) > DISCUSSION_REASON_MAX) {
-        $errors[] = 'Please choose a reason.';
-    }
-
-    if (mb_strlen($details) > DISCUSSION_DETAILS_MAX) {
-        $errors[] = 'The additional details must be ' . DISCUSSION_DETAILS_MAX . ' characters or fewer.';
-    }
-
-    return [
-        'clean' => [
-            'content_type' => $contentType,
-            'content_id'   => $contentId,
-            'reason'       => $reason,
-            'details'      => $details,
         ],
         'errors' => $errors,
     ];

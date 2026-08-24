@@ -29,7 +29,8 @@ function student_validate_input($input, $pdo, $excludeId = null)
     $email        = strtolower(trim((string) ($input['email'] ?? '')));
     $password     = (string) ($input['password'] ?? '');
     $classroomId  = filter_var($input['classroom_id'] ?? null, FILTER_VALIDATE_INT);
-    $status       = $input['status'] ?? 1;
+    $status       = $input['status'] ?? 'active';
+    $emailNotif   = $input['email_notifications'] ?? '1';
 
     // ---- Student ID ------------------------------------------------------
     if ($studentId === '') {
@@ -120,19 +121,20 @@ function student_validate_input($input, $pdo, $excludeId = null)
         }
     }
 
-    if (!in_array($status, [0, 1, '0', '1'], true)) {
+    if (!in_array($status, ['active', 'graduated'], true)) {
         $errors[] = 'Invalid status selected.';
     }
 
     return [
         'clean' => [
-            'student_id'   => $studentId,
-            'roll_number'  => $rollNumber,
-            'name'         => $name,
-            'email'        => $email,
-            'password'     => $password,
-            'classroom_id' => $classroomId,
-            'status'       => in_array($status, [1, '1'], true) ? 1 : 0,
+            'student_id'          => $studentId,
+            'roll_number'         => $rollNumber,
+            'name'                => $name,
+            'email'               => $email,
+            'password'            => $password,
+            'classroom_id'        => $classroomId,
+            'status'              => $status === 'graduated' ? 'graduated' : 'active',
+            'email_notifications' => in_array($emailNotif, [0, '0'], true) ? 0 : 1,
         ],
         'errors' => $errors,
     ];

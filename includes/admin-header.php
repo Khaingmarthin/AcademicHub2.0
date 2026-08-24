@@ -13,26 +13,10 @@ if ($ucsAdminUser !== null) {
     $ucsAvatarInitial = $ucsInitial !== '' ? $ucsInitial : 'A';
 }
 
-$ucsHeaderActiveYear = null;
-if (isset($pdo) && $pdo instanceof PDO) {
-    try {
-        $ucsYearStmt = $pdo->query(
-            "SELECT year_name FROM academic_years
-             WHERE status = 'Active'
-             ORDER BY start_date DESC, id DESC
-             LIMIT 1"
-        );
-        $ucsYearRow = $ucsYearStmt->fetch();
-        $ucsHeaderActiveYear = $ucsYearRow['year_name'] ?? null;
-    } catch (PDOException $e) {
-        $ucsHeaderActiveYear = null;
-    }
-}
-
-$ucsCurrentTime = date('h:i:s A');
+$ucsCurrentTime = date('H:i:s');
 $ucsCurrentDate = date('D, d M Y');
 ?>
-<header class="sticky top-0 z-20 flex h-[64px] shrink-0 items-center justify-between border-b border-slate-200 bg-white px-4 sm:px-6">
+<header style="z-index: 9999; position: sticky; top: 0; background-color: #f8fafc; background-image: linear-gradient(to right, #f1f5f9, #ffffff, #f1f5f9);" class="flex h-[64px] shrink-0 items-center justify-between border-b border-slate-200 px-4 sm:px-6">
     <!-- Left: Mobile toggle + Page Title -->
     <div class="flex items-center gap-4">
         <button type="button" id="admin-sidebar-toggle" class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-slate-500 transition-colors duration-150 hover:bg-slate-100 hover:text-slate-700 lg:hidden focus:outline-none" aria-label="Open menu" aria-expanded="false" aria-controls="admin-sidebar">
@@ -58,20 +42,9 @@ $ucsCurrentDate = date('D, d M Y');
         <!-- Divider -->
         <div class="hidden sm:block h-8 w-px bg-slate-200"></div>
 
-        <!-- Active Academic Year -->
-        <?php if ($ucsHeaderActiveYear !== null && $ucsHeaderActiveYear !== ''): ?>
-            <span class="hidden lg:inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-3 py-1.5 text-[11px] font-medium text-emerald-700">
-                <span class="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
-                <?php echo htmlspecialchars($ucsHeaderActiveYear); ?> (Active)
-            </span>
-        <?php endif; ?>
-
-        <!-- Divider -->
-        <div class="hidden sm:block h-8 w-px bg-slate-200"></div>
-
         <!-- Time -->
         <div class="hidden sm:flex flex-col items-end">
-            <span class="text-xs font-semibold text-slate-700"><?php echo htmlspecialchars($ucsCurrentTime); ?></span>
+            <span id="admin-live-clock" class="text-xs font-semibold text-slate-700"><?php echo htmlspecialchars($ucsCurrentTime); ?></span>
             <span class="text-[10px] text-slate-400"><?php echo htmlspecialchars($ucsCurrentDate); ?></span>
         </div>
 
@@ -93,7 +66,7 @@ $ucsCurrentDate = date('D, d M Y');
                         <path d="m6 9 6 6 6-6"></path>
                     </svg>
                 </button>
-                <div data-admin-profile-menu class="invisible absolute right-0 top-full z-50 mt-2 w-52 origin-top-right rounded-xl border border-slate-200 bg-white p-1.5 opacity-0 shadow-xl shadow-slate-900/10 transition-all duration-150" role="menu">
+                <div data-admin-profile-menu style="z-index: 9999;" class="invisible absolute right-0 top-full mt-2 w-52 origin-top-right rounded-xl border border-slate-200 bg-white p-1.5 opacity-0 shadow-xl shadow-slate-900/10 transition-all duration-150" role="menu">
                     <div class="border-b border-slate-100 px-3 py-2.5 mb-1">
                         <p class="truncate text-[12px] font-semibold text-slate-800"><?php echo htmlspecialchars($ucsAdminName); ?></p>
                         <p class="truncate text-[10px] text-slate-400"><?php echo htmlspecialchars($ucsAdminUser['email'] ?? ''); ?></p>
@@ -118,3 +91,16 @@ $ucsCurrentDate = date('D, d M Y');
         <?php endif; ?>
     </div>
 </header>
+<script>
+(function() {
+    var clockEl = document.getElementById('admin-live-clock');
+    if (!clockEl) return;
+    function pad(n) { return n < 10 ? '0' + n : n; }
+    function updateClock() {
+        var now = new Date();
+        clockEl.textContent = pad(now.getHours()) + ':' + pad(now.getMinutes()) + ':' + pad(now.getSeconds());
+    }
+    updateClock();
+    setInterval(updateClock, 1000);
+})();
+</script>

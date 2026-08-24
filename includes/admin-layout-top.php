@@ -52,10 +52,10 @@ $hidePageHeader = (bool) ($hidePageHeader ?? false);
     <div class="min-h-screen lg:flex">
         <?php include __DIR__ . '/admin-sidebar.php'; ?>
 
-        <div class="flex min-w-0 flex-1 flex-col">
+        <div class="flex min-w-0 flex-1 flex-col" style="overflow-x: clip;">
             <?php include __DIR__ . '/admin-header.php'; ?>
 
-            <main class="flex-1 p-4 sm:p-5 lg:p-6">
+            <main class="relative flex-1 p-4 sm:p-5 lg:p-6" style="z-index: 0;">
                 <div class="mx-auto w-full max-w-7xl">
                     <?php if (!$hidePageHeader): ?>
                     <!-- Page header -->

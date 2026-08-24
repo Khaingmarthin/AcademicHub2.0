@@ -215,7 +215,6 @@ function alumni_story_submit_validate_input($input, $pdo)
     return [
         'clean' => [
             'alumni_profile_id' => (int) $alumniProfileId,
-            'alumni_student_id' => $studentId,
             'title'             => $title,
             'summary'           => $summary,
             'content'           => $content,

@@ -8,17 +8,21 @@
 require_once __DIR__ . '/../config/app.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../includes/student-auth.php';
+require_once __DIR__ . '/../includes/helpers/student-validation.php';
 
 student_require_login();
 
 $pageTitle = 'My Profile';
+
+$ucsFlash = $_SESSION['student_flash'] ?? null;
+unset($_SESSION['student_flash']);
 
 $ucsStudent = student_current_user();
 $ucsDetails = null;
 
 try {
     $ucsStmt = $pdo->prepare(
-        "SELECT s.student_id, s.name, s.email, s.status, s.created_at,
+        "SELECT s.student_id, s.name, s.email, s.status, s.email_notifications, s.created_at,
                 c.classroom_name, c.year_level, c.section,
                 m.name AS major_name,
                 ay.year_name AS academic_year
@@ -55,6 +59,12 @@ require_once __DIR__ . '/../includes/header.php';
                     Back to Dashboard
                 </a>
             </div>
+
+            <?php if ($ucsFlash !== null): ?>
+                <div class="mt-6 <?php echo $ucsFlash['type'] === 'error' ? 'bg-red-50 ring-red-100 text-red-700' : 'bg-emerald-50 ring-emerald-100 text-emerald-700'; ?> rounded-xl px-4 py-3 ring-1" role="<?php echo $ucsFlash['type'] === 'error' ? 'alert' : 'status'; ?>">
+                    <p class="text-sm font-medium"><?php echo htmlspecialchars($ucsFlash['message']); ?></p>
+                </div>
+            <?php endif; ?>
 
             <?php if ($ucsDetails !== null): ?>
                 <!-- Identity -->
@@ -103,6 +113,29 @@ require_once __DIR__ . '/../includes/header.php';
                         </div>
                     </dl>
                 </div>
+
+                <?php if ($ucsAccountStatus === 'Active'): ?>
+                    <!-- Notification Preferences -->
+                    <div class="mt-6 rounded-lg border border-slate-200 bg-white px-6 py-8 sm:px-8">
+                        <h2 class="text-lg font-semibold tracking-tight text-slate-900">Notification Preferences</h2>
+                        <p class="mt-2 text-sm text-slate-500">Choose whether you receive email notifications about news and announcements.</p>
+                        <form method="POST" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/student/update-notification.php'); ?>" class="mt-5">
+                            <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(student_csrf_token()); ?>">
+                            <div class="flex items-center gap-4">
+                                <label for="email_notifications" class="text-sm font-medium text-slate-700">Email Notifications</label>
+                                <select id="email_notifications" name="email_notifications" required
+                                        class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                                    <option value="1" <?php echo (int) ($ucsDetails['email_notifications'] ?? 1) === 1 ? 'selected' : ''; ?>>Enabled</option>
+                                    <option value="0" <?php echo (int) ($ucsDetails['email_notifications'] ?? 1) === 0 ? 'selected' : ''; ?>>Disabled</option>
+                                </select>
+                                <button type="submit"
+                                        class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                <?php endif; ?>
             <?php else: ?>
                 <div class="mt-8 rounded-lg border border-slate-200 bg-white px-6 py-10 text-center sm:px-8">
                     <p class="text-base text-slate-600">Your profile details could not be loaded at this time. Please try again later.</p>

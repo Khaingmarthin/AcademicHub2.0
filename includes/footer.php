@@ -44,12 +44,10 @@ $footerLinks = [
     'Home'              => BASE_URL . '/index.php',
     'About Us'          => BASE_URL . '/about.php',
     'Degree Programmes' => BASE_URL . '/degree-programmes.php',
-    'Campus Life'       => BASE_URL . '/campus-life.php',
     'Alumni'            => BASE_URL . '/alumni-overview.php',
     'Alumni Directory'  => BASE_URL . '/alumni.php',
     'Alumni Stories'    => BASE_URL . '/alumni-stories.php',
     'Career Discussions' => BASE_URL . '/career-discussions.php',
-    'Admissions'        => BASE_URL . '/entrance-information.php',
     'Faculties'         => BASE_URL . '/faculties.php',
     'News'              => BASE_URL . '/news.php',
 ];

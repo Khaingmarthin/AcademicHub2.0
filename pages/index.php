@@ -12,7 +12,6 @@ require_once '../includes/header.php';
     <?php include __DIR__ . '/sections/home-programmes.php'; ?>
     <?php include __DIR__ . '/sections/home-faculties.php'; ?>
     <?php include __DIR__ . '/sections/home-announcements.php'; ?>
-    <?php include __DIR__ . '/sections/home-campus-life.php'; ?>
     <?php include __DIR__ . '/sections/home-student-life.php'; ?>
     <?php include __DIR__ . '/sections/home-admissions.php'; ?>
     <?php include __DIR__ . '/sections/home-location-contact.php'; ?>

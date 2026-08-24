@@ -47,6 +47,7 @@ if (!empty($ucsErrors)) {
 }
 
 try {
+    $ucsIsGraduated = $ucsClean['status'] === 'graduated';
     if ($ucsClean['password'] !== '') {
         $ucsStmt = $pdo->prepare(
             "UPDATE students
@@ -56,18 +57,22 @@ try {
                  email = :email,
                  password = :password,
                  classroom_id = :classroom_id,
-                 status = :status
+                 status = :status,
+                 email_notifications = :email_notifications,
+                 student_status = :student_status
              WHERE id = :id"
         );
         $ucsStmt->execute([
-            ':student_id'   => $ucsClean['student_id'],
-            ':roll_number'  => $ucsClean['roll_number'],
-            ':name'         => $ucsClean['name'],
-            ':email'        => $ucsClean['email'],
-            ':password'     => password_hash($ucsClean['password'], PASSWORD_DEFAULT),
-            ':classroom_id' => $ucsClean['classroom_id'],
-            ':status'       => $ucsClean['status'],
-            ':id'           => $ucsId,
+            ':student_id'           => $ucsClean['student_id'],
+            ':roll_number'          => $ucsClean['roll_number'],
+            ':name'                 => $ucsClean['name'],
+            ':email'                => $ucsClean['email'],
+            ':password'             => password_hash($ucsClean['password'], PASSWORD_DEFAULT),
+            ':classroom_id'         => $ucsClean['classroom_id'],
+            ':status'               => 1,
+            ':email_notifications'  => $ucsClean['email_notifications'],
+            ':student_status'       => $ucsIsGraduated ? 'graduated' : 'active',
+            ':id'                   => $ucsId,
         ]);
     } else {
         $ucsStmt = $pdo->prepare(
@@ -77,17 +82,21 @@ try {
                  name = :name,
                  email = :email,
                  classroom_id = :classroom_id,
-                 status = :status
+                 status = :status,
+                 email_notifications = :email_notifications,
+                 student_status = :student_status
              WHERE id = :id"
         );
         $ucsStmt->execute([
-            ':student_id'   => $ucsClean['student_id'],
-            ':roll_number'  => $ucsClean['roll_number'],
-            ':name'         => $ucsClean['name'],
-            ':email'        => $ucsClean['email'],
-            ':classroom_id' => $ucsClean['classroom_id'],
-            ':status'       => $ucsClean['status'],
-            ':id'           => $ucsId,
+            ':student_id'           => $ucsClean['student_id'],
+            ':roll_number'          => $ucsClean['roll_number'],
+            ':name'                 => $ucsClean['name'],
+            ':email'                => $ucsClean['email'],
+            ':classroom_id'         => $ucsClean['classroom_id'],
+            ':status'               => 1,
+            ':email_notifications'  => $ucsClean['email_notifications'],
+            ':student_status'       => $ucsIsGraduated ? 'graduated' : 'active',
+            ':id'                   => $ucsId,
         ]);
     }
 

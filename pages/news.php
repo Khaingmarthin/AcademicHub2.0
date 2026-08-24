@@ -56,7 +56,7 @@ try {
         $ucsParams[':search'] = '%' . $ucsSearchQuery . '%';
     }
 
-    $ucsSql .= " ORDER BY n.published_at DESC, n.id DESC";
+    $ucsSql .= " ORDER BY n.created_at DESC, n.id DESC";
 
     $ucsStmt = $pdo->prepare($ucsSql);
     $ucsStmt->execute($ucsParams);

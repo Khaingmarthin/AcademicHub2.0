@@ -33,16 +33,7 @@ try {
     if ($ucsDiscussion === null) {
         discussion_flash('error', 'That discussion could not be found.');
     } else {
-        // MyISAM has no cascade support; remove replies + reports manually.
         $ucsStmt = $pdo->prepare("DELETE FROM discussion_replies WHERE discussion_id = :id");
-        $ucsStmt->execute([':id' => $ucsDiscussionId]);
-
-        $ucsStmt = $pdo->prepare(
-            "DELETE FROM discussion_reports WHERE content_type = 'reply' AND content_id NOT IN (SELECT id FROM discussion_replies)"
-        );
-        $ucsStmt->execute();
-
-        $ucsStmt = $pdo->prepare("DELETE FROM discussion_reports WHERE content_type = 'discussion' AND content_id = :id");
         $ucsStmt->execute([':id' => $ucsDiscussionId]);
 
         $ucsStmt = $pdo->prepare("DELETE FROM discussions WHERE id = :id");

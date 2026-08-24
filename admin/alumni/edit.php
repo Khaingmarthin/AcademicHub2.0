@@ -25,7 +25,7 @@ try {
         "SELECT ap.id, ap.current_job, ap.company, ap.professional_field,
                 ap.skills, ap.bio, ap.career_journey,
                 ap.linkedin_url, ap.github_url, ap.website_url,
-                ap.mentorship_available, ap.visibility, ap.verification_status,
+                ap.verification_status,
                 s.name AS student_name, s.student_id AS student_code,
                 s.roll_number, s.graduation_year,
                 m.name AS major_name
@@ -64,8 +64,7 @@ $ucsForm = [
     'linkedin_url'         => $ucsOld['linkedin_url'] ?? (string) $ucsProfile['linkedin_url'],
     'github_url'           => $ucsOld['github_url'] ?? (string) $ucsProfile['github_url'],
     'website_url'          => $ucsOld['website_url'] ?? (string) $ucsProfile['website_url'],
-    'mentorship_available' => (int) ($ucsOld['mentorship_available'] ?? (int) $ucsProfile['mentorship_available']),
-    'visibility'           => $ucsOld['visibility'] ?? (string) $ucsProfile['visibility'],
+    'verification_status'  => $ucsOld['verification_status'] ?? (string) $ucsProfile['verification_status'],
 ];
 
 require_once __DIR__ . '/../../includes/admin-layout-top.php';
@@ -96,8 +95,50 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                 <div class="grid gap-6 sm:grid-cols-2">
                     <div>
                         <label for="current_job" class="block text-sm font-medium text-gray-700">Current Job <span class="text-gray-400">(optional)</span></label>
-                        <input type="text" id="current_job" name="current_job" value="<?php echo htmlspecialchars($ucsForm['current_job']); ?>" maxlength="255" placeholder="e.g. Software Engineer"
-                               class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        <select id="current_job" name="current_job"
+                                class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                            <option value="">— Select job title —</option>
+                            <?php
+                            $ucsJobs = [
+                                'Software Engineer',
+                                'Frontend Developer',
+                                'Backend Developer',
+                                'Full Stack Developer',
+                                'Mobile Developer',
+                                'Data Analyst',
+                                'Data Scientist',
+                                'DevOps Engineer',
+                                'Cloud Engineer',
+                                'System Administrator',
+                                'Network Engineer',
+                                'Database Administrator',
+                                'Cybersecurity Analyst',
+                                'AI/ML Engineer',
+                                'QA Engineer',
+                                'UI/UX Designer',
+                                'Product Manager',
+                                'Project Manager',
+                                'Scrum Master',
+                                'Business Analyst',
+                                'IT Consultant',
+                                'Technical Writer',
+                                'CTO',
+                                'CEO',
+                                'Founder',
+                                'Teacher/Lecturer',
+                                'Researcher',
+                                'Freelancer',
+                                'Other',
+                            ];
+                            foreach ($ucsJobs as $ucsJob): ?>
+                                <option value="<?php echo htmlspecialchars($ucsJob); ?>" <?php echo $ucsForm['current_job'] === $ucsJob ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($ucsJob); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <?php if (!empty($ucsForm['current_job']) && !in_array($ucsForm['current_job'], $ucsJobs, true)): ?>
+                            <p class="mt-1.5 text-xs text-gray-500">Current: <span class="font-medium text-gray-700"><?php echo htmlspecialchars($ucsForm['current_job']); ?></span> (not in the list above)</p>
+                        <?php endif; ?>
                     </div>
                     <div>
                         <label for="company" class="block text-sm font-medium text-gray-700">Company / Organization <span class="text-gray-400">(optional)</span></label>
@@ -108,8 +149,47 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
 
                 <div>
                     <label for="professional_field" class="block text-sm font-medium text-gray-700">Professional Field <span class="text-gray-400">(optional)</span></label>
-                    <input type="text" id="professional_field" name="professional_field" value="<?php echo htmlspecialchars($ucsForm['professional_field']); ?>" maxlength="255" placeholder="e.g. Information Technology"
-                           class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                    <select id="professional_field" name="professional_field"
+                            class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        <option value="">— Select field —</option>
+                        <?php
+                        $ucsFields = [
+                            'Information Technology',
+                            'Software Engineering',
+                            'Web Development',
+                            'Data Science',
+                            'Cybersecurity',
+                            'Artificial Intelligence',
+                            'Network Engineering',
+                            'Systems Administration',
+                            'Database Administration',
+                            'Cloud Computing',
+                            'Mobile Development',
+                            'DevOps',
+                            'UI/UX Design',
+                            'Project Management',
+                            'Business Analysis',
+                            'Marketing',
+                            'Finance',
+                            'Accounting',
+                            'Human Resources',
+                            'Education',
+                            'Healthcare',
+                            'Engineering',
+                            'Legal',
+                            'Consulting',
+                            'Entrepreneurship',
+                            'Other',
+                        ];
+                        foreach ($ucsFields as $ucsField): ?>
+                            <option value="<?php echo htmlspecialchars($ucsField); ?>" <?php echo $ucsForm['professional_field'] === $ucsField ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($ucsField); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                    <?php if (!empty($ucsForm['professional_field']) && !in_array($ucsForm['professional_field'], $ucsFields, true)): ?>
+                        <p class="mt-1.5 text-xs text-gray-500">Current: <span class="font-medium text-gray-700"><?php echo htmlspecialchars($ucsForm['professional_field']); ?></span> (not in the list above)</p>
+                    <?php endif; ?>
                 </div>
 
                 <div>
@@ -151,23 +231,14 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
 
                 <div class="grid gap-6 sm:grid-cols-2">
                     <div>
-                        <label for="visibility" class="block text-sm font-medium text-gray-700">Profile Visibility</label>
-                        <select id="visibility" name="visibility" required
+                        <label for="verification_status" class="block text-sm font-medium text-gray-700">Verification Status</label>
+                        <select id="verification_status" name="verification_status" required
                                 class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                            <option value="private" <?php echo $ucsForm['visibility'] === 'private' ? 'selected' : ''; ?>>Private (hidden from public)</option>
-                            <option value="public" <?php echo $ucsForm['visibility'] === 'public' ? 'selected' : ''; ?>>Public (visible on the public alumni directory)</option>
+                            <option value="pending" <?php echo $ucsForm['verification_status'] === 'pending' ? 'selected' : ''; ?>>Pending</option>
+                            <option value="verified" <?php echo $ucsForm['verification_status'] === 'verified' ? 'selected' : ''; ?>>Verified</option>
+                            <option value="rejected" <?php echo $ucsForm['verification_status'] === 'rejected' ? 'selected' : ''; ?>>Rejected</option>
                         </select>
-                        <p class="mt-1.5 text-xs text-gray-500">Only verified public profiles are shown on the public directory.</p>
-                    </div>
-                    <div>
-                        <span class="block text-sm font-medium text-gray-700">Mentorship Availability</span>
-                        <label for="mentorship_available" class="mt-2 flex cursor-pointer items-center justify-between rounded-xl border border-gray-300 px-4 py-2.5">
-                            <span class="text-sm font-medium text-gray-700">Open to mentoring students</span>
-                            <input type="checkbox" id="mentorship_available" name="mentorship_available" value="1"
-                                   class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                                   <?php echo $ucsForm['mentorship_available'] === 1 ? 'checked' : ''; ?>>
-                        </label>
-                        <p class="mt-1.5 text-xs text-gray-500">Shown on verified public profiles when enabled.</p>
+                        <p class="mt-1.5 text-xs text-gray-500">Only verified profiles are shown on the public directory.</p>
                     </div>
                 </div>
             </div>

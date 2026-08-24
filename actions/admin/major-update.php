@@ -53,6 +53,7 @@ try {
              short_name = :short_name,
              degree_name = :degree_name,
              description = :description,
+             faculty_id = :faculty_id,
              status = :status
          WHERE id = :id"
     );
@@ -61,6 +62,7 @@ try {
         ':short_name'  => $ucsClean['short_name'],
         ':degree_name' => $ucsClean['degree_name'],
         ':description' => $ucsClean['description'],
+        ':faculty_id'  => $ucsClean['faculty_id'] ?: null,
         ':status'      => $ucsClean['status'],
         ':id'          => $ucsId,
     ]);

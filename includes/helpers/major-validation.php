@@ -27,6 +27,7 @@ function major_validate_input($input, $pdo = null, $excludeId = null)
     $shortName   = trim((string) ($input['short_name'] ?? ''));
     $degreeName  = trim((string) ($input['degree_name'] ?? ''));
     $description = trim((string) ($input['description'] ?? ''));
+    $facultyId   = $input['faculty_id'] ?? '';
     $status      = $input['status'] ?? 1;
 
     if ($name === '') {
@@ -53,6 +54,7 @@ function major_validate_input($input, $pdo = null, $excludeId = null)
             'short_name'  => $shortName === '' ? null : $shortName,
             'degree_name' => $degreeName === '' ? null : $degreeName,
             'description' => $description === '' ? null : $description,
+            'faculty_id'  => $facultyId !== '' ? (int) $facultyId : null,
             'status'      => in_array($status, [1, '1'], true) ? 1 : 0,
         ],
         'errors' => $errors,

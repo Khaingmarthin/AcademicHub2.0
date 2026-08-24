@@ -63,7 +63,7 @@ try {
     $ucsYearOptions = $ucsYears->fetchAll(PDO::FETCH_COLUMN);
 
     $ucsMajors = $pdo->prepare(
-        "SELECT DISTINCT m.id, m.name " . $ucsBaseJoin . "
+        "SELECT DISTINCT m.id, m.short_name, m.name " . $ucsBaseJoin . "
          WHERE " . $ucsBaseWhere . "
          ORDER BY m.name ASC"
     );
@@ -131,7 +131,7 @@ try {
                 ap.profile_photo, ap.linkedin_url, ap.github_url,
                 ap.website_url, ap.updated_at,
                 s.name AS student_name, s.graduation_year,
-                m.id AS major_id, m.name AS major_name
+                m.id AS major_id, m.short_name AS major_short, m.name AS major_name
          FROM alumni_profiles ap
          JOIN students s ON s.id = ap.student_id
          JOIN classrooms cl ON cl.id = s.classroom_id
@@ -210,6 +210,7 @@ require_once '../includes/header.php';
                     <div>
                         <label for="alumni-year-filter" class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Graduation Year</label>
                         <select id="alumni-year-filter" name="graduation_year" aria-label="Filter by graduation year"
+                                onchange="this.form.submit()"
                                 class="mt-1.5 block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                             <option value="">All Years</option>
                             <?php foreach ($ucsYearOptions as $ucsYearOption): ?>
@@ -220,16 +221,30 @@ require_once '../includes/header.php';
                     <div>
                         <label for="alumni-major-filter" class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Major</label>
                         <select id="alumni-major-filter" name="major" aria-label="Filter by major"
+                                onchange="this.form.submit()"
                                 class="mt-1.5 block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                             <option value="">All Majors</option>
+                            <?php
+                            // Always include CT (Computer Technology) even if no alumni yet
+                            $ucsHasCT = false;
+                            foreach ($ucsMajorOptions as $ucsMajorOption) {
+                                if ((int) $ucsMajorOption['id'] === 3 || strtoupper((string) $ucsMajorOption['short_name']) === 'CT') {
+                                    $ucsHasCT = true;
+                                    break;
+                                }
+                            }
+                            if (!$ucsHasCT): ?>
+                                <option value="3" <?php echo (int) $ucsMajorId === 3 ? 'selected' : ''; ?>>CT - Computer Technology</option>
+                            <?php endif; ?>
                             <?php foreach ($ucsMajorOptions as $ucsMajorOption): ?>
-                                <option value="<?php echo (int) $ucsMajorOption['id']; ?>" <?php echo (int) $ucsMajorId === (int) $ucsMajorOption['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars((string) $ucsMajorOption['name']); ?></option>
+                                <option value="<?php echo (int) $ucsMajorOption['id']; ?>" <?php echo (int) $ucsMajorId === (int) $ucsMajorOption['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars(((string) $ucsMajorOption['short_name'] !== '' ? (string) $ucsMajorOption['short_name'] . ' - ' : '') . (string) $ucsMajorOption['name']); ?></option>
                             <?php endforeach; ?>
                         </select>
                     </div>
                     <div>
                         <label for="alumni-profession-filter" class="block text-xs font-semibold uppercase tracking-wider text-slate-500">Profession</label>
                         <select id="alumni-profession-filter" name="profession" aria-label="Filter by profession"
+                                onchange="this.form.submit()"
                                 class="mt-1.5 block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                             <option value="">All Professions</option>
                             <?php foreach ($ucsProfessionOptions as $ucsProfessionOption): ?>
@@ -328,7 +343,7 @@ require_once '../includes/header.php';
                                     </div>
                                 </div>
 
-                                <p class="mt-1 text-sm font-medium text-slate-500"><?php echo htmlspecialchars((string) ($ucsAlumnus['major_name'] ?? '')); ?></p>
+                                <p class="mt-1 text-sm font-medium text-slate-500"><?php echo htmlspecialchars(((string) ($ucsAlumnus['major_short'] ?? '') !== '' ? (string) $ucsAlumnus['major_short'] . ' - ' : '') . (string) ($ucsAlumnus['major_name'] ?? '')); ?></p>
 
                                 <?php if (!empty($ucsAlumnus['current_job']) || !empty($ucsAlumnus['company'])): ?>
                                     <p class="mt-2 text-sm text-slate-700">

@@ -30,20 +30,23 @@ if (!empty($ucsErrors)) {
 }
 
 try {
+    $ucsIsGraduated = $ucsClean['status'] === 'graduated';
     $ucsStmt = $pdo->prepare(
         "INSERT INTO students
-            (student_id, roll_number, name, email, password, classroom_id, status)
+            (student_id, roll_number, name, email, password, classroom_id, status, email_notifications, student_status)
          VALUES
-            (:student_id, :roll_number, :name, :email, :password, :classroom_id, :status)"
+            (:student_id, :roll_number, :name, :email, :password, :classroom_id, :status, :email_notifications, :student_status)"
     );
     $ucsStmt->execute([
-        ':student_id'   => $ucsClean['student_id'],
-        ':roll_number'  => $ucsClean['roll_number'],
-        ':name'         => $ucsClean['name'],
-        ':email'        => $ucsClean['email'],
-        ':password'     => password_hash($ucsClean['password'], PASSWORD_DEFAULT),
-        ':classroom_id' => $ucsClean['classroom_id'],
-        ':status'       => $ucsClean['status'],
+        ':student_id'           => $ucsClean['student_id'],
+        ':roll_number'          => $ucsClean['roll_number'],
+        ':name'                 => $ucsClean['name'],
+        ':email'                => $ucsClean['email'],
+        ':password'             => password_hash($ucsClean['password'], PASSWORD_DEFAULT),
+        ':classroom_id'         => $ucsClean['classroom_id'],
+        ':status'               => 1,
+        ':email_notifications'  => $ucsClean['email_notifications'],
+        ':student_status'       => $ucsIsGraduated ? 'graduated' : 'active',
     ]);
 
     student_flash('success', 'Student "' . $ucsClean['name'] . '" created successfully.');

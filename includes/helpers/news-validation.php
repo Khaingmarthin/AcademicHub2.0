@@ -113,7 +113,7 @@ function news_validate_input($input, $pdo, $excludeId = null)
     $content     = trim((string) ($input['content'] ?? ''));
     $yearLevels  = $input['target_year_level'] ?? [];
     $sections    = $input['target_section'] ?? [];
-    $targetYears = $input['target_academic_year_id'] ?? [];
+    $targetClassrooms = $input['target_classroom_id'] ?? [];
     $targetMajors = $input['target_major_id'] ?? [];
 
     // ---- Publish / Expired dates -------------------------------------------
@@ -198,7 +198,7 @@ function news_validate_input($input, $pdo, $excludeId = null)
     // ---- Targets -----------------------------------------------------------
     $ucsTargets = [];
     $ucsTargetCount = max(
-        is_array($targetYears) ? count($targetYears) : 0,
+        is_array($targetClassrooms) ? count($targetClassrooms) : 0,
         is_array($targetMajors) ? count($targetMajors) : 0,
         is_array($yearLevels) ? count($yearLevels) : 0,
         is_array($sections) ? count($sections) : 0
@@ -207,16 +207,16 @@ function news_validate_input($input, $pdo, $excludeId = null)
     if ($ucsTargetCount > 0) {
         for ($ucsI = 0; $ucsI < $ucsTargetCount; $ucsI++) {
             $ucsTarget = [
-                'academic_year_id' => is_array($targetYears) && isset($targetYears[$ucsI]) && $targetYears[$ucsI] !== '' ? (int) $targetYears[$ucsI] : null,
-                'major_id'         => is_array($targetMajors) && isset($targetMajors[$ucsI]) && $targetMajors[$ucsI] !== '' ? (int) $targetMajors[$ucsI] : null,
-                'year_level'       => is_array($yearLevels) && isset($yearLevels[$ucsI]) && $yearLevels[$ucsI] !== '' ? (string) $yearLevels[$ucsI] : null,
-                'section'          => is_array($sections) && isset($sections[$ucsI]) ? trim((string) $sections[$ucsI]) : '',
+                'classroom_id' => is_array($targetClassrooms) && isset($targetClassrooms[$ucsI]) && $targetClassrooms[$ucsI] !== '' ? (int) $targetClassrooms[$ucsI] : null,
+                'major_id'     => is_array($targetMajors) && isset($targetMajors[$ucsI]) && $targetMajors[$ucsI] !== '' ? (int) $targetMajors[$ucsI] : null,
+                'year_level'   => is_array($yearLevels) && isset($yearLevels[$ucsI]) && $yearLevels[$ucsI] !== '' ? (string) $yearLevels[$ucsI] : null,
+                'section'      => is_array($sections) && isset($sections[$ucsI]) ? trim((string) $sections[$ucsI]) : '',
             ];
             if ($ucsTarget['section'] === '') {
                 $ucsTarget['section'] = null;
             }
 
-            if ($ucsTarget['academic_year_id'] === null && $ucsTarget['major_id'] === null
+            if ($ucsTarget['classroom_id'] === null && $ucsTarget['major_id'] === null
                 && $ucsTarget['year_level'] === null && $ucsTarget['section'] === null) {
                 continue;
             }

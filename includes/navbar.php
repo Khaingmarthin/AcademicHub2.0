@@ -85,8 +85,7 @@ $navItems = [
         ],
     ],
     ['label' => 'Faculties', 'url' => BASE_URL . '/faculties.php'],
-    ['label' => 'Campus Life', 'url' => BASE_URL . '/campus-life.php'],
-        [
+    [
         'label'    => 'Alumni',
         'children' => [
             ['label' => 'Alumni Directory', 'url' => BASE_URL . '/alumni.php', 'match' => ['alumni.php', 'alumni-details.php']],
@@ -95,13 +94,6 @@ $navItems = [
         ],
     ],
     ['label' => 'News', 'url' => BASE_URL . '/news.php'],
-    [
-        'label'    => 'Admissions',
-        'children' => [
-            ['label' => 'Entrance Information', 'url' => BASE_URL . '/entrance-information.php'],
-            ['label' => 'Admitted Student List', 'url' => BASE_URL . '/admitted-students.php'],
-        ],
-    ],
     ['label' => 'Contact', 'url' => BASE_URL . '/index.php#location-contact-heading'],
 ];
 

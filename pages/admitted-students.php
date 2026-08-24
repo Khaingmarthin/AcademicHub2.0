@@ -12,13 +12,11 @@ $pageTitle = 'Admitted Student List';
 
 $ucsHeroMedia  = 'images/front_view.jpg';
 $ucsAdmission  = null;
-$ucsYearName   = '';
-$ucsPdfUrl     = '';
-$ucsHasPdf     = false;
 
 try {
     $ucsProfileStmt = $pdo->query(
-        "SELECT short_name, hero_media
+        "SELECT short_name, hero_media,
+                admission_title, admission_description
          FROM university_profile
          ORDER BY id ASC
          LIMIT 1"
@@ -26,46 +24,11 @@ try {
     $ucsProfileRow = $ucsProfileStmt->fetch() ?: null;
     $ucsHeroMedia  = $ucsProfileRow['hero_media'] ?? 'images/front_view.jpg';
 
-    // Fetch admission for the Active academic year; fall back to the latest record.
-    $ucsStmt = $pdo->prepare(
-        "SELECT a.id, a.title, a.description,
-                a.document_title, a.document_path, a.document_type,
-                ay.year_name, ay.status AS year_status
-         FROM admissions a
-         JOIN academic_years ay ON ay.id = a.academic_year_id
-         WHERE a.status = 1 AND ay.status = 'Active'
-         ORDER BY a.id DESC
-         LIMIT 1"
-    );
-    $ucsStmt->execute();
-    $ucsAdmission = $ucsStmt->fetch() ?: null;
-
-    if ($ucsAdmission === null) {
-        $ucsStmt = $pdo->prepare(
-            "SELECT a.id, a.title, a.description,
-                    a.document_title, a.document_path, a.document_type,
-                    ay.year_name, ay.status AS year_status
-             FROM admissions a
-             JOIN academic_years ay ON ay.id = a.academic_year_id
-             WHERE a.status = 1
-             ORDER BY a.id DESC
-             LIMIT 1"
-        );
-        $ucsStmt->execute();
-        $ucsAdmission = $ucsStmt->fetch() ?: null;
-    }
-
-    if ($ucsAdmission !== null) {
-        $ucsYearName = $ucsAdmission['year_name'] ?? '';
-
-        // Verify the PDF exists on disk.
-        if (!empty($ucsAdmission['document_path'])) {
-            $ucsPdfFile = dirname(__DIR__) . '/assets/uploads/' . ltrim($ucsAdmission['document_path'], '/');
-            $ucsHasPdf  = is_file($ucsPdfFile);
-            if ($ucsHasPdf) {
-                $ucsPdfUrl = ROOT_URL . '/assets/uploads/' . ltrim($ucsAdmission['document_path'], '/');
-            }
-        }
+    if ($ucsProfileRow !== null) {
+        $ucsAdmission = [
+            'title'       => $ucsProfileRow['admission_title'] ?? '',
+            'description' => $ucsProfileRow['admission_description'] ?? '',
+        ];
     }
 } catch (PDOException $e) {
     $ucsAdmission = null;
@@ -96,17 +59,8 @@ require_once '../includes/header.php';
                     Admitted Student List
                 </h1>
                 <p class="mt-4 max-w-2xl text-base leading-relaxed text-slate-600">
-                    View the official admission results for the <?php echo htmlspecialchars($ucsYearName !== '' ? $ucsYearName : 'current'); ?> academic year.
+                    View the official admission results.
                 </p>
-                <?php if ($ucsYearName !== ''): ?>
-                    <div class="mt-5 inline-flex items-center gap-2 rounded-md bg-blue-50 px-3.5 py-2 text-sm font-semibold text-blue-700 ring-1 ring-blue-100">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <path d="M8 2v4M16 2v4M3 10h18"></path>
-                            <rect x="3" y="4" width="18" height="18" rx="2"></rect>
-                        </svg>
-                        Academic Year <?php echo htmlspecialchars($ucsYearName); ?>
-                    </div>
-                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -115,59 +69,23 @@ require_once '../includes/header.php';
         <!-- Admission Results -->
         <section class="bg-slate-50 py-12 sm:py-16 lg:py-20" aria-labelledby="admission-results-heading">
             <div class="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
-                <!-- Document header -->
                 <div class="border border-slate-200 bg-white">
                     <div class="border-b border-slate-200 px-6 py-4 sm:px-8">
                         <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Admission Results</p>
                         <h2 id="admission-results-heading" class="mt-1 text-lg font-semibold tracking-tight text-slate-900">
-                            <?php echo htmlspecialchars($ucsAdmission['document_title'] ?? 'Admitted Student List'); ?>
+                            <?php echo htmlspecialchars($ucsAdmission['title'] ?: 'Admitted Student List'); ?>
                         </h2>
                     </div>
 
                     <?php if (!empty($ucsAdmission['description'])): ?>
                         <div class="px-6 py-5 sm:px-8 text-sm leading-relaxed text-slate-600">
-                            <?php echo htmlspecialchars($ucsAdmission['description']); ?>
-                        </div>
-                    <?php endif; ?>
-
-                    <?php if ($ucsHasPdf): ?>
-                        <!-- PDF Viewer -->
-                        <div class="border-t border-slate-200">
-                            <iframe
-                                src="<?php echo htmlspecialchars($ucsPdfUrl); ?>"
-                                title="<?php echo htmlspecialchars($ucsAdmission['document_title'] ?? 'Admitted Student List'); ?>"
-                                class="h-[500px] w-full border-0 sm:h-[600px] lg:h-[700px]"
-                                loading="lazy"
-                            ></iframe>
-                        </div>
-
-                        <!-- Action buttons -->
-                        <div class="border-t border-slate-200 px-6 py-4 sm:px-8">
-                            <div class="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-4">
-                                <a href="<?php echo htmlspecialchars($ucsPdfUrl); ?>" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-150 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                                        <polyline points="15 3 21 3 21 9"></polyline>
-                                        <line x1="10" y1="14" x2="21" y2="3"></line>
-                                    </svg>
-                                    View PDF
-                                </a>
-                                <a href="<?php echo htmlspecialchars($ucsPdfUrl); ?>" download class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                        <polyline points="7 10 12 15 17 10"></polyline>
-                                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                                    </svg>
-                                    Download PDF
-                                </a>
-                            </div>
+                            <?php echo nl2br(htmlspecialchars($ucsAdmission['description'])); ?>
                         </div>
                     <?php else: ?>
-                        <!-- Empty state: no PDF available -->
-                        <div class="border-t border-slate-200 px-6 py-12 sm:px-8 text-center">
-                            <p class="text-base font-semibold text-slate-900">Document Not Available</p>
+                        <div class="px-6 py-12 sm:px-8 text-center">
+                            <p class="text-base font-semibold text-slate-900">Admission Information</p>
                             <p class="mt-2 text-sm text-slate-500">
-                                The admitted student list has not been published yet.
+                                Please contact the admissions office for the latest admitted student list.
                             </p>
                         </div>
                     <?php endif; ?>

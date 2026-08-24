@@ -42,15 +42,14 @@ if (!empty($ucsErrors)) {
 try {
     $ucsStmt = $pdo->prepare(
         "INSERT INTO alumni_stories
-            (alumni_profile_id, alumni_student_id, title, summary, content,
+            (alumni_profile_id, title, summary, content,
              career_field, cover_image, status)
          VALUES
-            (:alumni_profile_id, :alumni_student_id, :title, :summary, :content,
+            (:alumni_profile_id, :title, :summary, :content,
              :career_field, :cover_image, 'pending')"
     );
     $ucsStmt->execute([
         ':alumni_profile_id' => $ucsClean['alumni_profile_id'],
-        ':alumni_student_id' => $ucsClean['alumni_student_id'],
         ':title'             => $ucsClean['title'],
         ':summary'           => $ucsClean['summary'],
         ':content'           => $ucsClean['content'],

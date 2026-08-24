@@ -18,7 +18,7 @@ $ucsId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
 
 try {
     $ucsStmt = $pdo->prepare(
-        "SELECT id, student_id, roll_number, name, email, classroom_id, status
+        "SELECT id, student_id, roll_number, name, email, classroom_id, status, email_notifications, student_status
          FROM students
          WHERE id = :id
          LIMIT 1"
@@ -42,12 +42,13 @@ $ucsOld = $_SESSION['student_old'] ?? null;
 unset($_SESSION['student_old']);
 
 $ucsForm = [
-    'student_id'   => $ucsOld['student_id'] ?? $ucsStudent['student_id'],
-    'roll_number'  => $ucsOld['roll_number'] ?? $ucsStudent['roll_number'],
-    'name'         => $ucsOld['name'] ?? $ucsStudent['name'],
-    'email'        => $ucsOld['email'] ?? $ucsStudent['email'],
-    'classroom_id' => $ucsOld['classroom_id'] ?? (int) $ucsStudent['classroom_id'],
-    'status'       => $ucsOld['status'] ?? (int) $ucsStudent['status'],
+    'student_id'          => $ucsOld['student_id'] ?? $ucsStudent['student_id'],
+    'roll_number'         => $ucsOld['roll_number'] ?? $ucsStudent['roll_number'],
+    'name'                => $ucsOld['name'] ?? $ucsStudent['name'],
+    'email'               => $ucsOld['email'] ?? $ucsStudent['email'],
+    'classroom_id'        => $ucsOld['classroom_id'] ?? (int) $ucsStudent['classroom_id'],
+    'status'              => $ucsOld['status'] ?? $ucsStudent['student_status'],
+    'email_notifications' => $ucsOld['email_notifications'] ?? ($ucsStudent['email_notifications'] ?? 1),
 ];
 
 // Students are scoped to the active academic year. Classroom options come
@@ -180,9 +181,19 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                     <label for="status" class="block text-sm font-medium text-slate-700">Status</label>
                     <select id="status" name="status" required
                             class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                        <option value="1" <?php echo (int) $ucsForm['status'] === 1 ? 'selected' : ''; ?>>Active</option>
-                        <option value="0" <?php echo (int) $ucsForm['status'] === 0 ? 'selected' : ''; ?>>Inactive</option>
+                        <option value="active" <?php echo ($ucsForm['status'] ?? '') === 'active' ? 'selected' : ''; ?>>Active</option>
+                        <option value="graduated" <?php echo ($ucsForm['status'] ?? '') === 'graduated' ? 'selected' : ''; ?>>Graduated</option>
                     </select>
+                </div>
+
+                <div>
+                    <label for="email_notifications" class="block text-sm font-medium text-slate-700">Email Notifications</label>
+                    <select id="email_notifications" name="email_notifications" required
+                            class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        <option value="1" <?php echo (int) ($ucsForm['email_notifications'] ?? 1) === 1 ? 'selected' : ''; ?>>Enabled</option>
+                        <option value="0" <?php echo (int) ($ucsForm['email_notifications'] ?? 1) === 0 ? 'selected' : ''; ?>>Disabled</option>
+                    </select>
+                    <p class="mt-1.5 text-xs text-slate-500">Whether this student receives email notifications about news and announcements.</p>
                 </div>
             </div>
 

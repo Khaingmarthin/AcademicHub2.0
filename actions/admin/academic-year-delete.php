@@ -4,9 +4,8 @@
  *
  * Permanently removes an academic year, but only when it is safe to do so:
  * the Active year can never be deleted, and a year that still has related
- * courses, classrooms, admissions or news targets is refused (the schema
- * uses ON DELETE RESTRICT). In those cases the administrator is told to
- * archive the year instead.
+ * courses or classrooms is refused (the schema uses ON DELETE RESTRICT).
+ * In those cases the administrator is told to archive the year instead.
  */
 require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
@@ -56,7 +55,7 @@ if ($ucsYear['status'] === 'Active') {
 // A year with dependent records cannot be deleted (ON DELETE RESTRICT).
 $ucsDependentCount = 0;
 try {
-    foreach (['courses', 'classrooms', 'admissions', 'news_targets'] as $ucsTable) {
+    foreach (['courses', 'classrooms'] as $ucsTable) {
         $ucsStmt = $pdo->prepare(
             "SELECT COUNT(*) FROM `$ucsTable` WHERE academic_year_id = :id"
         );
@@ -70,7 +69,7 @@ try {
 if ($ucsDependentCount > 0) {
     academic_year_flash(
         'error',
-        'Academic year ' . $ucsYear['year_name'] . ' has linked courses, classrooms, admissions or news records and cannot be deleted. Archive it instead.'
+        'Academic year ' . $ucsYear['year_name'] . ' has linked courses or classrooms and cannot be deleted. Archive it instead.'
     );
     header('Location: ' . $ucsReturnUrl);
     exit;

@@ -270,9 +270,9 @@ function alumni_verification_validate_input($input, $pdo, $targetStatus)
 /**
  * Validate the alumni-specific profile fields for the admin edit form.
  *
- * Only alumni-specific information is editable here. Student identity,
- * academic status and verification status are managed by their own
- * dedicated workflows and never appear in this validator.
+ * Only alumni-specific information is editable here. Student identity
+ * and academic status are managed by their own dedicated workflows
+ * and never appear in this validator.
  *
  * @param array $input Raw form values (e.g. $_POST).
  * @param PDO   $pdo   Database connection.
@@ -292,8 +292,7 @@ function alumni_update_validate_input($input, $pdo, $id)
     $linkedinUrl       = trim((string) ($input['linkedin_url'] ?? ''));
     $githubUrl         = trim((string) ($input['github_url'] ?? ''));
     $websiteUrl        = trim((string) ($input['website_url'] ?? ''));
-    $mentorshipActive  = $input['mentorship_available'] ?? 0;
-    $visibility        = (string) ($input['visibility'] ?? '');
+    $verificationStatus = (string) ($input['verification_status'] ?? 'pending');
 
     $id = filter_var($id, FILTER_VALIDATE_INT);
     if ($id === false || $id < 1) {
@@ -339,12 +338,8 @@ function alumni_update_validate_input($input, $pdo, $id)
         }
     }
 
-    if (!in_array($mentorshipActive, [0, 1, '0', '1'], true)) {
-        $errors[] = 'Invalid mentorship availability selected.';
-    }
-
-    if (!in_array($visibility, ['public', 'private'], true)) {
-        $errors[] = 'Invalid visibility selected.';
+    if (!in_array($verificationStatus, ['pending', 'verified', 'rejected'], true)) {
+        $errors[] = 'Invalid verification status selected.';
     }
 
     return [
@@ -359,8 +354,7 @@ function alumni_update_validate_input($input, $pdo, $id)
             'linkedin_url'         => $linkedinUrl,
             'github_url'           => $githubUrl,
             'website_url'          => $websiteUrl,
-            'mentorship_available' => in_array($mentorshipActive, [1, '1'], true) ? 1 : 0,
-            'visibility'           => $visibility,
+            'verification_status'  => $verificationStatus,
         ],
         'errors' => $errors,
     ];

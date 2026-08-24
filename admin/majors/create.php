@@ -5,6 +5,7 @@
 require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../includes/auth.php';
+require_once __DIR__ . '/../../includes/helpers/ucs-admin-lists.php';
 
 admin_require_login();
 
@@ -20,9 +21,12 @@ $ucsOld = $_SESSION['major_old'] ?? [
     'short_name'  => '',
     'degree_name' => '',
     'description' => '',
+    'faculty_id'  => '',
     'status'      => 1,
 ];
 unset($_SESSION['major_old']);
+
+$ucsFaculties = ucs_admin_faculties($pdo);
 
 require_once __DIR__ . '/../../includes/admin-layout-top.php';
 ?>
@@ -65,6 +69,19 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                         <input type="text" id="degree_name" name="degree_name" value="<?php echo htmlspecialchars($ucsOld['degree_name'] ?? ''); ?>" placeholder="e.g. B.C.Sc." maxlength="100"
                                class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                     </div>
+                </div>
+
+                <div>
+                    <label for="faculty_id" class="block text-sm font-medium text-gray-700">Faculty</label>
+                    <select id="faculty_id" name="faculty_id"
+                            class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        <option value="">No Faculty</option>
+                        <?php foreach ($ucsFaculties as $ucsFaculty): ?>
+                            <option value="<?php echo (int) $ucsFaculty['id']; ?>" <?php echo (int) ($ucsOld['faculty_id'] ?? 0) === (int) $ucsFaculty['id'] ? 'selected' : ''; ?>>
+                                <?php echo htmlspecialchars($ucsFaculty['name']); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
                 </div>
 
                 <div>
