@@ -23,11 +23,12 @@ try {
                 c.classroom_name, c.year_level, c.section,
                 c.academic_year_id AS classroom_academic_year_id,
                 c.major_id AS classroom_major_id,
+                c.id AS classroom_id,
                 m.name AS major_name,
                 ay.year_name AS academic_year
          FROM students s
          JOIN classrooms c ON c.id = s.classroom_id
-         JOIN majors m ON m.id = c.major_id
+         LEFT JOIN majors m ON m.id = c.major_id
          JOIN academic_years ay ON ay.id = c.academic_year_id
          WHERE s.id = :id
          LIMIT 1"
@@ -42,18 +43,24 @@ $ucsCourses = [];
 if ($ucsDetails !== null) {
     try {
         $ucsStmt = $pdo->prepare(
-            "SELECT course_code, course_name
-             FROM courses
-             WHERE academic_year_id = :academic_year_id
-               AND major_id = :major_id
-               AND year_level = :year_level
-               AND status = TRUE
-             ORDER BY course_code ASC"
+            "SELECT c.course_code, c.course_name,
+                    t.name AS teacher_name, tca.semester
+             FROM courses c
+             LEFT JOIN teacher_course_assignments tca
+                ON tca.course_id = c.id
+                AND tca.classroom_id = :classroom_id
+             LEFT JOIN teachers t ON t.id = tca.teacher_id
+             WHERE c.academic_year_id = :academic_year_id
+               AND c.major_id = :major_id
+               AND c.year_level = :year_level
+               AND c.status = TRUE
+             ORDER BY c.course_code ASC"
         );
         $ucsStmt->execute([
             ':academic_year_id' => $ucsDetails['classroom_academic_year_id'],
             ':major_id'         => $ucsDetails['classroom_major_id'],
             ':year_level'       => $ucsDetails['year_level'],
+            ':classroom_id'     => $ucsDetails['classroom_id'],
         ]);
         $ucsCourses = $ucsStmt->fetchAll();
     } catch (PDOException $e) {
@@ -309,14 +316,18 @@ require_once __DIR__ . '/../includes/header.php';
                 <?php if ($ucsCourses): ?>
                     <div class="mt-4 overflow-hidden rounded-lg border border-slate-200 bg-white">
                         <div class="hidden border-b border-slate-200 bg-slate-50 px-6 py-3 sm:flex sm:items-center sm:gap-6">
-                            <span class="w-40 shrink-0 text-xs font-bold uppercase tracking-wider text-slate-500">Course Code</span>
+                            <span class="w-36 shrink-0 text-xs font-bold uppercase tracking-wider text-slate-500">Course Code</span>
                             <span class="flex-1 text-xs font-bold uppercase tracking-wider text-slate-500">Course Name</span>
+                            <span class="w-48 text-xs font-bold uppercase tracking-wider text-slate-500">Teacher</span>
+                            <span class="w-36 text-xs font-bold uppercase tracking-wider text-slate-500">Semester</span>
                         </div>
                         <ul class="divide-y divide-slate-200">
                             <?php foreach ($ucsCourses as $ucsCourse): ?>
                                 <li class="flex flex-col gap-0.5 px-6 py-4 transition-colors duration-150 hover:bg-slate-50 sm:flex-row sm:items-center sm:gap-6">
-                                    <span class="w-40 shrink-0 text-sm font-bold text-blue-600"><?php echo htmlspecialchars($ucsCourse['course_code']); ?></span>
+                                    <span class="w-36 shrink-0 text-sm font-bold text-blue-600"><?php echo htmlspecialchars($ucsCourse['course_code']); ?></span>
                                     <span class="flex-1 text-sm font-medium text-slate-800"><?php echo htmlspecialchars($ucsCourse['course_name']); ?></span>
+                                    <span class="w-48 text-sm text-slate-600"><?php echo htmlspecialchars($ucsCourse['teacher_name'] ?? '—'); ?></span>
+                                    <span class="w-36 text-sm text-slate-500"><?php echo htmlspecialchars($ucsCourse['semester'] ?? '—'); ?></span>
                                 </li>
                             <?php endforeach; ?>
                         </ul>

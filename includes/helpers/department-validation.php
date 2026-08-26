@@ -11,8 +11,8 @@ if (!defined('BASE_URL')) {
  * Validate and normalise department form input.
  *
  * @param array    $input     Raw form values (e.g. $_POST).
- * @param PDO|null $pdo       Unused here; kept for the shared signature.
- * @param int|null $excludeId Unused here; kept for the shared signature.
+ * @param PDO|null $pdo       Database connection for duplicate checks.
+ * @param int|null $excludeId ID to exclude from duplicate name check (edit mode).
  * @return array{clean:array, errors:array}
  */
 function department_validate_input($input, $pdo = null, $excludeId = null)
@@ -21,7 +21,6 @@ function department_validate_input($input, $pdo = null, $excludeId = null)
 
     $name        = trim((string) ($input['name'] ?? ''));
     $description = trim((string) ($input['description'] ?? ''));
-    $facultyId   = filter_var($input['faculty_id'] ?? null, FILTER_VALIDATE_INT);
     $status      = $input['status'] ?? 1;
 
     if ($name === '') {
@@ -46,21 +45,6 @@ function department_validate_input($input, $pdo = null, $excludeId = null)
         }
     }
 
-    // ---- Faculty ---------------------------------------------------------
-    if ($facultyId === false || $facultyId < 1) {
-        $errors[] = 'A faculty must be selected.';
-    } elseif ($pdo !== null) {
-        try {
-            $ucsStmt = $pdo->prepare("SELECT id FROM faculties WHERE id = :id LIMIT 1");
-            $ucsStmt->execute([':id' => $facultyId]);
-            if ($ucsStmt->fetchColumn() === false) {
-                $errors[] = 'The selected faculty does not exist.';
-            }
-        } catch (PDOException $e) {
-            $errors[] = 'Unable to validate the faculty. Please try again.';
-        }
-    }
-
     if (!in_array($status, [0, 1, '0', '1'], true)) {
         $errors[] = 'Invalid status selected.';
     }
@@ -69,7 +53,6 @@ function department_validate_input($input, $pdo = null, $excludeId = null)
         'clean' => [
             'name'        => $name,
             'description' => $description === '' ? null : $description,
-            'faculty_id'  => $facultyId,
             'status'      => in_array($status, [1, '1'], true) ? 1 : 0,
         ],
         'errors' => $errors,

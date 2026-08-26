@@ -57,21 +57,30 @@ CREATE TABLE faculties (
 
 
 -- =========================================================
--- 3. DEPARTMENTS
+-- 3. DEPARTMENTS (Academic Departments - independent units)
 -- =========================================================
 
 CREATE TABLE departments (
     id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    faculty_id  BIGINT UNSIGNED NOT NULL,
     name        VARCHAR(255) NOT NULL,
     description TEXT NULL,
     status      BOOLEAN NOT NULL DEFAULT TRUE,
     created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
 
-    CONSTRAINT fk_departments_faculty
-        FOREIGN KEY (faculty_id) REFERENCES faculties(id)
-        ON UPDATE CASCADE ON DELETE RESTRICT
+
+-- =========================================================
+-- 3b. ADMINISTRATIVE UNITS (non-academic university units)
+-- =========================================================
+
+CREATE TABLE administrative_units (
+    id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name        VARCHAR(255) NOT NULL,
+    description TEXT NULL,
+    status      BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
 
@@ -118,7 +127,7 @@ CREATE TABLE majors (
 CREATE TABLE courses (
     id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     academic_year_id  BIGINT UNSIGNED NOT NULL,
-    major_id          BIGINT UNSIGNED NOT NULL,
+    major_id          BIGINT UNSIGNED NULL,
     course_code       VARCHAR(50) NOT NULL,
     course_name       VARCHAR(255) NOT NULL,
     year_level        ENUM('First Year','Second Year','Third Year','Fourth Year','Fifth Year') NOT NULL,
@@ -148,7 +157,7 @@ CREATE TABLE courses (
 CREATE TABLE classrooms (
     id                BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     academic_year_id  BIGINT UNSIGNED NOT NULL,
-    major_id          BIGINT UNSIGNED NOT NULL,
+    major_id          BIGINT UNSIGNED NULL,
     year_level        ENUM('First Year','Second Year','Third Year','Fourth Year','Fifth Year') NOT NULL,
     section           VARCHAR(10) NOT NULL,
     classroom_name    VARCHAR(100) NOT NULL,
@@ -428,10 +437,64 @@ CREATE TABLE discussion_replies (
 
 
 -- =========================================================
+-- 19. TEACHERS
+-- =========================================================
+
+CREATE TABLE teachers (
+    id              BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    teacher_id      VARCHAR(50) NOT NULL UNIQUE,
+    name            VARCHAR(255) NOT NULL,
+    email           VARCHAR(191) NULL,
+    phone           VARCHAR(50) NULL,
+    faculty_id      BIGINT UNSIGNED NULL,
+    department_id   BIGINT UNSIGNED NULL,
+    specialization  VARCHAR(255) NULL,
+    status          BOOLEAN NOT NULL DEFAULT TRUE,
+    created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_teachers_faculty
+        FOREIGN KEY (faculty_id) REFERENCES faculties(id)
+        ON UPDATE CASCADE ON DELETE SET NULL,
+
+    CONSTRAINT fk_teachers_department
+        FOREIGN KEY (department_id) REFERENCES departments(id)
+        ON UPDATE CASCADE ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+
+-- =========================================================
+-- 20. TEACHER COURSE ASSIGNMENTS
+-- =========================================================
+
+CREATE TABLE teacher_course_assignments (
+    id            BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    teacher_id    BIGINT UNSIGNED NOT NULL,
+    course_id     BIGINT UNSIGNED NOT NULL,
+    classroom_id  BIGINT UNSIGNED NOT NULL,
+    created_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    CONSTRAINT fk_tca_teacher
+        FOREIGN KEY (teacher_id) REFERENCES teachers(id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+
+    CONSTRAINT fk_tca_course
+        FOREIGN KEY (course_id) REFERENCES courses(id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+
+    CONSTRAINT fk_tca_classroom
+        FOREIGN KEY (classroom_id) REFERENCES classrooms(id)
+        ON UPDATE CASCADE ON DELETE CASCADE,
+
+    UNIQUE KEY uq_teacher_course_classroom (teacher_id, course_id, classroom_id)
+) ENGINE=InnoDB;
+
+
+-- =========================================================
 -- INDEXES
 -- =========================================================
 
-CREATE INDEX idx_departments_faculty ON departments(faculty_id);
 CREATE INDEX idx_majors_faculty ON majors(faculty_id);
 CREATE INDEX idx_courses_academic_year ON courses(academic_year_id);
 CREATE INDEX idx_courses_major ON courses(major_id);
@@ -458,6 +521,11 @@ CREATE INDEX idx_discussions_category ON discussions(category_id);
 CREATE INDEX idx_discussions_author ON discussions(author_student_id);
 CREATE INDEX idx_discussions_status ON discussions(status);
 CREATE INDEX idx_discussions_pinned ON discussions(is_pinned);
+CREATE INDEX idx_teachers_faculty ON teachers(faculty_id);
+CREATE INDEX idx_teachers_department ON teachers(department_id);
+CREATE INDEX idx_tca_teacher ON teacher_course_assignments(teacher_id);
+CREATE INDEX idx_tca_course ON teacher_course_assignments(course_id);
+CREATE INDEX idx_tca_classroom ON teacher_course_assignments(classroom_id);
 CREATE INDEX idx_discussion_replies_discussion ON discussion_replies(discussion_id);
 CREATE INDEX idx_discussion_replies_author ON discussion_replies(author_student_id);
 CREATE INDEX idx_discussion_replies_status ON discussion_replies(status);
@@ -482,13 +550,25 @@ INSERT INTO discussion_categories (name, slug, description, sort_order) VALUES
 -- RELATIONSHIP SUMMARY
 -- =========================================================
 --
--- Academic Structure:
---   departments.faculty_id          -> faculties.id          (M:1, RESTRICT)
+-- Academic Organization:
+--   faculties (independent academic units)
+--   departments (independent academic units, no faculty FK)
+--   administrative_units (independent admin units)
 --   majors.faculty_id               -> faculties.id          (M:1, SET NULL)
 --   courses.academic_year_id        -> academic_years.id     (M:1, RESTRICT)
 --   courses.major_id                -> majors.id             (M:1, RESTRICT)
 --   classrooms.academic_year_id     -> academic_years.id     (M:1, RESTRICT)
---   classrooms.major_id             -> majors.id             (M:1, RESTRICT)
+--   classrooms.major_id             -> majors.id             (M:1, RESTRICT, nullable)
+--
+-- Teachers:
+--   teachers.faculty_id             -> faculties.id          (M:1, SET NULL)
+--   teachers.department_id          -> departments.id        (M:1, SET NULL)
+--
+-- Teaching Assignments:
+--   teacher_course_assignments.teacher_id    -> teachers.id    (M:1, CASCADE)
+--   teacher_course_assignments.course_id     -> courses.id     (M:1, CASCADE)
+--   teacher_course_assignments.classroom_id  -> classrooms.id  (M:1, CASCADE)
+--   UNIQUE (teacher_id, course_id, classroom_id, semester)
 --
 -- Student & Enrollment:
 --   students.classroom_id           -> classrooms.id         (M:1, RESTRICT)

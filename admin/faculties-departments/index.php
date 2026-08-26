@@ -2,10 +2,10 @@
 /**
  * Admin Faculties & Departments module - list view.
  *
- * Displays 3 parts:
+ * Displays 4 parts:
  *   Part 1 — Four Faculties
  *   Part 2 — Three academic departments (ITSM, Natural Language, Natural Science)
- *   Part 3 — Four administration departments (Library, Finance, Administration, Student Affairs)
+ *   Part 3 — Four administrative units (Library, Finance, Administration, Student Affairs)
  */
 require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
@@ -14,7 +14,7 @@ require_once __DIR__ . '/../../includes/auth.php';
 admin_require_login();
 
 $pageTitle    = 'Faculties & Departments';
-$pageSubtitle = 'Manage faculties and their departments.';
+$pageSubtitle = 'Manage academic organization and administrative units.';
 $activeNav    = 'faculties-departments';
 
 // Flash message.
@@ -34,48 +34,30 @@ try {
     $ucsFaculties = [];
 }
 
-// Load all departments keyed by faculty_id.
-$ucsDepartmentsByFaculty = [];
-$ucsAllDepartments = [];
+// Load academic departments (independent units, no faculty FK).
+$ucsAcademicDepts = [];
 try {
     $ucsDeptStmt = $pdo->query(
-        "SELECT d.id, d.faculty_id, d.name, d.description, d.status
-         FROM departments d
-         ORDER BY d.name ASC"
+        "SELECT id, name, description, status
+         FROM departments
+         ORDER BY name ASC"
     );
-    $ucsAllDepartments = $ucsDeptStmt->fetchAll();
-    foreach ($ucsAllDepartments as $ucsDept) {
-        $ucsDepartmentsByFaculty[(int) $ucsDept['faculty_id']][] = $ucsDept;
-    }
+    $ucsAcademicDepts = $ucsDeptStmt->fetchAll();
 } catch (PDOException $e) {
-    $ucsAllDepartments = [];
+    $ucsAcademicDepts = [];
 }
 
-// Part 2: Academic departments — these 3 specific departments
-$ucsAcademicDeptNames = [
-    'Information Technology and Systems Management (ITSM) Department',
-    'Department of Natural Language (Myanmar and English)',
-    'Department of Natural Science (Physics)',
-];
-
-// Part 3: Administration departments — these 4
-$ucsAdminDeptNames = [
-    'Library',
-    'Finance Department',
-    'Administration Department',
-    'Student Affairs Department',
-];
-
-// Separate academic and admin departments from the loaded data.
-$ucsAcademicDepts = [];
-$ucsAdminDepts    = [];
-foreach ($ucsAllDepartments as $ucsDept) {
-    $ucsDeptName = (string) $ucsDept['name'];
-    if (in_array($ucsDeptName, $ucsAcademicDeptNames, true)) {
-        $ucsAcademicDepts[] = $ucsDept;
-    } elseif (in_array($ucsDeptName, $ucsAdminDeptNames, true)) {
-        $ucsAdminDepts[] = $ucsDept;
-    }
+// Load administrative units.
+$ucsAdminUnits = [];
+try {
+    $ucsAdminUnitStmt = $pdo->query(
+        "SELECT id, name, description, status
+         FROM administrative_units
+         ORDER BY name ASC"
+    );
+    $ucsAdminUnits = $ucsAdminUnitStmt->fetchAll();
+} catch (PDOException $e) {
+    $ucsAdminUnits = [];
 }
 
 require_once __DIR__ . '/../../includes/admin-layout-top.php';
@@ -88,7 +70,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
 
 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
     <div>
-        <p class="text-sm text-gray-500"><?php echo count($ucsFaculties); ?> faculties &middot; <?php echo count($ucsAcademicDepts); ?> academic departments &middot; <?php echo count($ucsAdminDepts); ?> admin departments</p>
+        <p class="text-sm text-gray-500"><?php echo count($ucsFaculties); ?> faculties &middot; <?php echo count($ucsAcademicDepts); ?> academic departments &middot; <?php echo count($ucsAdminUnits); ?> administrative units</p>
     </div>
     <div class="flex flex-wrap items-center gap-2">
         <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/faculties/create.php'); ?>"
@@ -132,7 +114,6 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             <?php foreach ($ucsFaculties as $ucsFaculty): ?>
                 <?php
                 $ucsFacultyId       = (int) $ucsFaculty['id'];
-                $ucsFacultyDepts    = $ucsDepartmentsByFaculty[$ucsFacultyId] ?? [];
                 $ucsFacultyIsActive = (int) $ucsFaculty['status'] === 1;
                 ?>
                 <div class="group relative overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-100 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
@@ -149,12 +130,6 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                                 <?php if (!empty($ucsFaculty['description'])): ?>
                                     <p class="mt-1 truncate text-xs text-gray-500"><?php echo htmlspecialchars(mb_strimwidth($ucsFaculty['description'], 0, 100, '…')); ?></p>
                                 <?php endif; ?>
-                                <div class="mt-2 flex items-center gap-2">
-                                    <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-2 py-0.5 text-[10px] font-semibold text-blue-600">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
-                                        <?php echo count($ucsFacultyDepts); ?> departments
-                                    </span>
-                                </div>
                             </div>
                             <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/faculties/edit.php?id=' . $ucsFacultyId); ?>" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none">
                                 Edit
@@ -167,7 +142,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
     <?php endif; ?>
 </section>
 
-<!-- Academic Departments Section (Part 2) -->
+<!-- Academic Departments Section -->
 <section class="mt-8" aria-labelledby="academic-depts-heading">
     <div class="flex items-center gap-3 mb-4">
         <div class="h-8 w-1 rounded-full bg-emerald-600" aria-hidden="true"></div>
@@ -180,16 +155,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
     <?php else: ?>
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             <?php foreach ($ucsAcademicDepts as $ucsDept): ?>
-                <?php
-                $ucsDeptIsActive = (int) $ucsDept['status'] === 1;
-                $ucsFacultyName  = '';
-                foreach ($ucsFaculties as $ucsF) {
-                    if ((int) $ucsF['id'] === (int) $ucsDept['faculty_id']) {
-                        $ucsFacultyName = (string) $ucsF['name'];
-                        break;
-                    }
-                }
-                ?>
+                <?php $ucsDeptIsActive = (int) $ucsDept['status'] === 1; ?>
                 <div class="group relative overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-gray-100 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
                     <div class="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-emerald-500 to-teal-500" aria-hidden="true"></div>
                     <div class="p-5">
@@ -201,9 +167,6 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                                         <?php echo $ucsDeptIsActive ? 'Active' : 'Inactive'; ?>
                                     </span>
                                 </div>
-                                <?php if ($ucsFacultyName !== ''): ?>
-                                    <p class="mt-1 text-[11px] text-emerald-600 font-medium"><?php echo htmlspecialchars($ucsFacultyName); ?></p>
-                                <?php endif; ?>
                                 <?php if (!empty($ucsDept['description'])): ?>
                                     <p class="mt-1.5 text-xs text-gray-500 line-clamp-2"><?php echo htmlspecialchars(mb_strimwidth($ucsDept['description'], 0, 120, '…')); ?></p>
                                 <?php endif; ?>
@@ -219,16 +182,16 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
     <?php endif; ?>
 </section>
 
-<!-- Administration Departments Section (Part 3) -->
-<section class="mt-8" aria-labelledby="admin-depts-heading">
+<!-- Administrative Units Section -->
+<section class="mt-8" aria-labelledby="admin-units-heading">
     <div class="flex items-center gap-3 mb-4">
         <div class="h-8 w-1 rounded-full bg-violet-600" aria-hidden="true"></div>
-        <h2 id="admin-depts-heading" class="text-lg font-bold text-slate-800">Administration Departments</h2>
-        <span class="inline-flex items-center rounded-full bg-violet-50 px-2.5 py-0.5 text-xs font-semibold text-violet-600 ring-1 ring-violet-200"><?php echo count($ucsAdminDepts); ?> departments</span>
+        <h2 id="admin-units-heading" class="text-lg font-bold text-slate-800">Administrative Units</h2>
+        <span class="inline-flex items-center rounded-full bg-violet-50 px-2.5 py-0.5 text-xs font-semibold text-violet-600 ring-1 ring-violet-200"><?php echo count($ucsAdminUnits); ?> units</span>
     </div>
 
-    <?php if (empty($ucsAdminDepts)): ?>
-        <p class="text-sm text-gray-400 italic">No administration departments found.</p>
+    <?php if (empty($ucsAdminUnits)): ?>
+        <p class="text-sm text-gray-400 italic">No administrative units found.</p>
     <?php else: ?>
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <?php
@@ -244,11 +207,11 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                 'Administration Department'  => '<rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>',
                 'Finance Department'         => '<line x1="12" y1="1" x2="12" y2="23"></line><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>',
             ];
-            foreach ($ucsAdminDepts as $ucsDept):
-                $ucsDeptName = (string) $ucsDept['name'];
-                $ucsColor = $ucsAdminColors[$ucsDeptName] ?? ['gradient' => 'from-gray-500 to-gray-600', 'borderColor' => '#6b7280'];
-                $ucsIcon  = $ucsAdminIcons[$ucsDeptName] ?? '<rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>';
-                $ucsDeptIsActive = (int) $ucsDept['status'] === 1;
+            foreach ($ucsAdminUnits as $ucsUnit):
+                $ucsUnitName = (string) $ucsUnit['name'];
+                $ucsColor = $ucsAdminColors[$ucsUnitName] ?? ['gradient' => 'from-gray-500 to-gray-600', 'borderColor' => '#6b7280'];
+                $ucsIcon  = $ucsAdminIcons[$ucsUnitName] ?? '<rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>';
+                $ucsUnitIsActive = (int) $ucsUnit['status'] === 1;
             ?>
                 <div class="group relative overflow-hidden rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200/60 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md" style="border-left: 4px solid <?php echo $ucsColor['borderColor']; ?>">
                     <div class="flex items-start justify-between gap-2">
@@ -260,17 +223,14 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                             </span>
                             <div class="min-w-0">
                                 <div class="flex items-center gap-2 flex-wrap">
-                                    <h3 class="text-sm font-bold text-slate-800"><?php echo htmlspecialchars($ucsDept['name']); ?></h3>
-                                    <span class="inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide <?php echo $ucsDeptIsActive ? 'bg-green-50 text-green-700 ring-1 ring-green-200' : 'bg-gray-100 text-gray-500 ring-1 ring-gray-200'; ?>">
-                                        <?php echo $ucsDeptIsActive ? 'Active' : 'Inactive'; ?>
+                                    <h3 class="text-sm font-bold text-slate-800"><?php echo htmlspecialchars($ucsUnit['name']); ?></h3>
+                                    <span class="inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide <?php echo $ucsUnitIsActive ? 'bg-green-50 text-green-700 ring-1 ring-green-200' : 'bg-gray-100 text-gray-500 ring-1 ring-gray-200'; ?>">
+                                        <?php echo $ucsUnitIsActive ? 'Active' : 'Inactive'; ?>
                                     </span>
                                 </div>
-                                <p class="mt-0.5 text-[11px] text-slate-400">Administration Department</p>
+                                <p class="mt-0.5 text-[11px] text-slate-400">Administrative Unit</p>
                             </div>
                         </div>
-                        <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/departments/edit.php?id=' . (int) $ucsDept['id']); ?>" class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none">
-                            Edit
-                        </a>
                     </div>
                 </div>
             <?php endforeach; ?>

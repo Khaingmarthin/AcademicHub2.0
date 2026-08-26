@@ -90,7 +90,7 @@ function ucs_admin_classrooms($pdo)
                     m.name AS major_name, ay.year_name AS academic_year,
                     ay.status AS academic_year_status
              FROM classrooms cl
-             JOIN majors m ON m.id = cl.major_id
+             LEFT JOIN majors m ON m.id = cl.major_id
              JOIN academic_years ay ON ay.id = cl.academic_year_id
              WHERE cl.status = 1
              ORDER BY (ay.status = 'Active') DESC, ay.start_date DESC, cl.year_level ASC, cl.section ASC"
@@ -118,7 +118,7 @@ function ucs_admin_active_year_classrooms($pdo)
             "SELECT cl.id, cl.classroom_name, cl.year_level, cl.section,
                     m.name AS major_name, ay.year_name AS academic_year
              FROM classrooms cl
-             JOIN majors m ON m.id = cl.major_id
+             LEFT JOIN majors m ON m.id = cl.major_id
              JOIN academic_years ay ON ay.id = cl.academic_year_id
              WHERE ay.status = 'Active' AND cl.status = 1
              ORDER BY cl.year_level ASC, (cl.section IS NULL) ASC, cl.section ASC, cl.classroom_name ASC"
@@ -172,6 +172,93 @@ function ucs_admin_faculties($pdo)
 }
 
 /**
+ * Active academic departments (independent units, no faculty FK).
+ *
+ * @param PDO $pdo Database connection.
+ * @return array List of ['id', 'name'] rows.
+ */
+function ucs_admin_academic_departments($pdo)
+{
+    try {
+        $ucsStmt = $pdo->query(
+            "SELECT id, name
+             FROM departments
+             WHERE status = 1
+             ORDER BY name ASC"
+        );
+        return $ucsStmt->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+/**
+ * Active teachers, alphabetically.
+ *
+ * @param PDO $pdo Database connection.
+ * @return array List of ['id', 'teacher_id', 'name'] rows.
+ */
+function ucs_admin_teachers($pdo)
+{
+    try {
+        $ucsStmt = $pdo->query(
+            "SELECT id, teacher_id, name
+             FROM teachers
+             WHERE status = 1
+             ORDER BY name ASC"
+        );
+        return $ucsStmt->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+/**
+ * Active courses for the currently Active academic year.
+ *
+ * @param PDO $pdo Database connection.
+ * @return array List of ['id', 'course_code', 'course_name', 'year_level', 'major_name'] rows.
+ */
+function ucs_admin_active_year_courses($pdo)
+{
+    try {
+        $ucsStmt = $pdo->query(
+            "SELECT c.id, c.course_code, c.course_name, c.year_level, m.name AS major_name
+             FROM courses c
+             JOIN academic_years ay ON ay.id = c.academic_year_id
+             LEFT JOIN majors m ON m.id = c.major_id
+             WHERE ay.status = 'Active' AND c.status = 1
+             ORDER BY c.year_level ASC, c.course_code ASC"
+        );
+        return $ucsStmt->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+/**
+ * All active courses, alphabetically by course code.
+ *
+ * @param PDO $pdo Database connection.
+ * @return array List of ['id', 'course_code', 'course_name', 'year_level', 'major_name'] rows.
+ */
+function ucs_admin_courses($pdo)
+{
+    try {
+        $ucsStmt = $pdo->query(
+            "SELECT c.id, c.course_code, c.course_name, c.year_level, m.name AS major_name
+             FROM courses c
+             LEFT JOIN majors m ON m.id = c.major_id
+             WHERE c.status = 1
+             ORDER BY c.course_code ASC"
+        );
+        return $ucsStmt->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+/**
  * All alumni profiles with a human-readable label for the story editor.
  *
  * Any graduate with an alumni profile can be featured in a story, so this
@@ -191,7 +278,7 @@ function ucs_admin_alumni_profiles($pdo)
              FROM alumni_profiles ap
              JOIN students s ON s.id = ap.student_id
              JOIN classrooms cl ON cl.id = s.classroom_id
-             JOIN majors m ON m.id = cl.major_id
+             LEFT JOIN majors m ON m.id = cl.major_id
              ORDER BY s.name ASC"
         );
         return $ucsStmt->fetchAll();

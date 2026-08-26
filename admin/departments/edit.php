@@ -5,19 +5,18 @@
 require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../includes/auth.php';
-require_once __DIR__ . '/../../includes/helpers/ucs-admin-lists.php';
 
 admin_require_login();
 
 $pageTitle    = 'Edit Department';
-$pageSubtitle = 'Update a department record.';
+$pageSubtitle = 'Update an academic department record.';
 $activeNav    = 'faculties-departments';
 
 $ucsId = filter_var($_GET['id'] ?? null, FILTER_VALIDATE_INT);
 
 try {
     $ucsStmt = $pdo->prepare(
-        "SELECT id, faculty_id, name, description, status FROM departments WHERE id = :id LIMIT 1"
+        "SELECT id, name, description, status FROM departments WHERE id = :id LIMIT 1"
     );
     $ucsStmt->execute([':id' => $ucsId]);
     $ucsDepartment = $ucsStmt->fetch() ?: null;
@@ -27,7 +26,7 @@ try {
 
 if ($ucsDepartment === null || $ucsId === false || $ucsId < 1) {
     $_SESSION['department_flash'] = ['type' => 'error', 'message' => 'Department not found.'];
-    header('Location: ' . ROOT_URL . '/admin/departments/index.php');
+    header('Location: ' . ROOT_URL . '/admin/faculties-departments/index.php');
     exit;
 }
 
@@ -38,13 +37,10 @@ $ucsOld = $_SESSION['department_old'] ?? null;
 unset($_SESSION['department_old']);
 
 $ucsForm = [
-    'faculty_id'  => $ucsOld['faculty_id'] ?? (int) $ucsDepartment['faculty_id'],
     'name'        => $ucsOld['name'] ?? $ucsDepartment['name'],
     'description' => $ucsOld['description'] ?? ($ucsDepartment['description'] ?? ''),
     'status'      => $ucsOld['status'] ?? (int) $ucsDepartment['status'],
 ];
-
-$ucsFaculties = ucs_admin_faculties($pdo);
 
 require_once __DIR__ . '/../../includes/admin-layout-top.php';
 ?>
@@ -63,7 +59,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
     <div class="rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
         <div class="border-b border-gray-100 px-6 py-5">
             <h2 class="text-base font-semibold text-gray-900">Edit Department</h2>
-            <p class="mt-1 text-sm text-gray-500">The description is optional and may include a short overview of the department.</p>
+            <p class="mt-1 text-sm text-gray-500">Academic departments are independent organizational units.</p>
         </div>
 
         <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/department-update.php'); ?>" novalidate>
@@ -72,22 +68,8 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
 
             <div class="space-y-6 px-6 py-6">
                 <div>
-                    <label for="faculty_id" class="block text-sm font-medium text-gray-700">Faculty <span class="text-red-500">*</span></label>
-                    <select id="faculty_id" name="faculty_id" required
-                            class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                        <option value="">Select a faculty…</option>
-                        <?php foreach ($ucsFaculties as $ucsFacultyOption): ?>
-                            <option value="<?php echo (int) $ucsFacultyOption['id']; ?>" <?php echo (int) $ucsForm['faculty_id'] === (int) $ucsFacultyOption['id'] ? 'selected' : ''; ?>>
-                                <?php echo htmlspecialchars($ucsFacultyOption['name']); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                    <p class="mt-1.5 text-xs text-gray-500">A department must belong to a faculty.</p>
-                </div>
-
-                <div>
                     <label for="name" class="block text-sm font-medium text-gray-700">Department Name <span class="text-red-500">*</span></label>
-                    <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($ucsForm['name']); ?>" placeholder="e.g. Student Affairs Department" required maxlength="255"
+                    <input type="text" id="name" name="name" value="<?php echo htmlspecialchars($ucsForm['name']); ?>" placeholder="e.g. Department of Natural Language" required maxlength="255"
                            class="mt-2 block w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                 </div>
 

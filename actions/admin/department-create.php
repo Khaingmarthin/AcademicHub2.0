@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../includes/helpers/department-validation.php';
 
 admin_require_login();
 
-$ucsReturnUrl = ROOT_URL . '/admin/departments/index.php';
+$ucsReturnUrl = ROOT_URL . '/admin/faculties-departments/index.php';
 $ucsFormUrl   = ROOT_URL . '/admin/departments/create.php';
 
 if (!admin_csrf_verify((string) ($_POST['csrf_token'] ?? ''))) {
@@ -31,11 +31,10 @@ if (!empty($ucsErrors)) {
 
 try {
     $ucsStmt = $pdo->prepare(
-        "INSERT INTO departments (faculty_id, name, description, status)
-         VALUES (:faculty_id, :name, :description, :status)"
+        "INSERT INTO departments (name, description, status)
+         VALUES (:name, :description, :status)"
     );
     $ucsStmt->execute([
-        ':faculty_id'  => $ucsClean['faculty_id'],
         ':name'        => $ucsClean['name'],
         ':description' => $ucsClean['description'],
         ':status'      => $ucsClean['status'],

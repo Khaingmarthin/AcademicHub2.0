@@ -6,6 +6,7 @@ require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../includes/auth.php';
 require_once __DIR__ . '/../../includes/helpers/student-validation.php';
+require_once __DIR__ . '/../../includes/helpers/classroom-validation.php';
 require_once __DIR__ . '/../../includes/helpers/ucs-admin-lists.php';
 
 admin_require_login();
@@ -63,6 +64,15 @@ $ucsClassrooms = ucs_admin_active_year_classrooms($pdo);
 
 $ucsCurrentClassroomId = (int) $ucsStudent['classroom_id'];
 $ucsInActiveYearList   = in_array($ucsCurrentClassroomId, array_map('intval', array_column($ucsClassrooms, 'id')), true);
+$ucsCurrentYearLevel   = '';
+if ($ucsInActiveYearList) {
+    foreach ($ucsClassrooms as $ucsCl) {
+        if ((int) $ucsCl['id'] === $ucsCurrentClassroomId) {
+            $ucsCurrentYearLevel = $ucsCl['year_level'];
+            break;
+        }
+    }
+}
 if (!$ucsInActiveYearList) {
     try {
         $ucsStmt = $pdo->prepare(
@@ -77,6 +87,7 @@ if (!$ucsInActiveYearList) {
         $ucsStmt->execute([':id' => $ucsCurrentClassroomId]);
         $ucsCurrentClassroom = $ucsStmt->fetch() ?: null;
         if ($ucsCurrentClassroom !== null) {
+            $ucsCurrentYearLevel = $ucsCurrentClassroom['year_level'];
             array_unshift($ucsClassrooms, $ucsCurrentClassroom);
         }
     } catch (PDOException $e) {
@@ -157,11 +168,22 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                            class="mt-2 block w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                 </div>
 
+                <div>
+                    <label for="password" class="block text-sm font-medium text-slate-700">New Password <span class="text-slate-400">(optional)</span></label>
+                    <input type="password" id="password" name="password" placeholder="Leave empty to keep current" minlength="8"
+                           class="mt-2 block w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                </div>
+
                 <div class="grid gap-6 sm:grid-cols-2">
                     <div>
-                        <label for="password" class="block text-sm font-medium text-slate-700">New Password <span class="text-slate-400">(optional)</span></label>
-                        <input type="password" id="password" name="password" placeholder="Leave empty to keep current" minlength="8"
-                               class="mt-2 block w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                        <label for="year_level" class="block text-sm font-medium text-slate-700">Year Level <span class="text-red-500">*</span></label>
+                        <select id="year_level" name="year_level" required
+                                class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
+                            <option value="">Select year level…</option>
+                            <?php foreach (CLASSROOM_YEAR_LEVELS as $ucsLevel): ?>
+                                <option value="<?php echo htmlspecialchars($ucsLevel); ?>" <?php echo $ucsCurrentYearLevel === $ucsLevel ? 'selected' : ''; ?>><?php echo htmlspecialchars($ucsLevel); ?></option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div>
                         <label for="classroom_id" class="block text-sm font-medium text-slate-700">Classroom / Section <span class="text-red-500">*</span></label>
@@ -209,4 +231,48 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
         </form>
     </div>
 </div>
+<script>
+(function () {
+    var yearSelect = document.getElementById('year_level');
+    var classSelect = document.getElementById('classroom_id');
+    if (!yearSelect || !classSelect) return;
+
+    var classrooms = <?php echo json_encode(array_map(function ($c) {
+        return [
+            'id'    => (int) $c['id'],
+            'label' => $c['classroom_name'] . ' — ' . $c['major_name'],
+            'year'  => $c['year_level'],
+        ];
+    }, $ucsClassrooms), JSON_HEX_TAG | JSON_HEX_AMP); ?>;
+
+    var placeholder = { id: '', label: 'Select a classroom\u2026', year: '' };
+
+    function buildOptions(selectedYear, keepVal) {
+        classSelect.innerHTML = '';
+        var ph = document.createElement('option');
+        ph.value = placeholder.id;
+        ph.textContent = placeholder.label;
+        classSelect.appendChild(ph);
+
+        classrooms.forEach(function (c) {
+            if (!selectedYear || c.year === selectedYear) {
+                var opt = document.createElement('option');
+                opt.value = c.id;
+                opt.textContent = c.label;
+                if (keepVal && String(c.id) === String(keepVal)) {
+                    opt.selected = true;
+                }
+                classSelect.appendChild(opt);
+            }
+        });
+    }
+
+    buildOptions(yearSelect.value.trim(), classSelect.value);
+
+    yearSelect.addEventListener('change', function () {
+        var prev = classSelect.value;
+        buildOptions(this.value.trim(), prev);
+    });
+})();
+</script>
 <?php require_once __DIR__ . '/../../includes/admin-layout-bottom.php'; ?>

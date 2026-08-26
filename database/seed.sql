@@ -88,46 +88,43 @@ VALUES
 );
 
 INSERT INTO departments
-(faculty_id, name, description, status)
+(name, description, status)
 VALUES
 (
-    1,
     'Information Technology and Systems Management (ITSM) Department',
     'The Information Technology and Systems Management Department is committed to providing quality and innovative education that promotes positive change, peace, and sustainable progress. It strives to build a knowledgeable, forward-thinking, and globally competitive community while empowering students to reach their full potential. Through a holistic education system, the department prepares graduates to contribute responsibly to national development and create a peaceful and sustainable society.',
     TRUE
 ),
 (
-    1,
     'Department of Natural Language (Myanmar and English)',
     'The Department of Natural Language (Myanmar and English) is committed to developing students'' communication skills in both Myanmar and English while preparing them for academic and professional success. The department emphasizes English language proficiency through IELTS-based learning, helping students strengthen their reading, writing, listening, and speaking skills. It also enhances students'' academic vocabulary and language accuracy, enabling them to pursue higher education, especially in IT and computing, and communicate effectively in a global environment.',
     TRUE
 ),
 (
-    2,
+    'Department of Natural Science (Physics)',
+    'The Department of Natural Science (Physics) is dedicated to providing quality education that connects theoretical knowledge with practical applications. It emphasizes hands-on learning through experiments, tutorials, and project-based activities to strengthen students'' scientific understanding and problem-solving skills. The department aims to develop competent graduates with strong analytical abilities, practical experience, and the knowledge needed to contribute effectively to science, engineering, and technological advancement.',
+    TRUE
+);
+
+INSERT INTO administrative_units
+(name, description, status)
+VALUES
+(
     'Library',
     'The University Library provides students, faculty members, and researchers with access to quality academic resources and learning facilities. It offers a wide collection of books, journals, reference materials, and digital resources to support teaching, learning, and research. The library encourages lifelong learning, independent study, and academic excellence by creating a quiet, resourceful, and welcoming environment for the university community.',
     TRUE
 ),
 (
-    2,
     'Finance Department',
     'The Finance Department is responsible for managing the university''s financial resources efficiently and transparently. It oversees budgeting, accounting, procurement, and financial administration to ensure the smooth operation of academic and administrative activities. The department supports students, faculty, and staff by maintaining sound financial practices and contributing to the sustainable development of the university.',
     TRUE
 ),
 (
-    3,
-    'Department of Natural Science (Physics)',
-    'The Department of Natural Science (Physics) is dedicated to providing quality education that connects theoretical knowledge with practical applications. It emphasizes hands-on learning through experiments, tutorials, and project-based activities to strengthen students'' scientific understanding and problem-solving skills. The department aims to develop competent graduates with strong analytical abilities, practical experience, and the knowledge needed to contribute effectively to science, engineering, and technological advancement.',
-    TRUE
-),
-(
-    4,
     'Administration Department',
     'The Administration Department is responsible for ensuring the efficient operation and effective management of the university''s administrative services. It supports teaching, research, and student affairs by providing quality administrative assistance, maintaining transparent policies, and coordinating essential university operations. Through a service-oriented approach, the department works closely with students, faculty, staff, parents, and other stakeholders to create a well-organized, supportive, and productive academic environment.',
     TRUE
 ),
 (
-    4,
     'Student Affairs Department',
     'The Student Affairs Department is committed to supporting students throughout their academic journey by promoting their personal, academic, and social development. The department manages student registration, welfare services, extracurricular activities, scholarships, and campus events while fostering a safe, inclusive, and disciplined learning environment. It serves as a bridge between students and the university administration to enhance the overall student experience.',
     TRUE
@@ -175,14 +172,6 @@ VALUES
     'B.C.Tech.',
     'An undergraduate major focusing on computer technology, systems and practical computing applications.',
     TRUE
-),
-(
-    NULL,
-    'Computer Science & Technology',
-    'CST',
-    'Common Major',
-    'Common major for first-year students before they specialize in Computer Science or Computer Technology',
-    TRUE
 );
 INSERT INTO courses
 (
@@ -197,10 +186,13 @@ INSERT INTO courses
     status
 )
 VALUES
+-- =========================================================
+-- FIRST YEAR (CS)
+-- =========================================================
 (
-    1, 3,
-    'M-1201',
-    'Myanmar',
+    2, NULL,
+    'E-1101',
+    'English Proficiency I',
     'First Year',
     NULL,
     NULL,
@@ -208,9 +200,9 @@ VALUES
     TRUE
 ),
 (
-    1, 3,
-    'E-1201',
-    'English Proficiency II',
+    2, NULL,
+    'CST-1102',
+    'Introduction to Computer Science',
     'First Year',
     NULL,
     NULL,
@@ -218,18 +210,8 @@ VALUES
     TRUE
 ),
 (
-    1, 3,
-    'P-1201',
-    'Physics',
-    'First Year',
-    NULL,
-    NULL,
-    NULL,
-    TRUE
-),
-(
-    1, 3,
-    'CST-1241',
+    2, NULL,
+    'CST-1103',
     'Discrete Mathematics',
     'First Year',
     NULL,
@@ -238,9 +220,9 @@ VALUES
     TRUE
 ),
 (
-    1, 3,
-    'CST-1212',
-    'Programming Logic and Design (Programming in C++)',
+    2, NULL,
+    'CST-1104',
+    'Programming Fundamentals',
     'First Year',
     NULL,
     NULL,
@@ -248,9 +230,9 @@ VALUES
     TRUE
 ),
 (
-    1, 3,
-    'CST-1223',
-    'Database Fundamentals',
+    2, NULL,
+    'CST-1105',
+    'Digital Electronics',
     'First Year',
     NULL,
     NULL,
@@ -258,30 +240,73 @@ VALUES
     TRUE
 ),
 (
-    1, 3,
-    'CST-1234',
-    'Digital and Logic Design',
+    2, NULL,
+    'M-1106',
+    'Calculus and Analytical Geometry',
     'First Year',
     NULL,
     NULL,
     NULL,
     TRUE
-);
-INSERT INTO courses
+),
+-- =========================================================
+-- FIRST YEAR (CT)
+-- =========================================================
 (
-    academic_year_id,
-    major_id,
-    course_code,
-    course_name,
-    year_level,
-    semester,
-    credit_hours,
-    description,
-    status
-)
-VALUES
+    2, NULL,
+    'E-1101',
+    'English Proficiency I',
+    'First Year',
+    NULL,
+    NULL,
+    NULL,
+    TRUE
+),
 (
-    1, 1,
+    2, NULL,
+    'CT-1102',
+    'Introduction to Computer Technology',
+    'First Year',
+    NULL,
+    NULL,
+    NULL,
+    TRUE
+),
+(
+    2, NULL,
+    'CT-1103',
+    'Basic Mathematics',
+    'First Year',
+    NULL,
+    NULL,
+    NULL,
+    TRUE
+),
+(
+    2, NULL,
+    'CT-1104',
+    'Programming Basics',
+    'First Year',
+    NULL,
+    NULL,
+    NULL,
+    TRUE
+),
+(
+    2, NULL,
+    'CT-1105',
+    'Computer Hardware Fundamentals',
+    'First Year',
+    NULL,
+    NULL,
+    NULL,
+    TRUE
+),
+-- =========================================================
+-- SECOND YEAR (CS)
+-- =========================================================
+(
+    2, 1,
     'E-2201',
     'English Proficiency IV',
     'Second Year',
@@ -356,7 +381,7 @@ VALUES
 -- =========================================================
 
 (
-    1, 2,
+    2, 2,
     'E-2201',
     'English Proficiency IV',
     'Second Year',
@@ -366,7 +391,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-2241',
     'Differential Equations and Numerical Analysis',
     'Second Year',
@@ -376,7 +401,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-2212',
     'Artificial Intelligence',
     'Second Year',
@@ -386,7 +411,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-2213',
     'Operating Systems',
     'Second Year',
@@ -396,7 +421,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-2224',
     'Software Analysis and Design',
     'Second Year',
@@ -406,7 +431,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-2235',
     'Data Communication and Networking',
     'Second Year',
@@ -416,7 +441,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CT-2236',
     'Circuits and Electronics',
     'Second Year',
@@ -431,7 +456,7 @@ VALUES
 -- =========================================================
 
 (
-    1, 1,
+    2, 1,
     'CST-3211',
     'Operating Systems',
     'Third Year',
@@ -441,7 +466,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-3242',
     'Probability and Statistics',
     'Third Year',
@@ -451,7 +476,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-3213',
     'Professional Ethics',
     'Third Year',
@@ -461,7 +486,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CS-3224',
     'Software Quality Assurance and Testing',
     'Third Year',
@@ -471,7 +496,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-3235',
     'Computer Networks I',
     'Third Year',
@@ -481,7 +506,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-3256',
     'Human Computer Interaction',
     'Third Year',
@@ -491,7 +516,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-3257(SS)',
     'Supporting Skill IV - Applied Database and Application (ADO.Net, C#)',
     'Third Year',
@@ -506,7 +531,7 @@ VALUES
 -- =========================================================
 
 (
-    1, 2,
+    2, 2,
     'CST-3211',
     'Operating Systems',
     'Third Year',
@@ -516,7 +541,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-3242',
     'Probability and Statistics',
     'Third Year',
@@ -526,7 +551,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-3213',
     'Professional Ethics',
     'Third Year',
@@ -536,7 +561,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CT-3234',
     'Computer Architecture and Organization II',
     'Third Year',
@@ -546,7 +571,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-3235',
     'Computer Networks I',
     'Third Year',
@@ -556,7 +581,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-3256',
     'Human Computer Interaction',
     'Third Year',
@@ -566,7 +591,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-3257(SS)',
     'Supporting Skill IV - Applied Database and Application (ADO.Net, C#)',
     'Third Year',
@@ -581,7 +606,7 @@ VALUES
 -- =========================================================
 
 (
-    1, 1,
+    2, 1,
     'CST-4211',
     'Distributed and Parallel Computing',
     'Fourth Year',
@@ -591,7 +616,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-4242',
     'Modeling and Simulations',
     'Fourth Year',
@@ -601,7 +626,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CS-4223',
     'Object-Oriented Design and Development',
     'Fourth Year',
@@ -611,7 +636,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CS-4214(Elective I A)',
     'Advanced Artificial Intelligence (Knowledge Representation and Management, Machine Learning with Python)',
     'Fourth Year',
@@ -621,7 +646,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CS-4225(Elective II A)',
     'Advanced Database System',
     'Fourth Year',
@@ -631,7 +656,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CS-4216(Elective III A)',
     'Strategic for Emerging Technologies (Cloud Computing)',
     'Fourth Year',
@@ -641,7 +666,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-4257(Elective IV A)',
     'Business Information System (Digital Business and e-Commerce)',
     'Fourth Year',
@@ -656,7 +681,7 @@ VALUES
 -- =========================================================
 
 (
-    1, 2,
+    2, 2,
     'CST-4211',
     'Distributed and Parallel Computing',
     'Fourth Year',
@@ -666,7 +691,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-4242',
     'Modeling and Simulations',
     'Fourth Year',
@@ -676,7 +701,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CT-4233',
     'Cryptography and Network Security',
     'Fourth Year',
@@ -686,7 +711,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CT-4234',
     'Embedded Systems Integrating IoT',
     'Fourth Year',
@@ -696,7 +721,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CT-4235(Elective I)',
     'Signals and Systems',
     'Fourth Year',
@@ -706,7 +731,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CT-4236(Elective II)',
     'Cyber Security and Ethical Hacking',
     'Fourth Year',
@@ -716,7 +741,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-4257(Elective III)',
     'Business Information System (Digital Business and e-Commerce)',
     'Fourth Year',
@@ -731,7 +756,7 @@ VALUES
 -- =========================================================
 
 (
-    1, 1,
+    2, 1,
     'E-5101',
     'Communication in Business English',
     'Fifth Year',
@@ -741,7 +766,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CS-5121',
     'Cyber Security and Digital Forensics',
     'Fifth Year',
@@ -751,7 +776,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CS-5112(Elective I B)',
     'Natural Language Processing',
     'Fifth Year',
@@ -761,7 +786,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-5123 A(Elective II B)',
     'Data Science Fundamental',
     'Fifth Year',
@@ -771,7 +796,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-5123 B(Elective II B)',
     'Data Analytic and Mining',
     'Fifth Year',
@@ -781,7 +806,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CS-5114(Elective III B)',
     'Strategies for Emerging Technology (Virtualization, Blockchain, Cloud Security and Internet of Things)',
     'Fifth Year',
@@ -791,7 +816,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-5155(Elective IV B)',
     'Business Information System (Enterprise Resource Planning (ERP))',
     'Fifth Year',
@@ -806,7 +831,7 @@ VALUES
 -- =========================================================
 
 (
-    1, 2,
+    2, 2,
     'E-5101',
     'Communication in Business English',
     'Fifth Year',
@@ -816,7 +841,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CT-5131',
     'Digital Forensics',
     'Fifth Year',
@@ -826,7 +851,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CT-5132',
     'Advanced Networking',
     'Fifth Year',
@@ -836,7 +861,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-5123 A(Elective)',
     'Data Science Fundamental',
     'Fifth Year',
@@ -846,7 +871,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-5123 B(Elective)',
     'Data Analytic and Mining',
     'Fifth Year',
@@ -856,7 +881,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CT-5134(Elective)',
     'Digital Signal Processing',
     'Fifth Year',
@@ -866,7 +891,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CST-5155(Elective)',
     'Business Information System (Enterprise Resource Planning (ERP))',
     'Fifth Year',
@@ -876,7 +901,7 @@ VALUES
     TRUE
 ),
 (
-    1, 2,
+    2, 2,
     'CT-5136(Elective)',
     'Image Processing and Computer Vision',
     'Fifth Year',
@@ -888,6 +913,7 @@ VALUES
 
 INSERT INTO classrooms
 (
+    id,
     academic_year_id,
     major_id,
     year_level,
@@ -897,160 +923,44 @@ INSERT INTO classrooms
 )
 VALUES
 -- =========================================================
--- FIRST YEAR - COMMON (NO MAJOR)
+-- ACADEMIC YEAR 2025-2026 (id=2) — ACTIVE
 -- =========================================================
-(
-    1,
-    3,
-    'First Year',
-    'A',
-    'First Year (A)',
-    TRUE
-),
-(
-    1,
-    3,
-    'First Year',
-    'B',
-    'First Year (B)',
-    TRUE
-),
-(
-    1,
-    3,
-    'First Year',
-    'C',
-    'First Year (C)',
-    TRUE
-),
 
--- =========================================================
+-- FIRST YEAR - COMMON (CS&T)
+( 1,  2, NULL, 'First Year',    'A', 'First Year (A)',        TRUE),
+( 2,  2, NULL, 'First Year',    'B', 'First Year (B)',        TRUE),
+( 3,  2, NULL, 'First Year',    'C', 'First Year (C)',        TRUE),
+
+-- FIRST YEAR - COMPUTER SCIENCE
+(32,  2, 1, 'First Year',    'D', 'First Year (D)',        TRUE),
+
 -- SECOND YEAR - COMPUTER SCIENCE
--- =========================================================
-(
-    1,
-    1,
-    'Second Year',
-    'A',
-    'Second Year CS (A)',
-    TRUE
-),
-(
-    1,
-    1,
-    'Second Year',
-    'B',
-    'Second Year CS (B)',
-    TRUE
-),
+( 4,  2, 1, 'Second Year',   'A', 'Second Year CS (A)',    TRUE),
+( 5,  2, 1, 'Second Year',   'B', 'Second Year CS (B)',    TRUE),
 
--- =========================================================
 -- SECOND YEAR - COMPUTER TECHNOLOGY
--- =========================================================
-(
-    1,
-    2,
-    'Second Year',
-    NULL,
-    'Second Year CT',
-    TRUE
-),
+( 6,  2, 2, 'Second Year',   NULL, 'Second Year CT',        TRUE),
 
--- =========================================================
 -- THIRD YEAR - COMPUTER SCIENCE
--- =========================================================
-(
-    1,
-    1,
-    'Third Year',
-    'A',
-    'Third Year CS (A)',
-    TRUE
-),
-(
-    1,
-    1,
-    'Third Year',
-    'B',
-    'Third Year CS (B)',
-    TRUE
-),
+( 7,  2, 1, 'Third Year',    'A', 'Third Year CS (A)',     TRUE),
+( 8,  2, 1, 'Third Year',    'B', 'Third Year CS (B)',     TRUE),
 
--- =========================================================
 -- THIRD YEAR - COMPUTER TECHNOLOGY
--- =========================================================
-(
-    1,
-    2,
-    'Third Year',
-    NULL,
-    'Third Year CT',
-    TRUE
-),
+( 9,  2, 2, 'Third Year',    NULL, 'Third Year CT',         TRUE),
 
--- =========================================================
 -- FOURTH YEAR - COMPUTER SCIENCE
--- =========================================================
-(
-    1,
-    1,
-    'Fourth Year',
-    'A',
-    'Fourth Year CS (A)',
-    TRUE
-),
-(
-    1,
-    1,
-    'Fourth Year',
-    'B',
-    'Fourth Year CS (B)',
-    TRUE
-),
+(10,  2, 1, 'Fourth Year',   'A', 'Fourth Year CS (A)',    TRUE),
+(11,  2, 1, 'Fourth Year',   'B', 'Fourth Year CS (B)',    TRUE),
 
--- =========================================================
 -- FOURTH YEAR - COMPUTER TECHNOLOGY
--- =========================================================
-(
-    1,
-    2,
-    'Fourth Year',
-    NULL,
-    'Fourth Year CT',
-    TRUE
-),
+(12,  2, 2, 'Fourth Year',   NULL, 'Fourth Year CT',        TRUE),
 
--- =========================================================
 -- FIFTH YEAR - COMPUTER SCIENCE
--- =========================================================
-(
-    1,
-    1,
-    'Fifth Year',
-    'A',
-    'Fifth Year CS (A)',
-    TRUE
-),
-(
-    1,
-    1,
-    'Fifth Year',
-    'B',
-    'Fifth Year CS (B)',
-    TRUE
-),
+(13,  2, 1, 'Fifth Year',    'A', 'Fifth Year CS (A)',     TRUE),
+(14,  2, 1, 'Fifth Year',    'B', 'Fifth Year CS (B)',     TRUE),
 
--- =========================================================
 -- FIFTH YEAR - COMPUTER TECHNOLOGY
--- =========================================================
-(
-    1,
-    2,
-    'Fifth Year',
-    NULL,
-    'Fifth Year CT',
-    TRUE
-);
+(15,  2, 2, 'Fifth Year',    NULL, 'Fifth Year CT',         TRUE);
 
 INSERT INTO timetables
 (
@@ -1519,8 +1429,67 @@ INSERT INTO news_targets
 VALUES
 (
     5,
-    1,
+    2,
     1,
     'Third Year',
    'A'
 );
+
+INSERT INTO teachers
+(teacher_id, name, email, phone, faculty_id, department_id, specialization, status)
+VALUES
+(
+    'T-001',
+    'Dr. Aung Aung',
+    'aung.aung@ucsmtla.edu.mm',
+    '09-123 456 001',
+    1, NULL,
+    'Artificial Intelligence',
+    TRUE
+),
+(
+    'T-002',
+    'Daw Su Su',
+    'su.su@ucsmtla.edu.mm',
+    '09-123 456 002',
+    NULL, 1,
+    'Information Technology',
+    TRUE
+),
+(
+    'T-003',
+    'Dr. Myo Myo',
+    'myo.myo@ucsmtla.edu.mm',
+    '09-123 456 003',
+    2, NULL,
+    'Library Science',
+    TRUE
+),
+(
+    'T-004',
+    'U Kyaw Kyaw',
+    'kyaw.kyaw@ucsmtla.edu.mm',
+    '09-123 456 004',
+    NULL, 2,
+    'Natural Language Processing',
+    TRUE
+),
+(
+    'T-005',
+    'Daw Thin Thin',
+    'thin.thin@ucsmtla.edu.mm',
+    '09-123 456 005',
+    1, NULL,
+    'Software Engineering',
+    TRUE
+);
+
+INSERT INTO teacher_course_assignments
+(teacher_id, course_id, classroom_id, semester)
+VALUES
+(1, (SELECT id FROM courses WHERE course_code = 'CST-2212' AND academic_year_id = 2 LIMIT 1),
+ (SELECT id FROM classrooms WHERE id = 4 LIMIT 1),
+ 'First Semester'),
+(2, (SELECT id FROM courses WHERE course_code = 'E-2201' AND academic_year_id = 2 AND major_id = 1 LIMIT 1),
+ (SELECT id FROM classrooms WHERE id = 4 LIMIT 1),
+ 'First Semester');

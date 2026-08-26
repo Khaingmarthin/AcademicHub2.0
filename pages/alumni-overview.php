@@ -175,7 +175,7 @@ require_once '../includes/header.php';
                         <div class="min-w-0 flex-1">
                             <h3 class="text-base font-semibold tracking-tight text-slate-900 group-hover:text-blue-700">Career Discussions</h3>
                             <p class="mt-1 text-sm leading-relaxed text-slate-500">
-                                Ask career questions and get advice from students and verified alumni.
+                                Browse career discussions started by verified alumni and join the conversation.
                             </p>
                             <span class="mt-2.5 inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600">
                                 Join the conversation
@@ -198,7 +198,7 @@ require_once '../includes/header.php';
                     </span>
                     <h2 id="alumni-overview-cta-heading" class="mt-5 text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">Welcome back, alumnus</h2>
                     <p class="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-600">
-                        Manage your profile, share your story, and participate in career discussions from your alumni dashboard.
+                        Manage your profile, share your story, and start career discussions from your alumni dashboard.
                     </p>
                     <div class="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
                         <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-colors duration-150 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
@@ -219,14 +219,14 @@ require_once '../includes/header.php';
                     </span>
                     <h2 id="alumni-overview-student-cta-heading" class="mt-5 text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">Students, get involved</h2>
                     <p class="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-600">
-                        Browse alumni profiles, ask career questions, and share your experience — all without leaving the community.
+                        Browse alumni profiles, read career discussions, and join the conversation — all without leaving the community.
                     </p>
                     <div class="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
                         <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-colors duration-150 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                             Browse Career Discussions
                         </a>
-                        <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussion-create.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                            Ask a Career Question
+                        <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                            Browse Alumni
                         </a>
                     </div>
                 </div>
@@ -242,7 +242,7 @@ require_once '../includes/header.php';
                     </span>
                     <h2 id="alumni-overview-guest-cta-heading" class="mt-5 text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">Join the community</h2>
                     <p class="mx-auto mt-3 max-w-xl text-sm leading-relaxed text-slate-600">
-                        Log in to ask career questions and share your experience as a verified UCSMTLA alumnus.
+                        Log in to join career discussions, reply to alumni insights and connect with the UCSMTLA community.
                     </p>
                     <div class="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
                         <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-colors duration-150 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">

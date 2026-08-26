@@ -1,6 +1,6 @@
 <?php
 /**
- * Public "Ask a Career Question" page.
+ * Public "Start a Career Discussion" page.
  *
  * Logged-in students (including verified alumni) start a new career
  * discussion. Guests are redirected to Student Login. The form posts to
@@ -15,7 +15,7 @@ student_require_login();
 
 $ucsUser = student_current_user();
 
-$pageTitle = 'Ask a Career Question';
+$pageTitle = 'Start a Career Discussion';
 
 $ucsErrors = $_SESSION['discussion_errors'] ?? [];
 unset($_SESSION['discussion_errors']);
@@ -56,7 +56,7 @@ require_once '../includes/header.php';
                 <li aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></li>
                 <li><a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="font-medium text-slate-600 transition-colors hover:text-blue-600">Career Discussions</a></li>
                 <li aria-hidden="true"><svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-slate-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg></li>
-                <li aria-current="page" class="font-semibold text-slate-900">Ask a Question</li>
+                <li aria-current="page" class="font-semibold text-slate-900">Start a Discussion</li>
             </ol>
         </div>
     </nav>
@@ -67,11 +67,11 @@ require_once '../includes/header.php';
         <div class="relative z-10 mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 sm:py-20 lg:py-24">
             <div class="hero-fade-up">
                 <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-300">Career Discussions</p>
-                <h1 id="career-discussion-create-heading" class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">Ask a Career Question</h1>
+                <h1 id="career-discussion-create-heading" class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl lg:text-5xl">Start a Career Discussion</h1>
                 <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-200 sm:text-lg sm:leading-8">
                     <?php echo $ucsIsAlumni
-                        ? 'Share your experience or start a topic for current students.'
-                        : 'Ask the UCSMTLA community and get advice from verified alumni in your field.'; ?>
+                        ? 'Share your career experience, offer advice, or start a topic that helps current students navigate their professional journey.'
+                        : 'Browse discussions started by verified alumni and join the conversation with your questions and insights.'; ?>
                 </p>
             </div>
         </div>
@@ -81,9 +81,9 @@ require_once '../includes/header.php';
     <section class="bg-slate-50 py-16 sm:py-20" aria-labelledby="career-discussion-form-heading">
         <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
             <div class="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-10">
-                <h2 id="career-discussion-form-heading" class="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">Your question</h2>
+                <h2 id="career-discussion-form-heading" class="text-xl font-extrabold tracking-tight text-slate-900 sm:text-2xl">Your discussion topic</h2>
                 <p class="mt-2 text-sm leading-6 text-slate-500">
-                    Write a clear, specific question so alumni can give you the most useful answer. Remember this is a public, moderated community — please keep it respectful.
+                    Share career advice, lessons from your professional journey, or a topic that would benefit current students. Remember this is a public, moderated community — please keep it respectful.
                 </p>
 
                 <?php if (!empty($ucsErrors)): ?>
@@ -113,28 +113,38 @@ require_once '../includes/header.php';
                     </div>
 
                     <div>
-                        <label for="title" class="block text-sm font-semibold text-slate-700">Question title</label>
-                        <input type="text" id="title" name="title" value="<?php echo htmlspecialchars((string) ($ucsOld['title'] ?? '')); ?>" required maxlength="255" placeholder="e.g. How should I prepare for my first software developer interview?"
+                        <label for="title" class="block text-sm font-semibold text-slate-700">Discussion title</label>
+                        <input type="text" id="title" name="title" value="<?php echo htmlspecialchars((string) ($ucsOld['title'] ?? '')); ?>" required maxlength="255" placeholder="e.g. How I landed my first software developer role after graduation"
                                class="mt-2 block w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                     </div>
 
                     <div>
                         <label for="content" class="block text-sm font-semibold text-slate-700">Description</label>
-                        <textarea id="content" name="content" rows="7" required placeholder="Share the details — what you have tried, what you are unsure about, and what kind of advice you would find most useful."
+                        <textarea id="content" name="content" rows="7" required placeholder="Share the details — your background, what worked for you, lessons learned, and what advice you would give to students starting out."
                                   class="mt-2 block w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100"><?php echo htmlspecialchars((string) ($ucsOld['content'] ?? '')); ?></textarea>
                     </div>
 
                     <div class="flex flex-col gap-3 border-t border-slate-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
-                        <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50">
-                            Cancel
-                        </a>
+                        <div class="flex items-center gap-3">
+                            <?php if ($ucsIsAlumni): ?>
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                                    </svg>
+                                    Back to Dashboard
+                                </a>
+                            <?php endif; ?>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50">
+                                Cancel
+                            </a>
+                        </div>
                         <button type="submit"
                                 class="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M12 20h9"></path>
                                 <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
                             </svg>
-                            Post Question
+                            Post Discussion
                         </button>
                     </div>
                 </form>

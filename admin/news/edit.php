@@ -197,7 +197,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                                         <select name="target_classroom_id[]" class="block w-full rounded-lg border border-gray-300 bg-white px-3 py-2 text-sm text-gray-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                                             <option value="">Any classroom</option>
                                             <?php foreach ($ucsClassrooms as $ucsCl): ?>
-                                                <option value="<?php echo (int) $ucsCl['id']; ?>"><?php echo htmlspecialchars($ucsCl['class_name']); ?> (<?php echo htmlspecialchars($ucsCl['year_level']); ?> - <?php echo htmlspecialchars($ucsCl['section']); ?>)</option>
+                                                <option value="<?php echo (int) $ucsCl['id']; ?>"><?php echo htmlspecialchars($ucsCl['classroom_name'] . ' — ' . $ucsCl['major_name']); ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </div>
@@ -305,7 +305,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
     function classroomOptions(selected) {
         var html = '<option value="">Any classroom</option>';
         classrooms.forEach(function (cl) {
-            html += '<option value="' + cl.id + '"' + (String(selected) === String(cl.id) ? ' selected' : '') + '>' + cl.class_name + ' (' + cl.year_level + ' - ' + cl.section + ')</option>';
+            html += '<option value="' + cl.id + '"' + (String(selected) === String(cl.id) ? ' selected' : '') + '>' + cl.classroom_name + ' \u2014 ' + cl.major_name + '</option>';
         });
         return html;
     }

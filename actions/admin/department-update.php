@@ -9,7 +9,7 @@ require_once __DIR__ . '/../../includes/helpers/department-validation.php';
 
 admin_require_login();
 
-$ucsReturnUrl = ROOT_URL . '/admin/departments/index.php';
+$ucsReturnUrl = ROOT_URL . '/admin/faculties-departments/index.php';
 
 if (!admin_csrf_verify((string) ($_POST['csrf_token'] ?? ''))) {
     department_flash('error', 'Your session has expired. Please try again.');
@@ -49,14 +49,12 @@ if (!empty($ucsErrors)) {
 try {
     $ucsStmt = $pdo->prepare(
         "UPDATE departments
-         SET faculty_id = :faculty_id,
-             name = :name,
+         SET name = :name,
              description = :description,
              status = :status
          WHERE id = :id"
     );
     $ucsStmt->execute([
-        ':faculty_id'  => $ucsClean['faculty_id'],
         ':name'        => $ucsClean['name'],
         ':description' => $ucsClean['description'],
         ':status'      => $ucsClean['status'],

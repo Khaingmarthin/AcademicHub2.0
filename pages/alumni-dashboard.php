@@ -244,6 +244,28 @@ try {
     $ucsLatestStories = [];
 }
 
+// ---------------------------------------------------------------------
+// My discussions list.
+// ---------------------------------------------------------------------
+$ucsMyDiscussions = [];
+try {
+    $ucsStmt = $pdo->prepare(
+        "SELECT d.id, d.title, d.status, d.is_pinned, d.created_at,
+                c.name AS category_name,
+                (SELECT COUNT(*) FROM discussion_replies r
+                 WHERE r.discussion_id = d.id AND r.status = 'visible') AS reply_count
+         FROM discussions d
+         JOIN discussion_categories c ON c.id = d.category_id
+         WHERE d.author_student_id = :student_id AND d.status <> 'hidden'
+         ORDER BY d.is_pinned DESC, d.created_at DESC
+         LIMIT 20"
+    );
+    $ucsStmt->execute([':student_id' => (int) $ucsStudent['id']]);
+    $ucsMyDiscussions = $ucsStmt->fetchAll() ?: [];
+} catch (PDOException $e) {
+    $ucsMyDiscussions = [];
+}
+
 $ucsDisplayName = $ucsStudent['name'] !== '' ? $ucsStudent['name'] : 'Alumnus';
 
 require_once __DIR__ . '/../includes/header.php';
@@ -399,21 +421,94 @@ require_once __DIR__ . '/../includes/header.php';
                             <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600 ring-4 ring-blue-100" aria-hidden="true"></span>
                             <h2 id="my-discussions-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-900">My Discussions</h2>
                             <span class="h-px flex-1 bg-blue-100" aria-hidden="true"></span>
-                            <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="shrink-0 text-xs font-semibold text-blue-700 transition-colors duration-150 hover:text-blue-800">Browse</a>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="shrink-0 text-xs font-semibold text-blue-700 transition-colors duration-150 hover:text-blue-800">Browse all</a>
                         </div>
 
-                        <div class="mt-4 rounded-lg border border-blue-100 bg-white p-6 shadow-sm">
-                            <p class="text-sm leading-6 text-slate-600">
-                                You have started
-                                <span class="font-bold text-slate-900"><?php echo $ucsDiscussionCount; ?></span>
-                                career discussion<?php echo $ucsDiscussionCount === 1 ? '' : 's'; ?>.
-                                Share your industry experience with students and fellow alumni.
-                            </p>
-                            <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussion-create.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
-                                Start a discussion
-                            </a>
-                        </div>
+                        <?php if (empty($ucsMyDiscussions)): ?>
+                            <div class="mt-4 rounded-lg border border-blue-100 bg-white p-8 text-center shadow-sm">
+                                <span class="mx-auto inline-flex h-12 w-12 items-center justify-center rounded-xl bg-violet-50 text-violet-500 ring-1 ring-violet-100" aria-hidden="true">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                </span>
+                                <p class="mt-3 text-sm font-medium text-slate-700">No discussions yet</p>
+                                <p class="mt-1 text-sm text-slate-500">Start a career discussion to share your experience.</p>
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussion-create.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                                    Start a discussion
+                                </a>
+                            </div>
+                        <?php else: ?>
+                            <div class="mt-4 space-y-3">
+                                <?php foreach ($ucsMyDiscussions as $ucsMyDisc): ?>
+                                    <?php
+                                    $ucsMyDiscUrl = BASE_URL . '/career-discussion-details.php?id=' . (int) $ucsMyDisc['id'];
+                                    $ucsMyDiscStatus = (string) $ucsMyDisc['status'];
+                                    $ucsIsPinned = (int) $ucsMyDisc['is_pinned'] === 1;
+                                    $ucsReplyCount = (int) $ucsMyDisc['reply_count'];
+                                    ?>
+                                    <div class="group relative rounded-lg border border-blue-100 bg-white p-4 shadow-sm transition-all duration-150 hover:border-blue-200 hover:shadow-md sm:p-5 <?php echo $ucsIsPinned ? 'border-l-4 border-l-indigo-400' : ''; ?>">
+                                        <a href="<?php echo htmlspecialchars($ucsMyDiscUrl); ?>" class="absolute inset-0 z-0" aria-hidden="true"></a>
+                                        <div class="relative z-10">
+                                            <div class="flex items-start justify-between gap-3">
+                                                <div class="min-w-0 flex-1">
+                                                    <!-- Title row -->
+                                                    <div class="flex flex-wrap items-center gap-2">
+                                                        <?php if ($ucsIsPinned): ?>
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 shrink-0 text-indigo-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                                                <path d="M12 17v5M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1z"></path>
+                                                            </svg>
+                                                        <?php endif; ?>
+                                                        <h3 class="truncate text-sm font-bold text-slate-900 group-hover:text-blue-700 transition-colors sm:text-base">
+                                                            <?php echo htmlspecialchars((string) $ucsMyDisc['title']); ?>
+                                                        </h3>
+                                                    </div>
+
+                                                    <!-- Meta row -->
+                                                    <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                                                        <span class="inline-flex items-center rounded-full bg-blue-50 px-2.5 py-0.5 text-[10px] font-bold text-blue-700 ring-1 ring-blue-100/80"><?php echo htmlspecialchars((string) $ucsMyDisc['category_name']); ?></span>
+                                                        <?php if ($ucsMyDiscStatus === 'open'): ?>
+                                                            <span class="inline-flex items-center gap-1 rounded-full bg-emerald-50 px-2.5 py-0.5 text-[10px] font-bold text-emerald-700 ring-1 ring-emerald-100/80">
+                                                                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span>
+                                                                Open
+                                                            </span>
+                                                        <?php elseif ($ucsMyDiscStatus === 'closed'): ?>
+                                                            <span class="inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-0.5 text-[10px] font-bold text-slate-500">
+                                                                <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span>
+                                                                Closed
+                                                            </span>
+                                                        <?php endif; ?>
+                                                        <span class="inline-flex items-center gap-1 text-xs text-slate-400">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                                            <?php echo $ucsReplyCount; ?> <?php echo $ucsReplyCount === 1 ? 'reply' : 'replies'; ?>
+                                                        </span>
+                                                        <span class="text-xs text-slate-400"><?php echo htmlspecialchars(date('M j, Y', strtotime((string) $ucsMyDisc['created_at']))); ?></span>
+                                                    </div>
+                                                </div>
+
+                                                <!-- Actions -->
+                                                <div class="relative z-10 flex shrink-0 items-center gap-2">
+                                                    <a href="<?php echo htmlspecialchars($ucsMyDiscUrl); ?>" class="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-600 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700" onclick="event.stopPropagation();">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                                                        View
+                                                    </a>
+                                                    <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussion-details.php?id=' . (int) $ucsMyDisc['id'] . '#reply-form'); ?>" class="inline-flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-700" onclick="event.stopPropagation();">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                                                        Reply
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                            <?php if ($ucsDiscussionCount > 20): ?>
+                                <div class="mt-4 text-center">
+                                    <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-700 transition-colors hover:text-blue-800">
+                                        View all <?php echo $ucsDiscussionCount; ?> discussions
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"></path></svg>
+                                    </a>
+                                </div>
+                            <?php endif; ?>
+                        <?php endif; ?>
                     </section>
 
                     <!-- Latest Alumni Stories -->

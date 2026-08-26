@@ -40,6 +40,20 @@ $ucsAdminNavItems = [
         'color' => ['iconBg' => 'bg-indigo-50', 'iconText' => 'text-indigo-500', 'activeBg' => 'bg-indigo-50', 'activeText' => 'text-indigo-600', 'activeRing' => 'ring-indigo-200', 'activeDot' => 'bg-indigo-500'],
     ],
     [
+        'key'   => 'teachers',
+        'label' => 'Teachers',
+        'url'   => '/admin/teachers/index.php',
+        'icon'  => '<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle>',
+        'color' => ['iconBg' => 'bg-teal-50', 'iconText' => 'text-teal-500', 'activeBg' => 'bg-teal-50', 'activeText' => 'text-teal-600', 'activeRing' => 'ring-teal-200', 'activeDot' => 'bg-teal-500'],
+    ],
+    [
+        'key'   => 'teacher-assignments',
+        'label' => 'Assign Teacher',
+        'url'   => '/admin/teacher-assignments/index.php',
+        'icon'  => '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path>',
+        'color' => ['iconBg' => 'bg-cyan-50', 'iconText' => 'text-cyan-500', 'activeBg' => 'bg-cyan-50', 'activeText' => 'text-cyan-600', 'activeRing' => 'ring-cyan-200', 'activeDot' => 'bg-cyan-500'],
+    ],
+    [
         'key'   => 'courses',
         'label' => 'Courses',
         'url'   => '/admin/courses/index.php',

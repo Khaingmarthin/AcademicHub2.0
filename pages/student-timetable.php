@@ -27,7 +27,7 @@ try {
                 ay.year_name AS academic_year
          FROM students s
          JOIN classrooms c ON c.id = s.classroom_id
-         JOIN majors m ON m.id = c.major_id
+         LEFT JOIN majors m ON m.id = c.major_id
          JOIN academic_years ay ON ay.id = c.academic_year_id
          WHERE s.id = :id
          LIMIT 1"

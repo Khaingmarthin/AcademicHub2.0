@@ -11,9 +11,32 @@ require_once __DIR__ . '/../../config/app.php';
 require_once __DIR__ . '/../../config/database.php';
 require_once __DIR__ . '/../../includes/student-auth.php';
 
-// Already authenticated students are sent straight to the dashboard.
+// Already authenticated students are sent straight to the appropriate dashboard.
 if (student_is_logged_in()) {
-    header('Location: ' . BASE_URL . '/student-dashboard.php');
+    $ucsAuthUser = student_current_user();
+    $ucsRedirectUrl = BASE_URL . '/student-dashboard.php';
+    if ($ucsAuthUser !== null) {
+        try {
+            $ucsCheckStmt = $pdo->prepare(
+                "SELECT s.student_status, ap.verification_status
+                 FROM students s
+                 LEFT JOIN alumni_profiles ap ON ap.student_id = s.id
+                 WHERE s.id = :id
+                 LIMIT 1"
+            );
+            $ucsCheckStmt->execute([':id' => $ucsAuthUser['id']]);
+            $ucsCheckRow = $ucsCheckStmt->fetch() ?: null;
+            if ($ucsCheckRow !== null
+                && (string) ($ucsCheckRow['student_status'] ?? '') === 'graduated'
+                && (string) ($ucsCheckRow['verification_status'] ?? '') === 'verified'
+            ) {
+                $ucsRedirectUrl = BASE_URL . '/alumni-dashboard.php';
+            }
+        } catch (PDOException $e) {
+            // Default to student dashboard on error.
+        }
+    }
+    header('Location: ' . $ucsRedirectUrl);
     exit;
 }
 
@@ -58,7 +81,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['student_email'] = (string) $ucsStudent['email'];
                 $_SESSION['student_last_activity'] = time();
 
-                header('Location: ' . BASE_URL . '/student-dashboard.php');
+                // Check if this is a verified alumni and redirect accordingly.
+                $ucsLoginRedirect = BASE_URL . '/student-dashboard.php';
+                try {
+                    $ucsAlumniCheck = $pdo->prepare(
+                        "SELECT s.student_status, ap.verification_status
+                         FROM students s
+                         LEFT JOIN alumni_profiles ap ON ap.student_id = s.id
+                         WHERE s.id = :id
+                         LIMIT 1"
+                    );
+                    $ucsAlumniCheck->execute([':id' => (int) $ucsStudent['id']]);
+                    $ucsAlumniRow = $ucsAlumniCheck->fetch() ?: null;
+                    if ($ucsAlumniRow !== null
+                        && (string) ($ucsAlumniRow['student_status'] ?? '') === 'graduated'
+                        && (string) ($ucsAlumniRow['verification_status'] ?? '') === 'verified'
+                    ) {
+                        $ucsLoginRedirect = BASE_URL . '/alumni-dashboard.php';
+                    }
+                } catch (PDOException $e) {
+                    // Default to student dashboard on error.
+                }
+
+                header('Location: ' . $ucsLoginRedirect);
                 exit;
             }
         } catch (PDOException $e) {

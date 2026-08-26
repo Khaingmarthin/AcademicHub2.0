@@ -15,13 +15,21 @@ $ucsStudentUser = student_current_user();
 // session itself is left untouched so authenticated pages keep working.
 $ucsStudentAreaPage = in_array(
     basename((string) ($_SERVER['SCRIPT_NAME'] ?? '')),
-    ['student-dashboard.php', 'student-profile.php', 'student-timetable.php', 'alumni-edit.php', 'alumni-join.php', 'alumni-dashboard.php', 'career-discussion-create.php'],
+    [
+        'student-dashboard.php', 'student-profile.php', 'student-timetable.php',
+        'alumni-edit.php', 'alumni-join.php', 'alumni-dashboard.php',
+        'career-discussion-create.php',
+        'career-discussions.php', 'career-discussion-details.php',
+        'alumni.php', 'alumni-overview.php', 'alumni-details.php',
+        'alumni-stories.php', 'alumni-story-details.php',
+    ],
     true
 );
 $ucsShowStudentMenu = ($ucsStudentUser !== null) && $ucsStudentAreaPage;
 
 // Verified alumni get an extra "Alumni Dashboard" entry in the student menu.
 $ucsVerifiedAlumnus = false;
+$ucsIsGraduated = false;
 if ($ucsShowStudentMenu && isset($pdo)) {
     try {
         $ucsStmt = $pdo->prepare(
@@ -33,6 +41,17 @@ if ($ucsShowStudentMenu && isset($pdo)) {
         $ucsVerifiedAlumnus = $ucsStmt->fetchColumn() !== false;
     } catch (PDOException $e) {
         $ucsVerifiedAlumnus = false;
+    }
+    try {
+        $ucsStmt = $pdo->prepare(
+            "SELECT student_status FROM students
+             WHERE id = :id
+             LIMIT 1"
+        );
+        $ucsStmt->execute([':id' => $ucsStudentUser['id']]);
+        $ucsIsGraduated = $ucsStmt->fetchColumn() === 'graduated';
+    } catch (PDOException $e) {
+        $ucsIsGraduated = false;
     }
 }
 
@@ -101,9 +120,13 @@ function ucs_avatar_initial($name)
                                 </svg>
                             </button>
                             <div class="nav-dropdown nav-dropdown-right" role="menu" aria-label="Student account menu">
-                                <a href="<?php echo htmlspecialchars(BASE_URL . '/student-dashboard.php'); ?>" class="nav-dropdown-link" role="menuitem">Dashboard</a>
+                                <?php if (!$ucsIsGraduated): ?>
+                                    <a href="<?php echo htmlspecialchars(BASE_URL . '/student-dashboard.php'); ?>" class="nav-dropdown-link" role="menuitem">Dashboard</a>
+                                <?php endif; ?>
                                 <a href="<?php echo htmlspecialchars(BASE_URL . '/student-profile.php'); ?>" class="nav-dropdown-link" role="menuitem">My Profile</a>
-                                <a href="<?php echo htmlspecialchars(BASE_URL . '/student-timetable.php'); ?>" class="nav-dropdown-link" role="menuitem">My Timetable</a>
+                                <?php if (!$ucsIsGraduated): ?>
+                                    <a href="<?php echo htmlspecialchars(BASE_URL . '/student-timetable.php'); ?>" class="nav-dropdown-link" role="menuitem">My Timetable</a>
+                                <?php endif; ?>
                                 <?php if ($ucsVerifiedAlumnus): ?>
                                     <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="nav-dropdown-link" role="menuitem">Alumni Dashboard</a>
                                 <?php endif; ?>
@@ -202,9 +225,13 @@ function ucs_avatar_initial($name)
                         <!-- Student account (mobile) -->
                         <li class="mt-2 border-t border-slate-200 pt-3">
                             <p class="px-3 pb-1 pt-1 text-[0.6875rem] font-semibold uppercase tracking-wide text-slate-400">Student Account</p>
-                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-dashboard.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900">Dashboard</a>
+                            <?php if (!$ucsIsGraduated): ?>
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/student-dashboard.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900">Dashboard</a>
+                            <?php endif; ?>
                             <a href="<?php echo htmlspecialchars(BASE_URL . '/student-profile.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900">My Profile</a>
-                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-timetable.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900">My Timetable</a>
+                            <?php if (!$ucsIsGraduated): ?>
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/student-timetable.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900">My Timetable</a>
+                            <?php endif; ?>
                             <?php if ($ucsVerifiedAlumnus): ?>
                                 <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="block rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-slate-100 hover:text-slate-900">Alumni Dashboard</a>
                             <?php endif; ?>
