@@ -10,9 +10,41 @@
  */
 require_once '../config/app.php';
 require_once '../config/database.php';
+require_once __DIR__ . '/../includes/student-auth.php';
 require_once __DIR__ . '/../includes/helpers/ucs-listing-helpers.php';
+require_once __DIR__ . '/../includes/helpers/alumni-validation.php';
 
 $pageTitle = 'Alumni';
+
+// Determine if the "Join Alumni Community" button should be shown.
+// Only for logged-in graduated students who don't have an alumni profile yet.
+$ucsShowJoinButton  = false;
+$ucsShowDashboardBtn = false;
+$ucsCurrentUser      = student_current_user();
+if ($ucsCurrentUser !== null) {
+    try {
+        $ucsStateStmt = $pdo->prepare(
+            "SELECT s.student_status, ap.verification_status AS profile_status
+             FROM students s
+             LEFT JOIN alumni_profiles ap ON ap.student_id = s.id
+             WHERE s.id = :id
+             LIMIT 1"
+        );
+        $ucsStateStmt->execute([':id' => (int) $ucsCurrentUser['id']]);
+        $ucsStateRow = $ucsStateStmt->fetch() ?: null;
+        if ($ucsStateRow !== null) {
+            $ucsUserStatus    = (string) ($ucsStateRow['student_status'] ?? 'active');
+            $ucsUserProfile   = $ucsStateRow['profile_status'] ?? null;
+            if ($ucsUserStatus === 'graduated' && $ucsUserProfile === null) {
+                $ucsShowJoinButton = true;
+            } elseif ($ucsUserProfile === 'verified') {
+                $ucsShowDashboardBtn = true;
+            }
+        }
+    } catch (PDOException $e) {
+        // Ignore – button stays hidden.
+    }
+}
 
 $ucsHeroMedia = 'images/front_view.jpg';
 try {
@@ -175,10 +207,17 @@ require_once '../includes/header.php';
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
                         Read Alumni Stories
                     </a>
-                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-join.php'); ?>" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
-                        Join Alumni Community
-                    </a>
+                    <?php if ($ucsShowJoinButton): ?>
+                        <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-join.php'); ?>" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><line x1="19" y1="8" x2="19" y2="14"></line><line x1="22" y1="11" x2="16" y2="11"></line></svg>
+                            Join Alumni Community
+                        </a>
+                    <?php elseif ($ucsShowDashboardBtn): ?>
+                        <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle></svg>
+                            Alumni Dashboard
+                        </a>
+                    <?php endif; ?>
                 </div>
             </div>
         </div>

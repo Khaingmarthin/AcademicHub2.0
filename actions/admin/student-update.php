@@ -21,7 +21,7 @@ $ucsId = filter_var($_POST['id'] ?? null, FILTER_VALIDATE_INT);
 
 try {
     $ucsStmt = $pdo->prepare(
-        "SELECT id, name FROM students WHERE id = :id LIMIT 1"
+        "SELECT id, name, status FROM students WHERE id = :id LIMIT 1"
     );
     $ucsStmt->execute([':id' => $ucsId]);
     $ucsExisting = $ucsStmt->fetch() ?: null;
@@ -48,6 +48,7 @@ if (!empty($ucsErrors)) {
 
 try {
     $ucsIsGraduated = $ucsClean['status'] === 'graduated';
+    $ucsPreservedStatus = (int) $ucsExisting['status'];
     if ($ucsClean['password'] !== '') {
         $ucsStmt = $pdo->prepare(
             "UPDATE students
@@ -69,7 +70,7 @@ try {
             ':email'                => $ucsClean['email'],
             ':password'             => password_hash($ucsClean['password'], PASSWORD_DEFAULT),
             ':classroom_id'         => $ucsClean['classroom_id'],
-            ':status'               => 1,
+            ':status'               => $ucsPreservedStatus,
             ':email_notifications'  => $ucsClean['email_notifications'],
             ':student_status'       => $ucsIsGraduated ? 'graduated' : 'active',
             ':id'                   => $ucsId,
@@ -93,7 +94,7 @@ try {
             ':name'                 => $ucsClean['name'],
             ':email'                => $ucsClean['email'],
             ':classroom_id'         => $ucsClean['classroom_id'],
-            ':status'               => 1,
+            ':status'               => $ucsPreservedStatus,
             ':email_notifications'  => $ucsClean['email_notifications'],
             ':student_status'       => $ucsIsGraduated ? 'graduated' : 'active',
             ':id'                   => $ucsId,

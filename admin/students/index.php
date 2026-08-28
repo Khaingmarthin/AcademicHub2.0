@@ -104,7 +104,7 @@ try {
                 m.name AS major_name
          FROM students st
          JOIN classrooms cl ON cl.id = st.classroom_id
-         JOIN majors m ON m.id = cl.major_id"
+         LEFT JOIN majors m ON m.id = cl.major_id"
         . $ucsWhereSql . "
          ORDER BY cl.year_level ASC, (cl.section IS NULL) ASC, cl.section ASC, st.name ASC"
     );

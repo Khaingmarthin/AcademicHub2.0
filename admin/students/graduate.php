@@ -24,11 +24,11 @@ try {
         "SELECT s.id, s.student_id, s.roll_number, s.name, s.email,
                 s.status, s.student_status, s.graduation_year,
                 c.classroom_name, c.year_level, c.section,
-                m.name AS major_name,
+                COALESCE(m.name, '') AS major_name,
                 ay.year_name AS academic_year, ay.end_date
          FROM students s
          JOIN classrooms c ON c.id = s.classroom_id
-         JOIN majors m ON m.id = c.major_id
+         LEFT JOIN majors m ON m.id = c.major_id
          JOIN academic_years ay ON ay.id = c.academic_year_id
          WHERE s.id = :id
          LIMIT 1"

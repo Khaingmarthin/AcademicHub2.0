@@ -83,6 +83,69 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
     </div>
 <?php endif; ?>
 
+<!-- Back link -->
+<div class="mb-4">
+    <?php if ($ucsIsPending): ?>
+        <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/applications.php'); ?>" class="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6"></path>
+            </svg>
+            Back to Applications
+        </a>
+    <?php else: ?>
+        <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/index.php'); ?>" class="inline-flex items-center gap-2 text-sm font-semibold text-gray-600 hover:text-blue-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="m15 18-6-6 6-6"></path>
+            </svg>
+            Back to Alumni
+        </a>
+    <?php endif; ?>
+</div>
+
+<?php if ($ucsIsPending): ?>
+    <!-- Application review banner -->
+    <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-5 shadow-sm">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div class="flex items-start gap-3">
+                <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-100 text-amber-600" aria-hidden="true">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="12" y1="8" x2="12" y2="12"></line>
+                        <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    </svg>
+                </span>
+                <div>
+                    <h2 class="text-base font-semibold text-amber-800">Application Pending Review</h2>
+                    <p class="mt-0.5 text-sm text-amber-700">
+                        This alumni profile application was submitted on <?php echo htmlspecialchars(date('F j, Y \a\t g:i A', strtotime((string) $ucsProfile['created_at']))); ?> and is awaiting your decision.
+                    </p>
+                </div>
+            </div>
+            <div class="flex flex-wrap items-center gap-2">
+                <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/alumni-verify.php'); ?>" class="inline-flex">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
+                    <input type="hidden" name="id" value="<?php echo (int) $ucsProfile['id']; ?>">
+                    <button type="submit"
+                            class="inline-flex items-center gap-1.5 rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-emerald-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Verify
+                    </button>
+                </form>
+                <form method="post" action="<?php echo htmlspecialchars(ROOT_URL . '/actions/admin/alumni-reject.php'); ?>" class="inline-flex"
+                      onsubmit="return confirm('Reject application from &quot;<?php echo htmlspecialchars($ucsJsName); ?>&quot;?');">
+                    <input type="hidden" name="csrf_token" value="<?php echo htmlspecialchars(admin_csrf_token()); ?>">
+                    <input type="hidden" name="id" value="<?php echo (int) $ucsProfile['id']; ?>">
+                    <button type="submit"
+                            class="inline-flex items-center gap-1.5 rounded-xl border border-red-200 bg-white px-4 py-2.5 text-sm font-semibold text-red-600 transition-colors duration-150 hover:bg-red-50 hover:text-red-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        Reject
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
 <div class="grid gap-6 lg:grid-cols-3">
     <!-- Profile card -->
     <div class="lg:col-span-1">
@@ -277,12 +340,21 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
         </div>
 
         <div class="flex items-center justify-end">
-            <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/index.php'); ?>" class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="m15 18-6-6 6-6"></path>
-                </svg>
-                Back to Alumni
-            </a>
+            <?php if ($ucsIsPending): ?>
+                <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/applications.php'); ?>" class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="m15 18-6-6 6-6"></path>
+                    </svg>
+                    Back to Applications
+                </a>
+            <?php else: ?>
+                <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/index.php'); ?>" class="inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="m15 18-6-6 6-6"></path>
+                    </svg>
+                    Back to Alumni
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 </div>

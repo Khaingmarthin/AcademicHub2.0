@@ -133,6 +133,13 @@ require_once '../includes/header.php';
                                     </svg>
                                     Back to Dashboard
                                 </a>
+                            <?php elseif ($ucsUser !== null): ?>
+                                <a href="<?php echo htmlspecialchars(BASE_URL . '/student-dashboard.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                        <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                                    </svg>
+                                    Back to Dashboard
+                                </a>
                             <?php endif; ?>
                             <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50">
                                 Cancel

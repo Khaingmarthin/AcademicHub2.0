@@ -77,9 +77,9 @@ if (!$ucsInActiveYearList) {
     try {
         $ucsStmt = $pdo->prepare(
             "SELECT cl.id, cl.classroom_name, cl.year_level, cl.section,
-                    m.name AS major_name, ay.year_name AS academic_year
+                    COALESCE(m.name, '') AS major_name, ay.year_name AS academic_year
              FROM classrooms cl
-             JOIN majors m ON m.id = cl.major_id
+             LEFT JOIN majors m ON m.id = cl.major_id
              JOIN academic_years ay ON ay.id = cl.academic_year_id
              WHERE cl.id = :id
              LIMIT 1"
@@ -200,12 +200,22 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                 </div>
 
                 <div>
-                    <label for="status" class="block text-sm font-medium text-slate-700">Status</label>
-                    <select id="status" name="status" required
-                            class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
-                        <option value="active" <?php echo ($ucsForm['status'] ?? '') === 'active' ? 'selected' : ''; ?>>Active</option>
-                        <option value="graduated" <?php echo ($ucsForm['status'] ?? '') === 'graduated' ? 'selected' : ''; ?>>Graduated</option>
-                    </select>
+                    <label for="status" class="block text-sm font-medium text-slate-700">Academic Status</label>
+                    <div class="mt-2">
+                        <?php if (($ucsForm['status'] ?? '') === 'graduated'): ?>
+                            <span class="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700 ring-1 ring-emerald-100">Graduated</span>
+                        <?php else: ?>
+                            <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-700 ring-1 ring-blue-100">Active</span>
+                        <?php endif; ?>
+                    </div>
+                    <p class="mt-1.5 text-xs text-slate-500">
+                        <?php if (($ucsForm['status'] ?? '') === 'graduated'): ?>
+                            To change this student's status, use the <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/graduate.php?id=' . (int) $ucsId); ?>" class="font-semibold text-blue-600 hover:underline">Graduate</a> action.
+                        <?php else: ?>
+                            To graduate this student, use the <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/students/graduate.php?id=' . (int) $ucsId); ?>" class="font-semibold text-blue-600 hover:underline">Graduate</a> action.
+                        <?php endif; ?>
+                    </p>
+                    <input type="hidden" name="status" value="<?php echo htmlspecialchars($ucsForm['status'] ?? 'active'); ?>">
                 </div>
 
                 <div>

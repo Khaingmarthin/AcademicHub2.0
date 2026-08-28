@@ -9,7 +9,13 @@ require_once __DIR__ . '/../../includes/helpers/discussion-validation.php';
 
 admin_require_login();
 
-$ucsReturnUrl = ROOT_URL . '/admin/discussions/index.php';
+$ucsReturnTo  = (string) ($_POST['return_to'] ?? '');
+$ucsReturnDiscussionId = filter_var($_POST['discussion_id'] ?? null, FILTER_VALIDATE_INT);
+if ($ucsReturnTo === 'view' && $ucsReturnDiscussionId !== false && $ucsReturnDiscussionId > 0) {
+    $ucsReturnUrl = ROOT_URL . '/admin/discussions/view.php?id=' . $ucsReturnDiscussionId;
+} else {
+    $ucsReturnUrl = ROOT_URL . '/admin/discussions/index.php';
+}
 
 if (!admin_csrf_verify((string) ($_POST['csrf_token'] ?? ''))) {
     discussion_flash('error', 'Your session has expired. Please try again.');
@@ -45,5 +51,5 @@ try {
     discussion_flash('error', 'Unable to delete the discussion. Please try again.');
 }
 
-header('Location: ' . $ucsReturnUrl);
+header('Location: ' . ROOT_URL . '/admin/discussions/index.php');
 exit;

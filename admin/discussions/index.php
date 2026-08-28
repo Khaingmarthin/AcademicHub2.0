@@ -261,7 +261,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                     if (strlen($ucsExcerpt) > 90) {
                         $ucsExcerpt = substr($ucsExcerpt, 0, 90) . '…';
                     }
-                    $ucsPublicUrl = BASE_URL . '/career-discussion-details.php?id=' . (int) $ucsDiscussion['id'];
+                    $ucsAdminViewUrl = ROOT_URL . '/admin/discussions/view.php?id=' . (int) $ucsDiscussion['id'];
                     ?>
                     <tr class="align-top transition-colors hover:bg-gray-50/60">
                         <td class="max-w-xs px-5 py-4">
@@ -271,7 +271,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                                         <path d="M12 17v5M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V6h1a2 2 0 0 0 0-4H8a2 2 0 0 0 0 4h1z"></path>
                                     </svg>
                                 <?php endif; ?>
-                                <a href="<?php echo htmlspecialchars($ucsPublicUrl); ?>" target="_blank" rel="noopener"
+                                <a href="<?php echo htmlspecialchars($ucsAdminViewUrl); ?>"
                                    class="font-semibold text-gray-900 transition-colors duration-150 hover:text-blue-700">
                                     <?php echo htmlspecialchars($ucsDiscussionTitle); ?>
                                 </a>
@@ -308,7 +308,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                         </td>
                         <td class="px-4 py-4">
                             <div class="flex flex-wrap items-center justify-end gap-1">
-                                <a href="<?php echo htmlspecialchars($ucsPublicUrl); ?>" target="_blank" rel="noopener" title="View <?php echo htmlspecialchars($ucsDiscussionTitle); ?>"
+                                <a href="<?php echo htmlspecialchars($ucsAdminViewUrl); ?>" title="View <?php echo htmlspecialchars($ucsDiscussionTitle); ?>"
                                    class="inline-flex items-center gap-1 rounded-lg px-2 py-1.5 text-xs font-semibold text-blue-600 transition-colors duration-150 hover:bg-blue-50">
                                     View
                                 </a>

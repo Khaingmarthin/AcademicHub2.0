@@ -24,7 +24,7 @@ try {
     $ucsStmt = $pdo->prepare(
         "SELECT s.student_id, s.name, s.email, s.status, s.email_notifications, s.created_at,
                 c.classroom_name, c.year_level, c.section,
-                m.name AS major_name,
+                COALESCE(m.name, '') AS major_name,
                 ay.year_name AS academic_year
          FROM students s
          JOIN classrooms c ON c.id = s.classroom_id

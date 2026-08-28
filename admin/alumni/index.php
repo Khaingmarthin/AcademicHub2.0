@@ -192,14 +192,6 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                 <input type="search" name="q" value="<?php echo htmlspecialchars($ucsQuery); ?>" placeholder="Search by name, roll number, company or job..." aria-label="Search alumni"
                        class="block w-full rounded-xl border border-gray-300 bg-white py-2.5 pl-10 pr-3 text-sm text-gray-900 placeholder:text-gray-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
             </div>
-
-            <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/create.php'); ?>" class="inline-flex shrink-0 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M5 12h14"></path>
-                    <path d="M12 5v14"></path>
-                </svg>
-                Add Alumni Profile
-            </a>
         </div>
 
         <div class="mt-5 grid gap-4 border-t border-gray-100 pt-5 sm:grid-cols-2 lg:grid-cols-5">
@@ -304,6 +296,20 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
     </div>
 </div>
 
+<?php if ($ucsSummary['pending'] > 0): ?>
+    <div class="mt-4">
+        <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/applications.php'); ?>"
+           class="inline-flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2.5 text-sm font-semibold text-amber-700 transition-colors duration-150 hover:bg-amber-100 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-600">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            View <?php echo $ucsSummary['pending']; ?> Pending Application<?php echo $ucsSummary['pending'] !== 1 ? 's' : ''; ?>
+        </a>
+    </div>
+<?php endif; ?>
+
 <!-- Alumni table -->
 <div class="mt-6 overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-gray-100">
     <div class="flex flex-col gap-1 border-b border-gray-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
@@ -352,10 +358,6 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             <?php if ($ucsHasFilters): ?>
                 <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/index.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                     Clear Filters
-                </a>
-            <?php else: ?>
-                <a href="<?php echo htmlspecialchars(ROOT_URL . '/admin/alumni/create.php'); ?>" class="mt-4 inline-flex items-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                    Add Alumni Profile
                 </a>
             <?php endif; ?>
         </div>

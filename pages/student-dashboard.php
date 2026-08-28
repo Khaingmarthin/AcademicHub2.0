@@ -207,6 +207,7 @@ require_once __DIR__ . '/../includes/header.php';
                         </svg>
                     </a>
 
+                    <?php if (($ucsDetails['student_status'] ?? '') !== 'graduated'): ?>
                     <a href="<?php echo htmlspecialchars(BASE_URL . '/student-timetable.php'); ?>" class="group flex items-center gap-4 border-t border-slate-200 px-5 py-4 transition-colors duration-150 hover:bg-slate-50 sm:px-6 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                         <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600 transition-colors duration-150 group-hover:bg-blue-600 group-hover:text-white" aria-hidden="true">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -222,6 +223,7 @@ require_once __DIR__ . '/../includes/header.php';
                             <path d="M9 18l6-6-6-6"></path>
                         </svg>
                     </a>
+                    <?php endif; ?>
 
                     <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="group flex items-center gap-4 border-t border-slate-200 px-5 py-4 transition-colors duration-150 hover:bg-slate-50 sm:px-6 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                         <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600 transition-colors duration-150 group-hover:bg-blue-600 group-hover:text-white" aria-hidden="true">
@@ -272,6 +274,24 @@ require_once __DIR__ . '/../includes/header.php';
                                 <path d="M9 18l6-6-6-6"></path>
                             </svg>
                         </a>
+                    <?php elseif (($ucsDetails['student_status'] ?? '') === 'graduated'): ?>
+                        <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-join.php'); ?>" class="group flex items-center gap-4 border-t border-slate-200 px-5 py-4 transition-colors duration-150 hover:bg-slate-50 sm:px-6 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                            <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600 transition-colors duration-150 group-hover:bg-blue-600 group-hover:text-white" aria-hidden="true">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <line x1="19" y1="8" x2="19" y2="14"></line>
+                                    <line x1="22" y1="11" x2="16" y2="11"></line>
+                                </svg>
+                            </span>
+                            <span class="min-w-0 flex-1">
+                                <span class="block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Join Alumni Community</span>
+                                <span class="mt-0.5 block text-sm text-slate-500">Apply to create your alumni profile</span>
+                            </span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 shrink-0 text-slate-300 transition-all duration-150 group-hover:translate-x-0.5 group-hover:text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M9 18l6-6-6-6"></path>
+                            </svg>
+                        </a>
                     <?php endif; ?>
 
                     <a href="<?php echo htmlspecialchars(ROOT_URL . '/actions/student/logout.php'); ?>" class="group flex items-center gap-4 border-t border-slate-200 px-5 py-4 transition-colors duration-150 hover:bg-red-50 sm:px-6 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600">
@@ -294,6 +314,7 @@ require_once __DIR__ . '/../includes/header.php';
             </section>
 
             <!-- My courses -->
+            <?php if (($ucsDetails['student_status'] ?? '') !== 'graduated'): ?>
             <section class="mt-10" aria-labelledby="my-courses-heading">
                 <div class="flex items-center justify-between">
                     <h2 id="my-courses-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">My Courses</h2>
@@ -338,6 +359,7 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
                 <?php endif; ?>
             </section>
+            <?php endif; ?>
         </div>
     </section>
 </main>
