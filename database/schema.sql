@@ -29,14 +29,8 @@ CREATE TABLE university_profile (
     address         TEXT NULL,
     phone           VARCHAR(50) NULL,
     email           VARCHAR(255) NULL,
-    admission_title             VARCHAR(255) NULL,
     admission_description       TEXT NULL,
-    admission_requirements      TEXT NULL,
-    admission_important_dates   TEXT NULL,
-    admission_application_info  TEXT NULL,
-    admission_document_title    VARCHAR(255) NULL,
-    admission_document_path     VARCHAR(255) NULL,
-    admission_document_type     VARCHAR(50) NULL,
+    document                    VARCHAR(255) NULL,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
@@ -215,7 +209,6 @@ CREATE TABLE students (
     email_notifications BOOLEAN NOT NULL DEFAULT TRUE,
     student_status  ENUM('active','graduated') NOT NULL DEFAULT 'active',
     graduation_year YEAR NULL,
-    graduated_at    TIMESTAMP NULL DEFAULT NULL,
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
@@ -325,9 +318,6 @@ CREATE TABLE alumni_profiles (
     linkedin_url            VARCHAR(191) NULL,
     github_url              VARCHAR(191) NULL,
     website_url             VARCHAR(191) NULL,
-    mentorship_available    BOOLEAN NOT NULL DEFAULT FALSE,
-    mentorship_contact_email VARCHAR(191) NULL,
-    mentorship_suspended    BOOLEAN NOT NULL DEFAULT FALSE,
     visibility              ENUM('public','private') NOT NULL DEFAULT 'private',
     verification_status     ENUM('pending','verified','rejected') NOT NULL DEFAULT 'pending',
     created_at              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,

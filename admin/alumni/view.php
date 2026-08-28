@@ -21,17 +21,17 @@ try {
         "SELECT ap.id, ap.current_job, ap.company, ap.professional_field,
                 ap.skills, ap.bio, ap.career_journey,
                 ap.linkedin_url, ap.github_url, ap.website_url,
-                ap.mentorship_available, ap.visibility, ap.verification_status,
+                ap.visibility, ap.verification_status,
                 ap.created_at, ap.updated_at,
                 s.id AS student_id, s.name AS student_name,
                 s.student_id AS student_code, s.roll_number,
                 s.status AS account_status, s.student_status, s.graduation_year,
-                s.graduated_at, s.email,
+                s.email,
                 m.name AS major_name, cl.classroom_name
          FROM alumni_profiles ap
          JOIN students s ON s.id = ap.student_id
-         JOIN classrooms cl ON cl.id = s.classroom_id
-         JOIN majors m ON m.id = cl.major_id
+         LEFT JOIN classrooms cl ON cl.id = s.classroom_id
+         LEFT JOIN majors m ON m.id = cl.major_id
          WHERE ap.id = :id
          LIMIT 1"
     );
@@ -109,9 +109,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                     <?php else: ?>
                         <span class="inline-flex items-center rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-semibold text-gray-500 ring-1 ring-gray-200">Private</span>
                     <?php endif; ?>
-                    <?php if ((int) $ucsProfile['mentorship_available'] === 1): ?>
-                        <span class="inline-flex items-center rounded-full bg-violet-50 px-2.5 py-0.5 text-xs font-semibold text-violet-700 ring-1 ring-violet-100">Mentorship</span>
-                    <?php endif; ?>
+
                 </div>
             </div>
 

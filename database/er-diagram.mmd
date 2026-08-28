@@ -1,0 +1,295 @@
+erDiagram
+
+    university_profile {
+        BIGINT id PK
+        VARCHAR name
+        VARCHAR short_name
+        TEXT history
+        TEXT vision
+        TEXT mission
+        TEXT rector_message
+        YEAR established_year
+        VARCHAR logo
+        VARCHAR hero_media
+        TEXT address
+        VARCHAR phone
+        VARCHAR email
+        TEXT admission_description
+        VARCHAR document
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    faculties {
+        BIGINT id PK
+        VARCHAR name
+        TEXT description
+        BOOLEAN status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    departments {
+        BIGINT id PK
+        VARCHAR name
+        TEXT description
+        BOOLEAN status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    administrative_units {
+        BIGINT id PK
+        VARCHAR name
+        TEXT description
+        BOOLEAN status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    academic_years {
+        BIGINT id PK
+        VARCHAR year_name UK
+        DATE start_date
+        DATE end_date
+        ENUM status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    majors {
+        BIGINT id PK
+        BIGINT faculty_id FK
+        VARCHAR name
+        VARCHAR short_name
+        VARCHAR degree_name
+        TEXT description
+        BOOLEAN status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    courses {
+        BIGINT id PK
+        BIGINT academic_year_id FK
+        BIGINT major_id FK
+        VARCHAR course_code
+        VARCHAR course_name
+        ENUM year_level
+        ENUM semester
+        INT credit_hours
+        TEXT description
+        BOOLEAN status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    classrooms {
+        BIGINT id PK
+        BIGINT academic_year_id FK
+        BIGINT major_id FK
+        ENUM year_level
+        VARCHAR section
+        VARCHAR classroom_name
+        BOOLEAN status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    timetables {
+        BIGINT id PK
+        BIGINT classroom_id FK
+        ENUM semester
+        VARCHAR title
+        VARCHAR image
+        BOOLEAN status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    students {
+        BIGINT id PK
+        VARCHAR student_id UK
+        VARCHAR roll_number UK
+        VARCHAR name
+        VARCHAR email UK
+        VARCHAR password
+        BIGINT classroom_id FK
+        BOOLEAN status
+        BOOLEAN email_notifications
+        ENUM student_status
+        YEAR graduation_year
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    categories {
+        BIGINT id PK
+        VARCHAR name UK
+        TEXT description
+        BOOLEAN status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    admins {
+        BIGINT id PK
+        VARCHAR name
+        VARCHAR email UK
+        VARCHAR password
+        BOOLEAN status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    news {
+        BIGINT id PK
+        BIGINT category_id FK
+        BIGINT admin_id FK
+        VARCHAR title
+        VARCHAR slug UK
+        LONGTEXT content
+        VARCHAR cover_image
+        DATETIME published_at
+        ENUM status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    news_targets {
+        BIGINT id PK
+        BIGINT news_id FK
+        BIGINT classroom_id FK
+        BIGINT major_id FK
+        ENUM year_level
+        VARCHAR section
+        TIMESTAMP created_at
+    }
+
+    alumni_profiles {
+        BIGINT id PK
+        BIGINT student_id FK
+        VARCHAR current_job
+        VARCHAR company
+        VARCHAR professional_field
+        TEXT career_journey
+        TEXT skills
+        TEXT bio
+        VARCHAR profile_photo
+        VARCHAR linkedin_url
+        VARCHAR github_url
+        VARCHAR website_url
+        ENUM visibility
+        ENUM verification_status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    alumni_stories {
+        BIGINT id PK
+        BIGINT alumni_profile_id FK
+        BIGINT admin_id FK
+        VARCHAR title
+        TEXT summary
+        TEXT content
+        VARCHAR career_field
+        VARCHAR cover_image
+        DATE publication_date
+        ENUM status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    discussion_categories {
+        BIGINT id PK
+        VARCHAR name UK
+        VARCHAR slug UK
+        TEXT description
+        INT sort_order
+        ENUM status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    discussions {
+        BIGINT id PK
+        BIGINT category_id FK
+        BIGINT author_student_id FK
+        VARCHAR title
+        TEXT content
+        ENUM status
+        TINYINT is_pinned
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    discussion_replies {
+        BIGINT id PK
+        BIGINT discussion_id FK
+        BIGINT author_student_id FK
+        TEXT content
+        ENUM status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    teachers {
+        BIGINT id PK
+        VARCHAR teacher_id UK
+        VARCHAR name
+        VARCHAR email
+        VARCHAR phone
+        BIGINT faculty_id FK
+        BIGINT department_id FK
+        VARCHAR specialization
+        BOOLEAN status
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    teacher_course_assignments {
+        BIGINT id PK
+        BIGINT teacher_id FK
+        BIGINT course_id FK
+        BIGINT classroom_id FK
+        TIMESTAMP created_at
+        TIMESTAMP updated_at
+    }
+
+    %% ── Academic Organization ──
+    faculties ||--o{ majors : "has"
+    faculties ||--o{ teachers : "employs"
+    departments ||--o{ teachers : "employs"
+    academic_years ||--o{ courses : "offers"
+    academic_years ||--o{ classrooms : "has"
+    majors ||--o{ courses : "offers"
+    majors ||--o{ classrooms : "has"
+
+    %% ── Teaching Assignments ──
+    teachers ||--o{ teacher_course_assignments : "assigned to"
+    courses ||--o{ teacher_course_assignments : "taught in"
+    classrooms ||--o{ teacher_course_assignments : "held in"
+
+    %% ── Students & Enrollment ──
+    classrooms ||--o{ students : "enrolls"
+
+    %% ── Timetable ──
+    classrooms ||--o{ timetables : "has"
+
+    %% ── News & Announcements ──
+    categories ||--o{ news : "categorizes"
+    admins ||--o{ news : "publishes"
+    news ||--o{ news_targets : "targets"
+    majors ||--o{ news_targets : "targets"
+    classrooms ||--o{ news_targets : "targets"
+
+    %% ── Alumni ──
+    students ||--o| alumni_profiles : "graduates to"
+    alumni_profiles ||--o{ alumni_stories : "writes"
+    admins ||--o{ alumni_stories : "moderates"
+
+    %% ── Career Discussions ──
+    discussion_categories ||--o{ discussions : "groups"
+    students ||--o{ discussions : "creates"
+    discussions ||--o{ discussion_replies : "receives"
+    students ||--o{ discussion_replies : "writes"

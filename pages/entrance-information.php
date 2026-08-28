@@ -2,8 +2,7 @@
 /**
  * Public Entrance Information page.
  *
- * Displays admission information for the current (Active) academic year,
- * including description, requirements, important dates, and application info.
+ * Displays admission information for the current (Active) academic year.
  * Editorial institutional layout with structured bordered sections.
  */
 require_once '../config/app.php';
@@ -13,13 +12,10 @@ $pageTitle = 'Entrance Information';
 
 $ucsHeroMedia  = 'images/front_view.jpg';
 $ucsAdmission  = null;
-$ucsYearName   = '';
 
 try {
     $ucsProfileStmt = $pdo->query(
-        "SELECT short_name, hero_media,
-                admission_title, admission_description, admission_requirements,
-                admission_important_dates, admission_application_info
+        "SELECT short_name, hero_media, admission_description
          FROM university_profile
          ORDER BY id ASC
          LIMIT 1"
@@ -28,13 +24,7 @@ try {
     $ucsHeroMedia  = $ucsProfileRow['hero_media'] ?? 'images/front_view.jpg';
 
     if ($ucsProfileRow !== null) {
-        $ucsAdmission = [
-            'title'           => $ucsProfileRow['admission_title'] ?? '',
-            'description'     => $ucsProfileRow['admission_description'] ?? '',
-            'requirements'    => $ucsProfileRow['admission_requirements'] ?? '',
-            'important_dates' => $ucsProfileRow['admission_important_dates'] ?? '',
-            'application_info'=> $ucsProfileRow['admission_application_info'] ?? '',
-        ];
+        $ucsAdmission = $ucsProfileRow['admission_description'] ?? '';
     }
 } catch (PDOException $e) {
     $ucsAdmission = null;
@@ -69,88 +59,23 @@ require_once '../includes/header.php';
         </div>
     </section>
 
-    <?php if ($ucsAdmission !== null): ?>
-        <!-- Admission overview -->
-        <section class="bg-slate-50 py-12 sm:py-16 lg:py-20" aria-labelledby="admission-overview-heading">
+    <?php if (!empty($ucsAdmission)): ?>
+        <!-- Admission content -->
+        <section class="bg-slate-50 py-12 sm:py-16 lg:py-20" aria-labelledby="admission-content-heading">
             <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
                 <div class="max-w-3xl">
                     <div class="border border-slate-200 bg-white">
                         <div class="border-b border-slate-200 px-6 py-4 sm:px-8">
-                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Admission Overview</p>
+                            <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Admission Information</p>
+                            <h2 id="admission-content-heading" class="mt-1 text-lg font-semibold tracking-tight text-slate-900">Entrance Information</h2>
                         </div>
-                        <div class="px-6 py-6 sm:px-8 sm:py-8">
-                            <?php if (!empty($ucsAdmission['title'])): ?>
-                                <h2 id="admission-overview-heading" class="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl"><?php echo htmlspecialchars($ucsAdmission['title']); ?></h2>
-                            <?php else: ?>
-                                <h2 id="admission-overview-heading" class="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">Admission Overview</h2>
-                            <?php endif; ?>
-                            <?php if (!empty($ucsAdmission['description'])): ?>
-                                <div class="mt-4 text-sm leading-relaxed text-slate-600">
-                                    <?php echo nl2br(htmlspecialchars($ucsAdmission['description'])); ?>
-                                </div>
-                            <?php endif; ?>
+                        <div class="px-6 py-6 sm:px-8 sm:py-8 text-sm leading-relaxed text-slate-600">
+                            <?php echo nl2br(htmlspecialchars($ucsAdmission)); ?>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
-
-        <!-- Requirements -->
-        <?php if (!empty($ucsAdmission['requirements'])): ?>
-            <section class="border-t border-slate-200 bg-white py-12 sm:py-16 lg:py-20" aria-labelledby="admission-requirements-heading">
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div class="max-w-3xl">
-                        <div class="border border-slate-200 bg-white">
-                            <div class="border-b border-slate-200 px-6 py-4 sm:px-8">
-                                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Requirements</p>
-                                <h2 id="admission-requirements-heading" class="mt-1 text-lg font-semibold tracking-tight text-slate-900">Admission Requirements</h2>
-                            </div>
-                            <div class="px-6 py-6 sm:px-8 sm:py-8 text-sm leading-relaxed text-slate-600">
-                                <?php echo nl2br(htmlspecialchars($ucsAdmission['requirements'])); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        <?php endif; ?>
-
-        <!-- Important dates -->
-        <?php if (!empty($ucsAdmission['important_dates'])): ?>
-            <section class="border-t border-slate-200 bg-slate-50 py-12 sm:py-16 lg:py-20" aria-labelledby="admission-dates-heading">
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div class="max-w-3xl">
-                        <div class="border border-slate-200 bg-white">
-                            <div class="border-b border-slate-200 px-6 py-4 sm:px-8">
-                                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Important Dates</p>
-                                <h2 id="admission-dates-heading" class="mt-1 text-lg font-semibold tracking-tight text-slate-900">Important Information</h2>
-                            </div>
-                            <div class="px-6 py-6 sm:px-8 sm:py-8 text-sm leading-relaxed text-slate-600">
-                                <?php echo nl2br(htmlspecialchars($ucsAdmission['important_dates'])); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        <?php endif; ?>
-
-        <!-- Application process -->
-        <?php if (!empty($ucsAdmission['application_info'])): ?>
-            <section class="border-t border-slate-200 bg-white py-12 sm:py-16 lg:py-20" aria-labelledby="admission-application-heading">
-                <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-                    <div class="max-w-3xl">
-                        <div class="border border-slate-200 bg-white">
-                            <div class="border-b border-slate-200 px-6 py-4 sm:px-8">
-                                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">How to Apply</p>
-                                <h2 id="admission-application-heading" class="mt-1 text-lg font-semibold tracking-tight text-slate-900">Application Process</h2>
-                            </div>
-                            <div class="px-6 py-6 sm:px-8 sm:py-8 text-sm leading-relaxed text-slate-600">
-                                <?php echo nl2br(htmlspecialchars($ucsAdmission['application_info'])); ?>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-        <?php endif; ?>
 
         <!-- Final action -->
         <section class="border-t border-slate-200 bg-slate-50 py-12 sm:py-16 lg:py-20" aria-labelledby="admission-cta-heading">

@@ -22,15 +22,15 @@ USE ucsmtla_academic_hub;
 -- =========================================================
 
 INSERT IGNORE INTO students
-(student_id, roll_number, name, email, password, classroom_id, status, student_status, graduation_year, graduated_at)
+(student_id, roll_number, name, email, password, classroom_id, status, student_status, graduation_year)
 VALUES
-('3',  'R-1003', 'Aung Min Thu',   'student3@gmail.com', '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi', 13, TRUE, 'graduated', 2025, '2025-09-15 10:00:00'),
-('4',  'R-1004', 'Thin Zar Aung',  'student4@gmail.com', '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi', 13, TRUE, 'graduated', 2025, '2025-09-15 10:00:00'),
-('5',  'R-1005', 'Kyaw Zin Oo',    'student5@gmail.com', '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi', 14, TRUE, 'graduated', 2025, '2025-09-15 10:00:00'),
-('6',  'R-1006', 'May Phyu Aung',  'student6@gmail.com', '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi', 14, TRUE, 'graduated', 2024, '2024-09-10 10:00:00'),
-('7',  'R-1007', 'Soe Myat Noe',   'student7@gmail.com', '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi', 15, TRUE, 'graduated', 2025, '2025-09-15 10:00:00'),
-('8',  'R-1008', 'Zaw Lin Htut',   'student8@gmail.com', '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi', 15, TRUE, 'graduated', 2024, '2024-09-10 10:00:00'),
-('9',  'R-1009', 'Nandar Aung',    'student9@gmail.com', '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi', 13, TRUE, 'graduated', 2025, '2025-09-15 10:00:00');
+('3',  'R-1003', 'Aung Min Thu',   'student3@gmail.com', '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi', 13, TRUE, 'graduated', 2025),
+('4',  'R-1004', 'Thin Zar Aung',  'student4@gmail.com', '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi', 13, TRUE, 'graduated', 2025),
+('5',  'R-1005', 'Kyaw Zin Oo',    'student5@gmail.com', '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi', 14, TRUE, 'graduated', 2025),
+('6',  'R-1006', 'May Phyu Aung',  'student6@gmail.com', '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi', 14, TRUE, 'graduated', 2024),
+('7',  'R-1007', 'Soe Myat Noe',   'student7@gmail.com', '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi', 15, TRUE, 'graduated', 2025),
+('8',  'R-1008', 'Zaw Lin Htut',   'student8@gmail.com', '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi', 15, TRUE, 'graduated', 2024),
+('9',  'R-1009', 'Nandar Aung',    'student9@gmail.com', '$2y$10$3i/6X9a5ZYymr/i0SCNQpuFnrA9phW.iLuz7eUXE7AzDsRPpX0gmi', 13, TRUE, 'graduated', 2025);
 
 
 -- =========================================================
@@ -45,7 +45,7 @@ VALUES
 -- =========================================================
 
 INSERT IGNORE INTO alumni_profiles
-(student_id, current_job, company, professional_field, career_journey, skills, bio, linkedin_url, github_url, visibility, verification_status, mentorship_available)
+(student_id, current_job, company, professional_field, career_journey, skills, bio, linkedin_url, github_url, visibility, verification_status)
 SELECT * FROM (
     SELECT
         (SELECT id FROM students WHERE student_id = '3') as student_id,
@@ -54,7 +54,7 @@ SELECT * FROM (
         'PHP, MySQL, JavaScript, Git, HTML, CSS',
         'Junior software developer with a focus on web application development. Graduate of UCSMTLA Computer Science program.',
         'https://linkedin.com/in/aungminthu', 'https://github.com/aungminthu',
-        'public', 'verified', TRUE
+        'public', 'verified'
     UNION ALL SELECT
         (SELECT id FROM students WHERE student_id = '4'),
         'IT Support Specialist', 'Digital Myanmar Group', 'Information Technology',
@@ -62,7 +62,7 @@ SELECT * FROM (
         'Windows Server, Linux, Networking, Active Directory, Troubleshooting',
         'IT support specialist with experience in enterprise systems management. B.C.Sc. graduate from UCSMTLA.',
         'https://linkedin.com/in/thinzaraung', NULL,
-        'public', 'verified', FALSE
+        'public', 'verified'
     UNION ALL SELECT
         (SELECT id FROM students WHERE student_id = '5'),
         'Web Developer', 'Yangon Digital Agency', 'Web Development',
@@ -70,7 +70,7 @@ SELECT * FROM (
         'PHP, Laravel, JavaScript, React, MySQL, Tailwind CSS',
         'Full-stack web developer specializing in PHP and JavaScript frameworks. UCSMTLA Computer Science graduate.',
         NULL, 'https://github.com/kyawzinoO',
-        'public', 'verified', TRUE
+        'public', 'verified'
     UNION ALL SELECT
         (SELECT id FROM students WHERE student_id = '6'),
         'Data Analyst', 'Myanmar Data Insights', 'Data Science',
@@ -78,7 +78,7 @@ SELECT * FROM (
         'SQL, Python, Excel, Data Visualization, Statistical Analysis',
         'Data analyst with a strong foundation in mathematics and computing. Graduate of UCSMTLA Computer Science program.',
         'https://linkedin.com/in/mayphyuaung', NULL,
-        'public', 'verified', FALSE
+        'public', 'verified'
     UNION ALL SELECT
         (SELECT id FROM students WHERE student_id = '7'),
         'Network Engineer', 'Telecom Myanmar', 'Networking',
@@ -86,19 +86,19 @@ SELECT * FROM (
         'Cisco Networking, TCP/IP, Firewall Management, Network Security, Linux',
         'Network engineer specializing in enterprise infrastructure. B.C.Tech. graduate from UCSMTLA.',
         NULL, NULL,
-        'private', 'verified', FALSE
+        'private', 'verified'
     UNION ALL SELECT
         (SELECT id FROM students WHERE student_id = '8'),
         NULL, NULL, NULL, NULL, NULL,
         'UCSMTLA Computer Technology graduate seeking to connect with fellow alumni.',
         NULL, NULL,
-        'public', 'pending', FALSE
+        'public', 'pending'
     UNION ALL SELECT
         (SELECT id FROM students WHERE student_id = '9'),
         NULL, NULL, NULL, NULL, NULL,
         'Computer Science graduate from UCSMTLA.',
         NULL, NULL,
-        'public', 'rejected', FALSE
+        'public', 'rejected'
 ) AS profiles
 WHERE profiles.student_id IS NOT NULL;
 

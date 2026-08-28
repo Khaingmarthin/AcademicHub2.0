@@ -14,14 +14,7 @@ INSERT INTO university_profile
     address,
     phone,
     email,
-    admission_title,
-    admission_description,
-    admission_requirements,
-    admission_important_dates,
-    admission_application_info,
-    admission_document_title,
-    admission_document_path,
-    admission_document_type
+    admission_description
 )
 VALUES
 (
@@ -53,14 +46,15 @@ To send qualified candidates abroad for advanced university studies.',
     'Meiktila, Myanmar',
     '09-123 456 789',
     'info@ucsmta.edu.mm',
-    'Admission Information 2025-2026',
-    'Information regarding entrance admission and enrollment for the academic year 2025-2026.',
-    'Applicants must satisfy the university entrance requirements and provide the required documents.',
-    'Entrance information and important dates will be announced by the university.',
-    'Applicants should follow the official admission instructions provided by the university.',
-    'Admitted Students 2025-2026',
-    'admissions/admitted-students-2025-2026.pdf',
-    'PDF'
+    'Admission Information 2025-2026
+
+Information regarding entrance admission and enrollment for the academic year 2025-2026.
+
+Applicants must satisfy the university entrance requirements and provide the required documents.
+
+Entrance information and important dates will be announced by the university.
+
+Applicants should follow the official admission instructions provided by the university.'
 );
 
 INSERT INTO faculties

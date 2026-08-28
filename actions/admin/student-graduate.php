@@ -38,8 +38,7 @@ try {
     $ucsStmt = $pdo->prepare(
         "UPDATE students
          SET student_status = 'graduated',
-             graduation_year = :graduation_year,
-             graduated_at = NOW()
+             graduation_year = :graduation_year
          WHERE id = :id"
     );
     $ucsStmt->execute([

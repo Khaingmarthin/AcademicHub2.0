@@ -15,8 +15,7 @@ $ucsAdmission  = null;
 
 try {
     $ucsProfileStmt = $pdo->query(
-        "SELECT short_name, hero_media,
-                admission_title, admission_description
+        "SELECT short_name, hero_media, admission_description
          FROM university_profile
          ORDER BY id ASC
          LIMIT 1"
@@ -25,10 +24,7 @@ try {
     $ucsHeroMedia  = $ucsProfileRow['hero_media'] ?? 'images/front_view.jpg';
 
     if ($ucsProfileRow !== null) {
-        $ucsAdmission = [
-            'title'       => $ucsProfileRow['admission_title'] ?? '',
-            'description' => $ucsProfileRow['admission_description'] ?? '',
-        ];
+        $ucsAdmission = $ucsProfileRow['admission_description'] ?? '';
     }
 } catch (PDOException $e) {
     $ucsAdmission = null;
@@ -73,13 +69,13 @@ require_once '../includes/header.php';
                     <div class="border-b border-slate-200 px-6 py-4 sm:px-8">
                         <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Admission Results</p>
                         <h2 id="admission-results-heading" class="mt-1 text-lg font-semibold tracking-tight text-slate-900">
-                            <?php echo htmlspecialchars($ucsAdmission['title'] ?: 'Admitted Student List'); ?>
+                            Admitted Student List
                         </h2>
                     </div>
 
-                    <?php if (!empty($ucsAdmission['description'])): ?>
+                    <?php if (!empty($ucsAdmission)): ?>
                         <div class="px-6 py-5 sm:px-8 text-sm leading-relaxed text-slate-600">
-                            <?php echo nl2br(htmlspecialchars($ucsAdmission['description'])); ?>
+                            <?php echo nl2br(htmlspecialchars($ucsAdmission)); ?>
                         </div>
                     <?php else: ?>
                         <div class="px-6 py-12 sm:px-8 text-center">

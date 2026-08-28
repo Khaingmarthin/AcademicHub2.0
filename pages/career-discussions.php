@@ -226,7 +226,7 @@ require_once '../includes/header.php';
                         ?>
                         <li class="group relative rounded-xl bg-white p-5 shadow-sm ring-1 ring-slate-200/80 transition-all duration-200 hover:shadow-md hover:ring-slate-300/80 sm:p-6 <?php echo $ucsIsOwn ? 'ring-2 ring-blue-200/60 bg-blue-50/20' : ''; ?> <?php echo $ucsIsPinned && !$ucsIsOwn ? 'border-l-4 border-l-indigo-400' : ''; ?>">
                             <a href="<?php echo htmlspecialchars($ucsDiscussionUrl); ?>" class="absolute inset-0 z-0" aria-hidden="true"></a>
-                            <div class="relative z-10">
+                            <div class="relative z-10 pointer-events-none">
                                 <div class="flex flex-wrap items-center gap-2">
                                     <span class="inline-flex items-center rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700 ring-1 ring-blue-100/80">
                                         <?php echo htmlspecialchars((string) $ucsDiscussion['category_name']); ?>

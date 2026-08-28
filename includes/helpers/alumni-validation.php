@@ -382,8 +382,7 @@ function alumni_current_profile($pdo)
             "SELECT id, student_id, current_job, company, professional_field,
                     skills, bio, career_journey, profile_photo,
                     linkedin_url, github_url, website_url,
-                    mentorship_available, mentorship_contact_email,
-                    mentorship_suspended, visibility, verification_status,
+                    visibility, verification_status,
                     created_at, updated_at
              FROM alumni_profiles
              WHERE student_id = :student_id

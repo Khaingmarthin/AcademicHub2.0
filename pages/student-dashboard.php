@@ -145,7 +145,7 @@ require_once __DIR__ . '/../includes/header.php';
                             </div>
                             <div class="bg-white px-6 py-5">
                                 <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Programme</dt>
-                                <dd class="mt-1 text-base font-semibold text-slate-900"><?php echo htmlspecialchars($ucsDetails['major_name']); ?></dd>
+                                <dd class="mt-1 text-base font-semibold text-slate-900"><?php echo htmlspecialchars($ucsDetails['major_name'] ?? ''); ?></dd>
                             </div>
                             <div class="bg-white px-6 py-5">
                                 <dt class="text-xs font-semibold uppercase tracking-wide text-slate-400">Year Level</dt>

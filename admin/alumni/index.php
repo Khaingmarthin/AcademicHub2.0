@@ -116,8 +116,8 @@ $ucsTotalPages = 1;
 try {
     $ucsBaseSql = "FROM alumni_profiles ap
          JOIN students s ON s.id = ap.student_id
-         JOIN classrooms cl ON cl.id = s.classroom_id
-         JOIN majors m ON m.id = cl.major_id"
+         LEFT JOIN classrooms cl ON cl.id = s.classroom_id
+         LEFT JOIN majors m ON m.id = cl.major_id"
         . $ucsWhereSql;
 
     $ucsCountStmt = $pdo->prepare("SELECT COUNT(*) " . $ucsBaseSql);
