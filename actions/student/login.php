@@ -81,6 +81,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['student_email'] = (string) $ucsStudent['email'];
                 $_SESSION['student_last_activity'] = time();
 
+                // Handle "Remember Me" — create a persistent cookie.
+                $ucsRememberMe = !empty($_POST['remember_me']);
+                if ($ucsRememberMe) {
+                    $ucsSelector    = bin2hex(random_bytes(8));
+                    $ucsValidator   = bin2hex(random_bytes(32));
+                    student_create_remember_token((int) $ucsStudent['id'], $ucsSelector, $ucsValidator);
+                    student_set_remember_cookie($ucsSelector, $ucsValidator);
+                }
+
                 // Check if this is a verified alumni and redirect accordingly.
                 $ucsLoginRedirect = BASE_URL . '/student-dashboard.php';
                 try {

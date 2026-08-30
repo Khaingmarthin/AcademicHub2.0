@@ -16,6 +16,8 @@ require_once __DIR__ . '/ucs-upload.php';
 const NEWS_STATUSES        = ['Draft', 'Published', 'Expired'];
 const NEWS_YEAR_LEVELS     = ['First Year', 'Second Year', 'Third Year', 'Fourth Year', 'Fifth Year'];
 const NEWS_COVER_MAX_BYTES = 5242880; // 5 MB
+const NEWS_GALLERY_MAX_BYTES = 5242880; // 5 MB per file
+const NEWS_GALLERY_MAX_FILES = 10;     // Maximum additional images
 
 /**
  * Build a URL-safe slug from a title.
@@ -195,6 +197,14 @@ function news_validate_input($input, $pdo, $excludeId = null)
         $errors[] = $e->getMessage();
     }
 
+    // ---- Gallery images (optional) ---------------------------------------
+    $ucsGalleryImages = [];
+    try {
+        $ucsGalleryImages = ucs_handle_multi_upload('gallery_images', ['jpg', 'jpeg', 'png', 'gif', 'webp'], NEWS_GALLERY_MAX_BYTES, NEWS_GALLERY_MAX_FILES);
+    } catch (RuntimeException $e) {
+        $errors[] = $e->getMessage();
+    }
+
     // ---- Targets -----------------------------------------------------------
     $ucsTargets = [];
     $ucsTargetCount = max(
@@ -238,6 +248,7 @@ function news_validate_input($input, $pdo, $excludeId = null)
             'publish_at'   => $publishAt,
             'expired_at'   => $expiredAt,
             'cover_image'  => $ucsCoverImage,
+            'gallery_images' => $ucsGalleryImages,
             'targets'      => $ucsTargets,
         ],
         'errors' => $errors,

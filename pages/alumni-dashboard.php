@@ -360,7 +360,7 @@ require_once __DIR__ . '/../includes/header.php';
                     </a>
 
                     <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-story-create.php'); ?>" class="group rounded-lg border border-blue-100 bg-white p-5 shadow-sm transition-colors duration-150 hover:border-blue-200 hover:bg-blue-50/50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 ring-1 ring-indigo-100 transition-colors duration-150 group-hover:bg-indigo-500 group-hover:text-white" aria-hidden="true">
+                        <span class="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 text-white ring-1 ring-blue-200 transition-colors duration-150 group-hover:from-blue-600 group-hover:to-indigo-600" aria-hidden="true">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path></svg>
                         </span>
                         <span class="mt-3 block text-sm font-semibold text-slate-900 group-hover:text-blue-700">Share Your Story</span>

@@ -147,6 +147,11 @@ function student_csrf_verify($token)
  */
 function student_logout()
 {
+    // Clear the "remember me" persistent cookie.
+    if (isset($_COOKIE['student_remember'])) {
+        student_clear_remember_cookie($_COOKIE['student_remember']);
+    }
+
     unset(
         $_SESSION['student_id'],
         $_SESSION['student_name'],
@@ -174,4 +179,218 @@ function student_logout()
 
     header('Location: ' . BASE_URL . '/student-login.php');
     exit;
+}
+
+/**
+ * Create a persistent "remember me" cookie by storing a token in the
+ * database and setting it in a cookie.
+ *
+ * @param int    $studentId
+ * @param string $selector
+ * @param string $validator
+ * @return void
+ */
+function student_create_remember_token($studentId, $selector, $validator)
+{
+    global $pdo;
+
+    $hashedValidator = hash('sha256', $validator);
+    $expires = date('Y-m-d H:i:s', time() + (30 * 24 * 60 * 60)); // 30 days
+
+    $stmt = $pdo->prepare(
+        "INSERT INTO password_reset_tokens (user_type, user_id, token, expires_at)
+         VALUES ('student', :uid, :token, :expires)"
+    );
+    $stmt->execute([
+        ':uid'     => $studentId,
+        ':token'   => $selector . ':' . $hashedValidator,
+        ':expires' => $expires,
+    ]);
+}
+
+/**
+ * Set the "remember me" cookie in the browser.
+ *
+ * @param string $selector
+ * @param string $validator
+ * @return void
+ */
+function student_set_remember_cookie($selector, $validator)
+{
+    $value = $selector . ':' . $validator;
+    setcookie('student_remember', $value, [
+        'expires'  => time() + (30 * 24 * 60 * 60),
+        'path'     => '/',
+        'domain'   => '',
+        'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+        'httponly'  => true,
+        'samesite' => 'Lax',
+    ]);
+}
+
+/**
+ * Validate the "remember me" cookie and return the student id, or false.
+ *
+ * @return int|false
+ */
+function student_validate_remember_cookie()
+{
+    global $pdo;
+
+    if (empty($_COOKIE['student_remember'])) {
+        return false;
+    }
+
+    $parts = explode(':', $_COOKIE['student_remember'], 2);
+    if (count($parts) !== 2) {
+        return false;
+    }
+
+    $selector          = $parts[0];
+    $validator         = $parts[1];
+    $hashedValidator   = hash('sha256', $validator);
+    $tokenValue        = $selector . ':' . $hashedValidator;
+
+    try {
+        $stmt = $pdo->prepare(
+            "SELECT id, user_id, expires_at, used
+             FROM password_reset_tokens
+             WHERE user_type = 'student' AND token = :token
+             LIMIT 1"
+        );
+        $stmt->execute([':token' => $tokenValue]);
+        $row = $stmt->fetch() ?: null;
+
+        if ($row === null) {
+            student_clear_remember_cookie($_COOKIE['student_remember']);
+            return false;
+        }
+
+        if ((int) $row['used'] === 1 || strtotime($row['expires_at']) < time()) {
+            student_clear_remember_cookie($_COOKIE['student_remember']);
+            return false;
+        }
+
+        return (int) $row['user_id'];
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * Remove a remember-me token from the database and clear the cookie.
+ *
+ * @param string $cookieValue
+ * @return void
+ */
+function student_clear_remember_cookie($cookieValue)
+{
+    global $pdo;
+
+    $parts = explode(':', $cookieValue, 2);
+    if (count($parts) === 2) {
+        $hashedValidator = hash('sha256', $parts[1]);
+        $tokenValue      = $parts[0] . ':' . $hashedValidator;
+        try {
+            $stmt = $pdo->prepare(
+                "DELETE FROM password_reset_tokens
+                 WHERE user_type = 'student' AND token = :token"
+            );
+            $stmt->execute([':token' => $tokenValue]);
+        } catch (PDOException $e) {
+            // Silently ignore — the cookie will still be cleared.
+        }
+    }
+
+    if (isset($_COOKIE['student_remember'])) {
+        setcookie('student_remember', '', [
+            'expires'  => time() - 3600,
+            'path'     => '/',
+            'domain'   => '',
+            'secure'   => !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off',
+            'httponly'  => true,
+            'samesite' => 'Lax',
+        ]);
+    }
+}
+
+/**
+ * Create a password-reset token for a student.
+ *
+ * @param int    $studentId
+ * @param string $token     The raw random token (hashed before storage).
+ * @param int    $ttl       Lifetime in seconds (default 1 hour).
+ * @return void
+ */
+function student_create_reset_token($studentId, $token, $ttl = 3600)
+{
+    global $pdo;
+
+    $hashed  = hash('sha256', $token);
+    $expires = date('Y-m-d H:i:s', time() + $ttl);
+
+    // Invalidate any previous unused tokens for this student.
+    $pdo->prepare(
+        "UPDATE password_reset_tokens
+         SET used = 1
+         WHERE user_type = 'student' AND user_id = :uid AND used = 0"
+    )->execute([':uid' => $studentId]);
+
+    $pdo->prepare(
+        "INSERT INTO password_reset_tokens (user_type, user_id, token, expires_at)
+         VALUES ('student', :uid, :token, :expires)"
+    )->execute([
+        ':uid'     => $studentId,
+        ':token'   => $hashed,
+        ':expires' => $expires,
+    ]);
+}
+
+/**
+ * Validate a password-reset token for a student and return the student id, or false.
+ *
+ * @param string $token
+ * @return int|false
+ */
+function student_validate_reset_token($token)
+{
+    global $pdo;
+
+    $hashed = hash('sha256', $token);
+
+    try {
+        $stmt = $pdo->prepare(
+            "SELECT id, user_id, expires_at, used
+             FROM password_reset_tokens
+             WHERE user_type = 'student' AND token = :token
+             LIMIT 1"
+        );
+        $stmt->execute([':token' => $hashed]);
+        $row = $stmt->fetch() ?: null;
+
+        if ($row === null || (int) $row['used'] === 1 || strtotime($row['expires_at']) < time()) {
+            return false;
+        }
+
+        return (int) $row['user_id'];
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * Mark a password-reset token as used for a student.
+ *
+ * @param string $token
+ * @return void
+ */
+function student_mark_reset_token_used($token)
+{
+    global $pdo;
+
+    $hashed = hash('sha256', $token);
+    $pdo->prepare(
+        "UPDATE password_reset_tokens SET used = 1
+         WHERE user_type = 'student' AND token = :token"
+    )->execute([':token' => $hashed]);
 }

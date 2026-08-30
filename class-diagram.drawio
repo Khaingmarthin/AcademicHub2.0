@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-08-30T00:00:00.000Z" agent="5.0" version="24.0.0" type="device">
+  <diagram id="academic-hub-class-diagram" name="Academic Hub UML Class Diagram">
+    <mxGraphModel dx="2400" dy="3800" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="2400" pageHeight="3800" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- ROW 1: USER HIERARCHY (y=50) -->
+
+        <mxCell id="Admin" value="Admin&#10;&#10;+ manageAcademicYear() : void&#10;+ manageFaculty() : void&#10;+ manageDepartment() : void&#10;+ manageMajor() : void&#10;+ manageCourse() : void&#10;+ manageClassroom() : void&#10;+ manageTeacher() : void&#10;+ manageStudent() : void&#10;+ manageNews() : void&#10;+ verifyAlumni(profile) : void&#10;+ moderateDiscussion() : void&#10;+ publishStory(story) : void" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="200" y="50" width="500" height="450" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="User" value="User (abstract)&#10;&#10;# id : int&#10;# name : String&#10;# email : String&#10;# password : String&#10;# status : Boolean&#10;# createdAt : DateTime&#10;# updatedAt : DateTime&#10;&#10;+ login(email, password) : Boolean&#10;+ logout() : void&#10;+ forgotPassword(email) : void&#10;+ resetPassword(token, newPass) : Boolean&#10;+ is_logged_in() : Boolean&#10;+ current_user() : Array" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="900" y="50" width="500" height="450" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Student" value="Student&#10;&#10;- studentId : String [UNIQUE]&#10;- rollNumber : String [UNIQUE]&#10;- studentStatus : enum&#10;- graduationYear : int&#10;- emailNotifications : Boolean&#10;&#10;+ getClassroom() : Classroom&#10;+ graduate(year) : void&#10;+ joinAlumni() : AlumniProfile&#10;+ createDiscussion(data) : Discussion&#10;+ replyToDiscussion(data) : DiscussionReply&#10;+ is_graduated() : Boolean" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1600" y="50" width="550" height="450" as="geometry"/>
+        </mxCell>
+
+        <!-- ROW 2: ACADEMIC STRUCTURE (y=600) -->
+
+        <mxCell id="AcademicYear" value="AcademicYear&#10;&#10;- yearName : String [UNIQUE]&#10;- startDate : Date&#10;- endDate : Date&#10;- status : enum&#10;&#10;+ getCourses() : List&lt;Course&gt;&#10;+ getClassrooms() : List&lt;Classroom&gt;&#10;+ activate() : void&#10;+ archive() : void&#10;+ isActive() : Boolean" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="100" y="600" width="480" height="330" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Faculty" value="Faculty&#10;&#10;- name : String&#10;- description : String&#10;- status : Boolean&#10;&#10;+ getMajors() : List&lt;Major&gt;&#10;+ getTeachers() : List&lt;Teacher&gt;" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="700" y="600" width="430" height="260" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Department" value="Department&#10;&#10;- name : String&#10;- description : String&#10;- status : Boolean&#10;&#10;+ getTeachers() : List&lt;Teacher&gt;" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1250" y="600" width="430" height="240" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Major" value="Major&#10;&#10;- shortName : String&#10;- degreeName : String&#10;- description : String&#10;&#10;+ getCourses() : List&lt;Course&gt;&#10;+ getFaculty() : Faculty" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1800" y="600" width="430" height="280" as="geometry"/>
+        </mxCell>
+
+        <!-- ROW 3: COURSES & CLASSROOMS (y=1000) -->
+
+        <mxCell id="Course" value="Course&#10;&#10;- courseCode : String&#10;- courseName : String&#10;- yearLevel : enum&#10;- semester : enum&#10;- creditHours : int&#10;&#10;+ getAssignments() : List&lt;TeacherAssignment&gt;&#10;+ getMajor() : Major&#10;+ getAcademicYear() : AcademicYear" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1000" width="500" height="340" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Classroom" value="Classroom&#10;&#10;- yearLevel : enum&#10;- section : String&#10;- classroomName : String&#10;- status : Boolean&#10;&#10;+ getStudents() : List&lt;Student&gt;&#10;+ getTimetables() : List&lt;Timetable&gt;&#10;+ getAssignments() : List&lt;TeacherAssignment&gt;&#10;+ getAcademicYear() : AcademicYear" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="750" y="1000" width="520" height="360" as="geometry"/>
+        </mxCell>
+
+        <!-- ROW 4: TEACHING (y=1450) -->
+
+        <mxCell id="Teacher" value="Teacher&#10;&#10;- teacherId : String [UNIQUE]&#10;- phone : String&#10;- specialization : String&#10;&#10;+ getAssignments() : List&lt;TeacherAssignment&gt;&#10;+ getFaculty() : Faculty&#10;+ getDepartment() : Department" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1450" width="480" height="280" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="TeacherAssignment" value="TeacherAssignment (association class)&#10;&#10;+ getTeacher() : Teacher&#10;+ getCourse() : Course&#10;+ getClassroom() : Classroom" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="700" y="1450" width="500" height="220" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Timetable" value="Timetable&#10;&#10;- semester : enum&#10;- title : String&#10;- image : String&#10;&#10;+ getClassroom() : Classroom" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="1450" width="480" height="250" as="geometry"/>
+        </mxCell>
+
+        <!-- ROW 5: NEWS (y=1800) -->
+
+        <mxCell id="NewsCategory" value="NewsCategory&#10;&#10;- name : String [UNIQUE]&#10;- description : String&#10;- status : Boolean&#10;&#10;+ getNews() : List&lt;News&gt;" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="100" y="1800" width="430" height="250" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="News" value="News&#10;&#10;- title : String&#10;- slug : String [UNIQUE]&#10;- content : String&#10;- coverImage : String&#10;- publishedAt : DateTime&#10;- status : enum&#10;&#10;+ getCategory() : NewsCategory&#10;+ getAdmin() : Admin&#10;+ getTargets() : List&lt;NewsTarget&gt;&#10;+ publish() : void&#10;+ unpublish() : void&#10;+ is_expired() : Boolean&#10;+ sendNotifications() : int" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="650" y="1800" width="520" height="400" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="NewsTarget" value="NewsTarget&#10;&#10;- yearLevel : enum&#10;- section : String&#10;&#10;+ getClassroom() : Classroom&#10;+ getMajor() : Major" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1300" y="1800" width="430" height="230" as="geometry"/>
+        </mxCell>
+
+        <!-- ROW 6: ALUMNI (y=2300) -->
+
+        <mxCell id="AlumniProfile" value="AlumniProfile&#10;&#10;- currentJob : String&#10;- company : String&#10;- professionalField : String&#10;- careerJourney : String&#10;- skills : String&#10;- bio : String&#10;- profilePhoto : String&#10;- linkedinUrl : String&#10;- githubUrl : String&#10;- websiteUrl : String&#10;- visibility : enum&#10;- verificationStatus : enum&#10;&#10;+ getStudent() : Student&#10;+ getStories() : List&lt;AlumniStory&gt;&#10;+ verify() : void&#10;+ reject() : void&#10;+ is_verified() : Boolean" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="100" y="2300" width="560" height="480" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="AlumniStory" value="AlumniStory&#10;&#10;- title : String&#10;- summary : String&#10;- content : String&#10;- careerField : String&#10;- coverImage : String&#10;- publicationDate : Date&#10;- status : enum&#10;&#10;+ getAlumniProfile() : AlumniProfile&#10;+ publish() : void&#10;+ unpublish() : void&#10;+ reject() : void" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="800" y="2300" width="520" height="400" as="geometry"/>
+        </mxCell>
+
+        <!-- ROW 7: DISCUSSION (y=2850) -->
+
+        <mxCell id="DiscussionCategory" value="DiscussionCategory&#10;&#10;- name : String [UNIQUE]&#10;- slug : String [UNIQUE]&#10;- description : String&#10;- sortOrder : int&#10;- status : enum&#10;&#10;+ getDiscussions() : List&lt;Discussion&gt;" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="100" y="2850" width="480" height="310" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="Discussion" value="Discussion&#10;&#10;- title : String&#10;- content : String&#10;- status : enum&#10;- isPinned : Boolean&#10;&#10;+ getCategory() : DiscussionCategory&#10;+ getAuthor() : Student&#10;+ getReplies() : List&lt;DiscussionReply&gt;&#10;+ pin() : void&#10;+ unpin() : void&#10;+ close() : void&#10;+ hide() : void" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="700" y="2850" width="500" height="340" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="DiscussionReply" value="DiscussionReply&#10;&#10;- content : String&#10;- status : enum&#10;&#10;+ getDiscussion() : Discussion&#10;+ getAuthor() : Student&#10;+ hide() : void&#10;+ restore() : void" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1350" y="2850" width="450" height="260" as="geometry"/>
+        </mxCell>
+
+        <!-- ROW 8: STANDALONE (y=3300) -->
+
+        <mxCell id="PasswordResetToken" value="PasswordResetToken&#10;&#10;- userType : enum&#10;- userId : int&#10;- token : String [UNIQUE]&#10;- expiresAt : DateTime&#10;- used : Boolean&#10;&#10;+ isValid() : Boolean&#10;+ markUsed() : void&#10;+ isExpired() : Boolean&#10;+ generate() : String" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="100" y="3300" width="480" height="350" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="UniversityProfile" value="UniversityProfile (singleton)&#10;&#10;- name : String&#10;- shortName : String&#10;- logo : String&#10;- address : String&#10;- phone : String&#10;- email : String&#10;&#10;+ getConfig() : UniversityProfile" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="700" y="3300" width="450" height="300" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="AdministrativeUnit" value="AdministrativeUnit (standalone)&#10;&#10;- name : String&#10;- description : String&#10;- status : Boolean&#10;&#10;+ getDescription() : String" style="shape=umlClass;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingRight=8;overflow=hidden;rotatable=0;fontFamily=Courier New;fontSize=22;fontStyle=1;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1300" y="3300" width="430" height="230" as="geometry"/>
+        </mxCell>
+
+        <!-- INHERITANCE (#1, #2) -->
+
+        <mxCell id="inhAdmin" style="endArrow=block;endFill=0;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="Admin" target="User" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="inhStudent" style="endArrow=block;endFill=0;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="Student" target="User" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ACADEMIC STRUCTURE (#3-#9) -->
+
+        <mxCell id="r_faculty_major" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="Faculty" target="Major" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_fm_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_faculty_major">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_fm_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_faculty_major">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r_major_course" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="Major" target="Course" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="2015" y="880"/><mxPoint x="2015" y="950"/><mxPoint x="350" y="950"/></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_mc_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_major_course">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_mc_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_major_course">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r_ay_course" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="AcademicYear" target="Course" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="340" y="930"/><mxPoint x="340" y="1000"/></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_ay_c_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_ay_course">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_ay_c_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_ay_course">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r_ay_classroom" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="AcademicYear" target="Classroom" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="340" y="930"/><mxPoint x="340" y="960"/><mxPoint x="1010" y="960"/></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_ay_cl_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_ay_classroom">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_ay_cl_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_ay_classroom">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r_classroom_student" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="Classroom" target="Student" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="1010" y="1000"/><mxPoint x="1010" y="530"/><mxPoint x="1875" y="530"/></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_cs_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_classroom_student">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_cs_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_classroom_student">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- TEACHER XOR (#4, #5) -->
+
+        <mxCell id="r_faculty_teacher" value="{xor}" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="Faculty" target="Teacher" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="915" y="860"/><mxPoint x="915" y="1450"/></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_ft_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_faculty_teacher">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_ft_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_faculty_teacher">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r_dept_teacher" value="{xor}" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="Department" target="Teacher" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="1465" y="840"/><mxPoint x="1465" y="1400"/><mxPoint x="340" y="1400"/><mxPoint x="340" y="1450"/></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_dt_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_dept_teacher">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_dt_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_dept_teacher">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- TEACHER ASSIGNMENT (#10-#13) -->
+
+        <mxCell id="r_teacher_ta" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="Teacher" target="TeacherAssignment" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_ta_t_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_teacher_ta">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_ta_t_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_teacher_ta">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r_course_ta" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="Course" target="TeacherAssignment" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="350" y="1340"/><mxPoint x="350" y="1400"/><mxPoint x="950" y="1400"/></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_ta_c_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_course_ta">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_ta_c_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_course_ta">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r_classroom_ta" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="Classroom" target="TeacherAssignment" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="1010" y="1360"/><mxPoint x="1010" y="1450"/></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_ta_cl_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_classroom_ta">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_ta_cl_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_classroom_ta">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r_classroom_tt" style="endArrow=none;startArrow=diamond;startFill=1;startSize=14;strokeWidth=2;strokeColor=#000000;" edge="1" source="Classroom" target="Timetable" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_ct_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_classroom_tt">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_ct_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_classroom_tt">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- NEWS (#16-#18) -->
+
+        <mxCell id="r_newscat_news" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="NewsCategory" target="News" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_cn_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_newscat_news">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_cn_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_newscat_news">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r_admin_news" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="Admin" target="News" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="450" y="500"/><mxPoint x="450" y="560"/><mxPoint x="910" y="560"/></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_an_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_admin_news">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_an_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_admin_news">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r_news_target" style="endArrow=none;startArrow=diamond;startFill=1;startSize=14;strokeWidth=2;strokeColor=#000000;" edge="1" source="News" target="NewsTarget" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_nt_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_news_target">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_nt_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_news_target">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- ALUMNI (#14, #15) -->
+
+        <mxCell id="r_student_alumni" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="Student" target="AlumniProfile" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="1875" y="500"/><mxPoint x="1875" y="560"/><mxPoint x="100" y="560"/><mxPoint x="100" y="2300"/></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_sa_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_student_alumni">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_sa_2" value="0..1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_student_alumni">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r_alumni_story" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="AlumniProfile" target="AlumniStory" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_as_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_alumni_story">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_as_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_alumni_story">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- DISCUSSION (#19-#22) -->
+
+        <mxCell id="r_discat_disc" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="DiscussionCategory" target="Discussion" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_dc_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_discat_disc">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_dc_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_discat_disc">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r_disc_reply" style="endArrow=none;startArrow=diamond;startFill=1;startSize=14;strokeWidth=2;strokeColor=#000000;" edge="1" source="Discussion" target="DiscussionReply" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_dr_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_disc_reply">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_dr_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_disc_reply">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r_student_disc" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="Student" target="Discussion" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="1875" y="500"/><mxPoint x="1875" y="560"/><mxPoint x="950" y="560"/><mxPoint x="950" y="2850"/></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_sd_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_student_disc">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_sd_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_student_disc">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <mxCell id="r_student_reply" style="endArrow=none;startArrow=none;strokeWidth=2;strokeColor=#000000;" edge="1" source="Student" target="DiscussionReply" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="1875" y="500"/><mxPoint x="1875" y="560"/><mxPoint x="1575" y="560"/><mxPoint x="1575" y="2850"/></Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="r_sr_1" value="1" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_student_reply">
+          <mxGeometry x="-0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+        <mxCell id="r_sr_2" value="0..*" style="edgeLabel;html=1;fontSize=28;fontStyle=1;fontFamily=Courier New;" vertex="1" connectable="0" parent="r_student_reply">
+          <mxGeometry x="0.5" y="-15" relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- PASSWORD RESET TOKEN (#23) -->
+
+        <mxCell id="r_prt_user" style="endArrow=none;startArrow=none;dashed=1;dashPattern=8 8;strokeWidth=2;strokeColor=#000000;" edge="1" source="PasswordResetToken" target="User" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points"><mxPoint x="340" y="3300"/><mxPoint x="340" y="3650"/><mxPoint x="1150" y="3650"/><mxPoint x="1150" y="500"/></Array>
+          </mxGeometry>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

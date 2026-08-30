@@ -64,6 +64,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['admin_email'] = (string) $ucsAdmin['email'];
                 $_SESSION['admin_last_activity'] = time();
 
+                // Handle "Remember Me" — create a persistent cookie.
+                $ucsRememberMe = !empty($_POST['remember_me']);
+                if ($ucsRememberMe) {
+                    $ucsSelector    = bin2hex(random_bytes(8));
+                    $ucsValidator   = bin2hex(random_bytes(32));
+                    admin_create_remember_token((int) $ucsAdmin['id'], $ucsSelector, $ucsValidator);
+                    admin_set_remember_cookie($ucsSelector, $ucsValidator);
+                }
+
                 header('Location: ' . ROOT_URL . '/admin/dashboard.php');
                 exit;
             }

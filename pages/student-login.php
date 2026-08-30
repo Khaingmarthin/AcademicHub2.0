@@ -16,7 +16,35 @@ if (student_is_logged_in()) {
     exit;
 }
 
-$pageTitle = 'Student Login';
+// Handle "remember me" persistent login before rendering the page.
+if (!student_is_logged_in()) {
+    $ucsRememberUserId = student_validate_remember_cookie();
+    if ($ucsRememberUserId !== false) {
+        try {
+            $ucsRememberStmt = $pdo->prepare(
+                "SELECT id, student_id, name, email, status
+                 FROM students
+                 WHERE id = :id AND status = 1
+                 LIMIT 1"
+            );
+            $ucsRememberStmt->execute([':id' => $ucsRememberUserId]);
+            $ucsRememberUser = $ucsRememberStmt->fetch() ?: null;
+            if ($ucsRememberUser !== null) {
+                session_regenerate_id(true);
+                $_SESSION['student_id']            = (int) $ucsRememberUser['id'];
+                $_SESSION['student_name']          = (string) $ucsRememberUser['name'];
+                $_SESSION['student_email']         = (string) $ucsRememberUser['email'];
+                $_SESSION['student_last_activity'] = time();
+                header('Location: ' . BASE_URL . '/student-dashboard.php');
+                exit;
+            }
+        } catch (PDOException $e) {
+            // Fall through to normal login page.
+        }
+    }
+}
+
+$pageTitle = 'Login';
 
 // Flash messages left by the login handler.
 $ucsLoginErrors = $_SESSION['student_login_errors'] ?? [];
@@ -48,7 +76,7 @@ require_once '../includes/header.php';
             <div class="text-center">
                 <img src="<?php echo htmlspecialchars($ucsLoginLogo); ?>" alt="UCSMTLA logo" class="mx-auto h-16 w-16 object-contain">
                 <p class="mt-5 text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">Student Portal</p>
-                <h1 id="student-login-heading" class="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">Student Login</h1>
+                <h1 id="student-login-heading" class="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">Login</h1>
                 <p class="mt-3 text-sm leading-6 text-slate-500">
                     Access your personalized academic information.
                 </p>
@@ -93,6 +121,18 @@ require_once '../includes/header.php';
                             </svg>
                         </button>
                     </div>
+                </div>
+
+                <!-- Remember Me + Forgot Password -->
+                <div class="flex items-center justify-between">
+                    <label class="flex items-center gap-2 cursor-pointer">
+                        <input type="checkbox" name="remember_me" value="1"
+                               class="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500">
+                        <span class="text-sm text-slate-600">Remember me</span>
+                    </label>
+                    <a href="<?php echo htmlspecialchars(ROOT_URL . '/pages/forgot-password-student.php'); ?>" class="text-sm font-semibold text-blue-600 transition-colors hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        Forgot password?
+                    </a>
                 </div>
 
                 <button type="submit" class="inline-flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-colors duration-150 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">

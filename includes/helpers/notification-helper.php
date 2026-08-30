@@ -161,3 +161,146 @@ function ucs_send_news_notification($pdo, $newsId, $title, $content, $slug)
 
     return $sent;
 }
+
+/**
+ * Create an in-app notification for a student.
+ *
+ * @param PDO    $pdo       Database connection.
+ * @param int    $studentId Recipient student id.
+ * @param string $type      Notification type ('news' or 'discussion_reply').
+ * @param string $title     Short headline.
+ * @param string $message   Preview text.
+ * @param string $link      URL to navigate to when clicked.
+ * @return int|false The new notification id, or false on failure.
+ */
+function ucs_create_notification($pdo, $studentId, $type, $title, $message, $link)
+{
+    try {
+        $ucsStmt = $pdo->prepare(
+            "INSERT INTO notifications (student_id, type, title, message, link)
+             VALUES (:student_id, :type, :title, :message, :link)"
+        );
+        $ucsStmt->execute([
+            ':student_id' => $studentId,
+            ':type'       => $type,
+            ':title'      => $title,
+            ':message'    => $message,
+            ':link'       => $link,
+        ]);
+        return (int) $pdo->lastInsertId();
+    } catch (PDOException $e) {
+        return false;
+    }
+}
+
+/**
+ * Return the number of unread in-app notifications for a student.
+ *
+ * @param PDO $pdo       Database connection.
+ * @param int $studentId Student id.
+ * @return int
+ */
+function ucs_unread_notification_count($pdo, $studentId)
+{
+    try {
+        $ucsStmt = $pdo->prepare(
+            "SELECT COUNT(*) FROM notifications
+             WHERE student_id = :student_id AND is_read = 0"
+        );
+        $ucsStmt->execute([':student_id' => $studentId]);
+        return (int) $ucsStmt->fetchColumn();
+    } catch (PDOException $e) {
+        return 0;
+    }
+}
+
+/**
+ * Mark all unread notifications as read for a student.
+ *
+ * @param PDO $pdo       Database connection.
+ * @param int $studentId Student id.
+ * @return void
+ */
+function ucs_mark_notifications_read($pdo, $studentId)
+{
+    try {
+        $ucsStmt = $pdo->prepare(
+            "UPDATE notifications SET is_read = 1
+             WHERE student_id = :student_id AND is_read = 0"
+        );
+        $ucsStmt->execute([':student_id' => $studentId]);
+    } catch (PDOException $e) {
+        // Silently ignore — this is best-effort.
+    }
+}
+
+/**
+ * Fetch the most recent in-app notifications for a student.
+ *
+ * @param PDO $pdo       Database connection.
+ * @param int $studentId Student id.
+ * @param int $limit     Maximum number of notifications to return.
+ * @return array
+ */
+function ucs_fetch_notifications($pdo, $studentId, $limit = 10)
+{
+    try {
+        $ucsStmt = $pdo->prepare(
+            "SELECT id, type, title, message, link, is_read, created_at
+             FROM notifications
+             WHERE student_id = :student_id
+             ORDER BY created_at DESC
+             LIMIT :limit"
+        );
+        $ucsStmt->bindValue(':student_id', $studentId, PDO::PARAM_INT);
+        $ucsStmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+        $ucsStmt->execute();
+        return $ucsStmt->fetchAll() ?: [];
+    } catch (PDOException $e) {
+        return [];
+    }
+}
+
+/**
+ * Create in-app notifications for a published news article.
+ *
+ * Resolves the target students and inserts one notification per student.
+ *
+ * @param PDO    $pdo     Database connection.
+ * @param int    $newsId  The news article id.
+ * @param string $title   Article title.
+ * @param string $content Article content (used as preview).
+ * @param string $slug    Article URL slug.
+ * @return int Number of notifications created.
+ */
+function ucs_create_news_notifications($pdo, $newsId, $title, $content, $slug)
+{
+    $students = ucs_resolve_target_students($pdo, $newsId);
+    if (empty($students)) {
+        return 0;
+    }
+
+    $link    = BASE_URL . '/news-details.php?slug=' . urlencode($slug);
+    $uniName = APP_NAME ?? 'Academic Hub';
+    $summary = mb_substr(strip_tags($content), 0, 150);
+    if (mb_strlen(strip_tags($content)) > 150) {
+        $summary .= '...';
+    }
+
+    $created = 0;
+    foreach ($students as $student) {
+        $result = ucs_create_notification(
+            $pdo,
+            (int) $student['id'],
+            'news',
+            $uniName . ': ' . $title,
+            $summary,
+            $link
+        );
+        if ($result) {
+            $created++;
+        }
+    }
+
+    return $created;
+}

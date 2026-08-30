@@ -51,6 +51,20 @@ if ($ucsArticle !== null) {
     $pageTitle = $ucsArticle['title'] ?? 'News Details';
 }
 
+// Fetch gallery images.
+$ucsGallery = [];
+if ($ucsArticle !== null && isset($pdo)) {
+    try {
+        $ucsGalleryStmt = $pdo->prepare(
+            "SELECT image_path FROM news_images WHERE news_id = :news_id ORDER BY sort_order ASC"
+        );
+        $ucsGalleryStmt->execute([':news_id' => $ucsArticle['id']]);
+        $ucsGallery = $ucsGalleryStmt->fetchAll() ?: [];
+    } catch (PDOException $e) {
+        $ucsGallery = [];
+    }
+}
+
 // Related articles (same category, excluding current).
 $ucsRelated = [];
 if ($ucsArticle !== null && isset($pdo)) {
@@ -148,6 +162,27 @@ require_once '../includes/header.php';
             <section class="bg-white" aria-hidden="true">
                 <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
                     <img src="<?php echo htmlspecialchars($ucsCoverUrl); ?>" alt="<?php echo htmlspecialchars($ucsArticle['title']); ?>" class="w-full rounded-lg object-cover" style="max-height: 32rem;">
+                </div>
+            </section>
+        <?php endif; ?>
+
+        <!-- Gallery images -->
+        <?php if (!empty($ucsGallery)): ?>
+            <section class="bg-white py-6 sm:py-8" aria-labelledby="news-gallery-heading">
+                <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+                    <h2 id="news-gallery-heading" class="sr-only">Photo Gallery</h2>
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3">
+                        <?php foreach ($ucsGallery as $ucsGalImg): ?>
+                            <?php
+                            $ucsGalFile = dirname(__DIR__) . '/assets/' . ltrim($ucsGalImg['image_path'], '/');
+                            if (!is_file($ucsGalFile)) continue;
+                            $ucsGalUrl = ROOT_URL . '/assets/' . ltrim($ucsGalImg['image_path'], '/');
+                            ?>
+                            <a href="<?php echo htmlspecialchars($ucsGalUrl); ?>" target="_blank" rel="noopener noreferrer" class="group block overflow-hidden rounded-lg ring-1 ring-slate-200 transition-shadow hover:shadow-md">
+                                <img src="<?php echo htmlspecialchars($ucsGalUrl); ?>" alt="" class="h-40 w-full object-cover transition-transform duration-300 group-hover:scale-105 sm:h-48">
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
                 </div>
             </section>
         <?php endif; ?>

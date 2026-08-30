@@ -25,6 +25,9 @@ $ucsErrors = $ucsResult['errors'];
 
 if (!empty($ucsErrors)) {
     ucs_delete_upload($ucsClean['cover_image'] ?? null);
+    foreach ($ucsClean['gallery_images'] ?? [] as $ucsImg) {
+        ucs_delete_upload($ucsImg);
+    }
     $_SESSION['news_errors'] = $ucsErrors;
     $_SESSION['news_old']    = $ucsClean;
     header('Location: ' . $ucsFormUrl);
@@ -80,8 +83,28 @@ try {
 
     $pdo->commit();
 
+    // Insert gallery images after commit.
+    if (!empty($ucsClean['gallery_images'])) {
+        try {
+            $ucsImgStmt = $pdo->prepare(
+                "INSERT INTO news_images (news_id, image_path, sort_order)
+                 VALUES (:news_id, :image_path, :sort_order)"
+            );
+            foreach ($ucsClean['gallery_images'] as $ucsIdx => $ucsImgPath) {
+                $ucsImgStmt->execute([
+                    ':news_id'     => $ucsNewsId,
+                    ':image_path'  => $ucsImgPath,
+                    ':sort_order'  => $ucsIdx,
+                ]);
+            }
+        } catch (PDOException $e) {
+            // Gallery insert is best-effort; article is already saved.
+        }
+    }
+
     if ($ucsClean['status'] === 'Published') {
         ucs_send_news_notification($pdo, $ucsNewsId, $ucsClean['title'], $ucsClean['content'], $ucsSlug);
+        ucs_create_news_notifications($pdo, $ucsNewsId, $ucsClean['title'], $ucsClean['content'], $ucsSlug);
     }
 
     news_flash('success', 'News article "' . $ucsClean['title'] . '" created successfully.');

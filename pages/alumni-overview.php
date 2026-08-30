@@ -246,7 +246,7 @@ require_once '../includes/header.php';
                     </p>
                     <div class="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
                         <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-lg bg-blue-600 px-6 py-3 text-sm font-semibold text-white transition-colors duration-150 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                            Student Login
+                            Login
                         </a>
                         <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition-colors duration-150 hover:bg-slate-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                             Browse Alumni

@@ -42,6 +42,9 @@ $ucsErrors = $ucsResult['errors'];
 
 if (!empty($ucsErrors)) {
     ucs_delete_upload($ucsClean['cover_image'] ?? null);
+    foreach ($ucsClean['gallery_images'] ?? [] as $ucsImg) {
+        ucs_delete_upload($ucsImg);
+    }
     $_SESSION['news_errors'] = $ucsErrors;
     $_SESSION['news_old']    = $ucsClean;
     header('Location: ' . ROOT_URL . '/admin/news/edit.php?id=' . $ucsId);
@@ -104,12 +107,64 @@ try {
 
     $pdo->commit();
 
+    // Remove gallery images checked for deletion.
+    $ucsRemoveGalleryIds = $_POST['remove_gallery_ids'] ?? [];
+    if (!empty($ucsRemoveGalleryIds) && is_array($ucsRemoveGalleryIds)) {
+        foreach ($ucsRemoveGalleryIds as $ucsRemoveId) {
+            $ucsRemoveId = filter_var($ucsRemoveId, FILTER_VALIDATE_INT);
+            if ($ucsRemoveId === false || $ucsRemoveId < 1) {
+                continue;
+            }
+            try {
+                $ucsStmt = $pdo->prepare("SELECT image_path FROM news_images WHERE id = :id AND news_id = :news_id LIMIT 1");
+                $ucsStmt->execute([':id' => $ucsRemoveId, ':news_id' => $ucsId]);
+                $ucsRemoveImg = $ucsStmt->fetch() ?: null;
+                if ($ucsRemoveImg) {
+                    ucs_delete_upload($ucsRemoveImg['image_path']);
+                    $pdo->prepare("DELETE FROM news_images WHERE id = :id")->execute([':id' => $ucsRemoveId]);
+                }
+            } catch (PDOException $e) {
+                // Best-effort cleanup.
+            }
+        }
+    }
+
+    // Insert new gallery images.
+    if (!empty($ucsClean['gallery_images'])) {
+        // Get current max sort_order for appending.
+        $ucsMaxSort = 0;
+        try {
+            $ucsStmt = $pdo->prepare("SELECT COALESCE(MAX(sort_order), -1) FROM news_images WHERE news_id = :news_id");
+            $ucsStmt->execute([':news_id' => $ucsId]);
+            $ucsMaxSort = (int) $ucsStmt->fetchColumn() + 1;
+        } catch (PDOException $e) {
+            $ucsMaxSort = 0;
+        }
+
+        try {
+            $ucsImgStmt = $pdo->prepare(
+                "INSERT INTO news_images (news_id, image_path, sort_order)
+                 VALUES (:news_id, :image_path, :sort_order)"
+            );
+            foreach ($ucsClean['gallery_images'] as $ucsIdx => $ucsImgPath) {
+                $ucsImgStmt->execute([
+                    ':news_id'    => $ucsId,
+                    ':image_path' => $ucsImgPath,
+                    ':sort_order' => $ucsMaxSort + $ucsIdx,
+                ]);
+            }
+        } catch (PDOException $e) {
+            // Gallery insert is best-effort.
+        }
+    }
+
     if ($ucsClean['cover_image'] !== null || $ucsRemoveCover) {
         ucs_delete_upload($ucsExisting['cover_image'] ?? null);
     }
 
     if ($ucsClean['status'] === 'Published' && $ucsExisting['status'] !== 'Published') {
         ucs_send_news_notification($pdo, $ucsId, $ucsClean['title'], $ucsClean['content'], $ucsSlug);
+        ucs_create_news_notifications($pdo, $ucsId, $ucsClean['title'], $ucsClean['content'], $ucsSlug);
     }
 
     news_flash('success', 'News article "' . $ucsClean['title'] . '" updated successfully.');

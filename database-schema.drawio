@@ -1,0 +1,244 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-08-29T00:00:00.000Z" agent="5.0" version="24.0.0" type="device">
+  <diagram id="db-schema" name="Database Schema">
+    <mxGraphModel dx="4000" dy="3000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="3200" pageHeight="2400" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+
+        <!-- university_profile -->
+        <mxCell id="university_profile" value="&lt;b&gt;university_profile&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;name&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;short_name&lt;/b&gt; VARCHAR(100)&lt;br&gt;&lt;b&gt;history&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;vision&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;mission&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;rector_message&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;established_year&lt;/b&gt; YEAR&lt;br&gt;&lt;b&gt;logo&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;hero_media&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;address&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;phone&lt;/b&gt; VARCHAR(50)&lt;br&gt;&lt;b&gt;email&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;admission_description&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;document&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="20" y="20" width="360" height="560" as="geometry"/>
+        </mxCell>
+
+        <!-- faculties -->
+        <mxCell id="faculties" value="&lt;b&gt;faculties&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;name&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;description&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;status&lt;/b&gt; BOOLEAN&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="440" y="20" width="360" height="220" as="geometry"/>
+        </mxCell>
+
+        <!-- departments -->
+        <mxCell id="departments" value="&lt;b&gt;departments&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;name&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;description&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;status&lt;/b&gt; BOOLEAN&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="860" y="20" width="360" height="220" as="geometry"/>
+        </mxCell>
+
+        <!-- academic_years -->
+        <mxCell id="academic_years" value="&lt;b&gt;academic_years&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;year_name&lt;/b&gt; VARCHAR(20) UNIQUE&lt;br&gt;&lt;b&gt;start_date&lt;/b&gt; DATE&lt;br&gt;&lt;b&gt;end_date&lt;/b&gt; DATE&lt;br&gt;&lt;b&gt;status&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="20" width="360" height="240" as="geometry"/>
+        </mxCell>
+
+        <!-- categories -->
+        <mxCell id="categories" value="&lt;b&gt;categories&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;name&lt;/b&gt; VARCHAR(100) UNIQUE&lt;br&gt;&lt;b&gt;description&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;status&lt;/b&gt; BOOLEAN&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="20" width="360" height="220" as="geometry"/>
+        </mxCell>
+
+        <!-- admins -->
+        <mxCell id="admins" value="&lt;b&gt;admins&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;name&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;email&lt;/b&gt; VARCHAR(191) UNIQUE&lt;br&gt;&lt;b&gt;password&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;status&lt;/b&gt; BOOLEAN&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2120" y="20" width="360" height="240" as="geometry"/>
+        </mxCell>
+
+        <!-- discussion_categories -->
+        <mxCell id="discussion_categories" value="&lt;b&gt;discussion_categories&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;name&lt;/b&gt; VARCHAR(191) UNIQUE&lt;br&gt;&lt;b&gt;slug&lt;/b&gt; VARCHAR(191) UNIQUE&lt;br&gt;&lt;b&gt;description&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;sort_order&lt;/b&gt; INT&lt;br&gt;&lt;b&gt;status&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2540" y="20" width="360" height="260" as="geometry"/>
+        </mxCell>
+
+        <!-- majors -->
+        <mxCell id="majors" value="&lt;b&gt;majors&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;faculty_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;name&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;short_name&lt;/b&gt; VARCHAR(50)&lt;br&gt;&lt;b&gt;degree_name&lt;/b&gt; VARCHAR(100)&lt;br&gt;&lt;b&gt;description&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;status&lt;/b&gt; BOOLEAN&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="440" y="300" width="360" height="280" as="geometry"/>
+        </mxCell>
+
+        <!-- teachers -->
+        <mxCell id="teachers" value="&lt;b&gt;teachers&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;teacher_id&lt;/b&gt; VARCHAR(50) UNIQUE&lt;br&gt;&lt;b&gt;name&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;email&lt;/b&gt; VARCHAR(191)&lt;br&gt;&lt;b&gt;phone&lt;/b&gt; VARCHAR(50)&lt;br&gt;&lt;b&gt;faculty_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;department_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;specialization&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;status&lt;/b&gt; BOOLEAN&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="860" y="300" width="360" height="340" as="geometry"/>
+        </mxCell>
+
+        <!-- courses -->
+        <mxCell id="courses" value="&lt;b&gt;courses&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;academic_year_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;major_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;course_code&lt;/b&gt; VARCHAR(50)&lt;br&gt;&lt;b&gt;course_name&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;year_level&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;semester&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;credit_hours&lt;/b&gt; INT UNSIGNED&lt;br&gt;&lt;b&gt;description&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;status&lt;/b&gt; BOOLEAN&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="300" width="360" height="370" as="geometry"/>
+        </mxCell>
+
+        <!-- news -->
+        <mxCell id="news" value="&lt;b&gt;news&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;category_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;admin_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;title&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;slug&lt;/b&gt; VARCHAR(191) UNIQUE&lt;br&gt;&lt;b&gt;content&lt;/b&gt; LONGTEXT&lt;br&gt;&lt;b&gt;cover_image&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;published_at&lt;/b&gt; DATETIME&lt;br&gt;&lt;b&gt;expired_at&lt;/b&gt; DATETIME&lt;br&gt;&lt;b&gt;status&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="300" width="360" height="370" as="geometry"/>
+        </mxCell>
+
+        <!-- students -->
+        <mxCell id="students" value="&lt;b&gt;students&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;student_id&lt;/b&gt; VARCHAR(50) UNIQUE&lt;br&gt;&lt;b&gt;roll_number&lt;/b&gt; VARCHAR(50) UNIQUE&lt;br&gt;&lt;b&gt;name&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;email&lt;/b&gt; VARCHAR(191) UNIQUE&lt;br&gt;&lt;b&gt;password&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;classroom_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;status&lt;/b&gt; BOOLEAN&lt;br&gt;&lt;b&gt;email_notifications&lt;/b&gt; BOOLEAN&lt;br&gt;&lt;b&gt;student_status&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;graduation_year&lt;/b&gt; YEAR&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2120" y="300" width="360" height="400" as="geometry"/>
+        </mxCell>
+
+        <!-- alumni_profiles -->
+        <mxCell id="alumni_profiles" value="&lt;b&gt;alumni_profiles&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;student_id&lt;/b&gt; BIGINT FK UNIQUE&lt;br&gt;&lt;b&gt;current_job&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;company&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;professional_field&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;career_journey&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;skills&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;bio&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;profile_photo&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;linkedin_url&lt;/b&gt; VARCHAR(191)&lt;br&gt;&lt;b&gt;github_url&lt;/b&gt; VARCHAR(191)&lt;br&gt;&lt;b&gt;website_url&lt;/b&gt; VARCHAR(191)&lt;br&gt;&lt;b&gt;visibility&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;verification_status&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2540" y="300" width="360" height="480" as="geometry"/>
+        </mxCell>
+
+        <!-- classrooms -->
+        <mxCell id="classrooms" value="&lt;b&gt;classrooms&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;academic_year_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;major_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;year_level&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;section&lt;/b&gt; VARCHAR(10)&lt;br&gt;&lt;b&gt;classroom_name&lt;/b&gt; VARCHAR(100)&lt;br&gt;&lt;b&gt;status&lt;/b&gt; BOOLEAN&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="440" y="640" width="360" height="280" as="geometry"/>
+        </mxCell>
+
+        <!-- timetables -->
+        <mxCell id="timetables" value="&lt;b&gt;timetables&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;classroom_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;semester&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;title&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;image&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;status&lt;/b&gt; BOOLEAN&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="440" y="960" width="360" height="260" as="geometry"/>
+        </mxCell>
+
+        <!-- discussions -->
+        <mxCell id="discussions" value="&lt;b&gt;discussions&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;category_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;author_student_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;title&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;content&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;status&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;is_pinned&lt;/b&gt; TINYINT(1)&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2540" y="820" width="360" height="280" as="geometry"/>
+        </mxCell>
+
+        <!-- discussion_replies -->
+        <mxCell id="discussion_replies" value="&lt;b&gt;discussion_replies&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;discussion_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;author_student_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;content&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;status&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2540" y="1140" width="360" height="220" as="geometry"/>
+        </mxCell>
+
+        <!-- alumni_stories -->
+        <mxCell id="alumni_stories" value="&lt;b&gt;alumni_stories&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;alumni_profile_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;admin_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;title&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;summary&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;content&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;career_field&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;cover_image&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;publication_date&lt;/b&gt; DATE&lt;br&gt;&lt;b&gt;status&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="2120" y="740" width="360" height="360" as="geometry"/>
+        </mxCell>
+
+        <!-- news_targets -->
+        <mxCell id="news_targets" value="&lt;b&gt;news_targets&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;news_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;classroom_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;major_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;year_level&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;section&lt;/b&gt; VARCHAR(10)&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="720" width="360" height="240" as="geometry"/>
+        </mxCell>
+
+        <!-- teacher_course_assignments -->
+        <mxCell id="teacher_course_assignments" value="&lt;b&gt;teacher_course_assignments&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;teacher_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;course_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;classroom_id&lt;/b&gt; BIGINT FK&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="720" width="360" height="220" as="geometry"/>
+        </mxCell>
+
+        <!-- administrative_units -->
+        <mxCell id="administrative_units" value="&lt;b&gt;administrative_units&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;name&lt;/b&gt; VARCHAR(255)&lt;br&gt;&lt;b&gt;description&lt;/b&gt; TEXT&lt;br&gt;&lt;b&gt;status&lt;/b&gt; BOOLEAN&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;br&gt;&lt;b&gt;updated_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1280" y="1000" width="360" height="220" as="geometry"/>
+        </mxCell>
+
+        <!-- password_reset_tokens -->
+        <mxCell id="password_reset_tokens" value="&lt;b&gt;password_reset_tokens&lt;/b&gt;&lt;hr size=&quot;1&quot;&gt;&lt;p style=&quot;margin:2px;&quot;&gt;&lt;b&gt;id&lt;/b&gt; BIGINT PK&lt;br&gt;&lt;b&gt;user_type&lt;/b&gt; ENUM&lt;br&gt;&lt;b&gt;user_id&lt;/b&gt; BIGINT&lt;br&gt;&lt;b&gt;token&lt;/b&gt; VARCHAR(64) UNIQUE&lt;br&gt;&lt;b&gt;expires_at&lt;/b&gt; DATETIME&lt;br&gt;&lt;b&gt;used&lt;/b&gt; BOOLEAN&lt;br&gt;&lt;b&gt;created_at&lt;/b&gt; TIMESTAMP&lt;/p&gt;" style="text;html=1;align=left;verticalAlign=top;spacingLeft=4;spacingRight=4;overflow=hidden;rotatable=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;fontFamily=Courier New;fontSize=24;fontColor=#000000;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="1700" y="1000" width="360" height="240" as="geometry"/>
+        </mxCell>
+
+        <!-- ========== RELATIONSHIP LINES ========== -->
+
+        <!-- faculties -> majors (1:N) -->
+        <mxCell id="r1" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="faculties" target="majors" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- faculties -> teachers (1:N) -->
+        <mxCell id="r2" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="faculties" target="teachers" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- departments -> teachers (1:N) -->
+        <mxCell id="r3" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="departments" target="teachers" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- academic_years -> courses (1:N) -->
+        <mxCell id="r4" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="academic_years" target="courses" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- academic_years -> classrooms (1:N) -->
+        <mxCell id="r5" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="academic_years" target="classrooms" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- majors -> courses (1:N) -->
+        <mxCell id="r6" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="majors" target="courses" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- majors -> classrooms (1:N) -->
+        <mxCell id="r7" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="majors" target="classrooms" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- majors -> news_targets (1:N) -->
+        <mxCell id="r8" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="majors" target="news_targets" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- categories -> news (1:N) -->
+        <mxCell id="r9" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="categories" target="news" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- admins -> news (1:N) -->
+        <mxCell id="r10" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="admins" target="news" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- admins -> alumni_stories (1:N) -->
+        <mxCell id="r11" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="admins" target="alumni_stories" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- news -> news_targets (1:N) -->
+        <mxCell id="r12" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="news" target="news_targets" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- classrooms -> news_targets (1:N) -->
+        <mxCell id="r13" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="classrooms" target="news_targets" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- classrooms -> students (1:N) -->
+        <mxCell id="r14" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="classrooms" target="students" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- classrooms -> timetables (1:N) -->
+        <mxCell id="r15" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="classrooms" target="timetables" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- classrooms -> teacher_course_assignments (1:N) -->
+        <mxCell id="r16" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="classrooms" target="teacher_course_assignments" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- teachers -> teacher_course_assignments (1:N) -->
+        <mxCell id="r17" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="teachers" target="teacher_course_assignments" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- courses -> teacher_course_assignments (1:N) -->
+        <mxCell id="r18" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="courses" target="teacher_course_assignments" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- students -> alumni_profiles (1:1) -->
+        <mxCell id="r19" value="1:1" style="endArrow=ERone;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="students" target="alumni_profiles" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- students -> discussions (1:N) -->
+        <mxCell id="r20" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="students" target="discussions" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- students -> discussion_replies (1:N) -->
+        <mxCell id="r21" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="students" target="discussion_replies" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- alumni_profiles -> alumni_stories (1:N) -->
+        <mxCell id="r22" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="alumni_profiles" target="alumni_stories" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- discussion_categories -> discussions (1:N) -->
+        <mxCell id="r23" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="discussion_categories" target="discussions" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+        <!-- discussions -> discussion_replies (1:N) -->
+        <mxCell id="r24" value="1:N" style="endArrow=ERmany;endFill=0;startArrow=ERone;startFill=0;strokeWidth=2;strokeColor=#000000;fontSize=24;fontStyle=1;fontColor=#000000;" edge="1" source="discussions" target="discussion_replies" parent="1">
+          <mxGeometry relative="1" as="geometry"/>
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

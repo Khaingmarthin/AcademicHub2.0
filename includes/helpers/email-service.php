@@ -1,18 +1,42 @@
 <?php
 /**
- * Email sending service using PHP mail().
+ * Email sending service using PHPMailer with SMTP.
  *
- * Provides a simple wrapper around PHP's built-in mail() function with
- * proper MIME headers for HTML emails. Intended for lightweight notification
- * sending; not suitable for high-volume or mission-critical delivery.
+ * Uses PHPMailer to send HTML emails via a configured SMTP server.
+ * Falls back to PHP's built-in mail() if SMTP is not configured.
  */
 
 if (!defined('BASE_URL')) {
     require_once __DIR__ . '/../../config/app.php';
 }
 
+// Load Composer autoloader if not already loaded.
+if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+    $autoloadPaths = [
+        __DIR__ . '/../../vendor/autoload.php',
+        dirname(__DIR__, 2) . '/vendor/autoload.php',
+    ];
+    $loaded = false;
+    foreach ($autoloadPaths as $path) {
+        if (file_exists($path)) {
+            require_once $path;
+            $loaded = true;
+            break;
+        }
+    }
+    if (!$loaded) {
+        error_log('[Email Service] Composer autoload not found. Emails will not be sent.');
+    }
+}
+
+// Load SMTP config if it exists.
+$smtpConfigFile = __DIR__ . '/../../config/smtp.php';
+if (file_exists($smtpConfigFile)) {
+    require_once $smtpConfigFile;
+}
+
 /**
- * Send an HTML email.
+ * Send an HTML email via SMTP (or fallback to mail()).
  *
  * @param string $to      Recipient email address.
  * @param string $subject Email subject line.
@@ -21,6 +45,69 @@ if (!defined('BASE_URL')) {
  * @return bool True on success, false on failure.
  */
 function ucs_send_email($to, $subject, $html, $text = '')
+{
+    // If PHPMailer class is not available, fall back to mail().
+    if (!class_exists('PHPMailer\PHPMailer\PHPMailer')) {
+        return ucs_send_email_fallback($to, $subject, $html, $text);
+    }
+
+    // If SMTP is not configured, fall back to mail().
+    if (!defined('SMTP_HOST') || SMTP_HOST === '' || !defined('SMTP_USERNAME') || SMTP_USERNAME === '') {
+        return ucs_send_email_fallback($to, $subject, $html, $text);
+    }
+
+    try {
+        $mail = new PHPMailer\PHPMailer\PHPMailer(true);
+        $mail->CharSet = 'UTF-8';
+
+        // SMTP Configuration
+        $mail->isSMTP();
+        $mail->Host       = SMTP_HOST;
+        $mail->SMTPAuth   = true;
+        $mail->Username   = SMTP_USERNAME;
+        $mail->Password   = SMTP_PASSWORD;
+
+        if (defined('SMTP_ENCRYPTION') && SMTP_ENCRYPTION === 'ssl') {
+            $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port       = defined('SMTP_PORT') ? SMTP_PORT : 465;
+        } else {
+            $mail->SMTPSecure = PHPMailer\PHPMailer\PHPMailer::ENCRYPTION_STARTTLS;
+            $mail->Port       = defined('SMTP_PORT') ? SMTP_PORT : 587;
+        }
+
+        // Sender
+        $fromEmail = defined('SMTP_FROM_EMAIL') && SMTP_FROM_EMAIL !== ''
+            ? SMTP_FROM_EMAIL
+            : SMTP_USERNAME;
+        $fromName  = defined('SMTP_FROM_NAME') ? SMTP_FROM_NAME : (APP_NAME ?? 'Academic Hub');
+
+        $mail->setFrom($fromEmail, $fromName);
+        $mail->addAddress($to);
+
+        // Content
+        $mail->isHTML(true);
+        $mail->Subject = $subject;
+        $mail->Body    = $html;
+        $mail->AltBody = $text !== '' ? $text : strip_tags($html);
+
+        $mail->send();
+        return true;
+    } catch (Exception $e) {
+        error_log('[Email Service] PHPMailer error: ' . $mail->ErrorInfo);
+        return false;
+    }
+}
+
+/**
+ * Fallback: Send email using PHP's built-in mail() function.
+ *
+ * @param string $to
+ * @param string $subject
+ * @param string $html
+ * @param string $text
+ * @return bool
+ */
+function ucs_send_email_fallback($to, $subject, $html, $text = '')
 {
     if ($text === '') {
         $text = strip_tags($html);

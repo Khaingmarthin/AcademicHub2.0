@@ -21,5 +21,11 @@
   "bugs": {
     "url": "https://github.com/Khaingmarthin/AcademicHub2.0/issues"
   },
-  "homepage": "https://github.com/Khaingmarthin/AcademicHub2.0#readme"
+  "homepage": "https://github.com/Khaingmarthin/AcademicHub2.0#readme",
+  "dependencies": {
+    "puppeteer": "^25.9.0"
+  },
+  "allowScripts": {
+    "puppeteer@25.9.0": true
+  }
 }

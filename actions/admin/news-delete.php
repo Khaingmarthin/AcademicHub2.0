@@ -37,17 +37,39 @@ if ($ucsNews === null || $ucsId === false || $ucsId < 1) {
     exit;
 }
 
+// Fetch gallery image paths before deletion (CASCADE will remove rows).
+$ucsGalleryPaths = [];
+try {
+    $ucsStmt = $pdo->prepare("SELECT image_path FROM news_images WHERE news_id = :news_id");
+    $ucsStmt->execute([':news_id' => $ucsId]);
+    $ucsGalleryPaths = $ucsStmt->fetchAll(PDO::FETCH_COLUMN) ?: [];
+} catch (PDOException $e) {
+    $ucsGalleryPaths = [];
+}
+
 try {
     $pdo->beginTransaction();
+    $pdo->prepare("DELETE FROM news_images WHERE news_id = :news_id")->execute([':news_id' => $ucsId]);
     $pdo->prepare("DELETE FROM news_targets WHERE news_id = :news_id")->execute([':news_id' => $ucsId]);
     $pdo->prepare("DELETE FROM news WHERE id = :id")->execute([':id' => $ucsId]);
     $pdo->commit();
 
+    // Delete cover image file.
     $ucsCoverImage = (string) ($ucsNews['cover_image'] ?? '');
     if ($ucsCoverImage !== '' && strpos($ucsCoverImage, 'uploads/') === 0) {
         $ucsFilePath = UPLOAD_DIR . substr($ucsCoverImage, strlen('uploads/'));
         if (is_file($ucsFilePath)) {
             @unlink($ucsFilePath);
+        }
+    }
+
+    // Delete gallery image files.
+    foreach ($ucsGalleryPaths as $ucsGalPath) {
+        if (!empty($ucsGalPath) && strpos($ucsGalPath, 'uploads/') === 0) {
+            $ucsGalFile = UPLOAD_DIR . substr($ucsGalPath, strlen('uploads/'));
+            if (is_file($ucsGalFile)) {
+                @unlink($ucsGalFile);
+            }
         }
     }
 

@@ -522,6 +522,24 @@ CREATE INDEX idx_discussion_replies_status ON discussion_replies(status);
 
 
 -- =========================================================
+-- 18. PASSWORD RESET TOKENS
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS password_reset_tokens (
+    id          BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_type   ENUM('student','admin') NOT NULL,
+    user_id     BIGINT UNSIGNED NOT NULL,
+    token       VARCHAR(64) NOT NULL UNIQUE,
+    expires_at  DATETIME NOT NULL,
+    used        BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    INDEX idx_prt_token (token),
+    INDEX idx_prt_user (user_type, user_id)
+) ENGINE=InnoDB;
+
+
+-- =========================================================
 -- SEED DATA: Discussion Categories
 -- =========================================================
 
@@ -584,4 +602,7 @@ INSERT INTO discussion_categories (name, slug, description, sort_order) VALUES
 --   discussions.author_student_id   -> students.id           (M:1, CASCADE)
 --   discussion_replies.discussion_id -> discussions.id       (M:1, CASCADE)
 --   discussion_replies.author_student_id -> students.id      (M:1, CASCADE)
+--
+-- Password Reset Tokens:
+--   password_reset_tokens.user_id   -> students.id | admins.id (polymorphic, no FK)
 --

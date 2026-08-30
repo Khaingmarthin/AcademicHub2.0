@@ -108,16 +108,16 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                 </div>
 
                 <div>
+                    <label for="gallery_images" class="block text-sm font-medium text-gray-700">Gallery Images <span class="text-gray-400">(optional)</span></label>
+                    <input type="file" id="gallery_images" name="gallery_images[]" accept=".jpg,.jpeg,.png,.gif,.webp" multiple
+                           class="mt-2 block w-full text-sm text-gray-500 file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2.5 file:text-sm file:font-semibold file:text-blue-700 transition-colors hover:file:bg-blue-100 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                    <p class="mt-2 text-xs text-gray-500">Select up to 10 additional images. JPG, PNG, GIF or WebP. Maximum 5 MB each.</p>
+                    <div id="gallery-preview" class="mt-3 flex flex-wrap gap-3"></div>
+                </div>
+
+                <div>
                     <div class="flex items-center justify-between">
                         <label class="block text-sm font-medium text-gray-700">Audience Targeting <span class="text-gray-400">(optional)</span></label>
-                        <button type="button" id="ucs-add-target"
-                                class="inline-flex items-center gap-1.5 rounded-lg border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 transition-colors duration-150 hover:bg-gray-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-400">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M5 12h14"></path>
-                                <path d="M12 5v14"></path>
-                            </svg>
-                            Add target
-                        </button>
                     </div>
                     <p class="mt-1 text-xs text-gray-500">Leave all fields empty for a target to reach everyone.</p>
 
@@ -269,10 +269,6 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
         return div;
     }
 
-    document.getElementById('ucs-add-target').addEventListener('click', function () {
-        document.getElementById('ucs-targets').appendChild(buildRow({}));
-    });
-
     document.getElementById('ucs-targets').addEventListener('click', function (e) {
         if (e.target.closest('.ucs-remove-target')) {
             var row = e.target.closest('.ucs-target-row');
@@ -281,6 +277,28 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             }
         }
     });
+
+    var galleryInput = document.getElementById('gallery_images');
+    var galleryPreview = document.getElementById('gallery-preview');
+    if (galleryInput && galleryPreview) {
+        galleryInput.addEventListener('change', function () {
+            galleryPreview.innerHTML = '';
+            var files = galleryInput.files;
+            for (var i = 0; i < files.length; i++) {
+                (function (file) {
+                    if (!file.type.startsWith('image/')) return;
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        var span = document.createElement('span');
+                        span.className = 'relative inline-block h-20 w-20 overflow-hidden rounded-lg ring-1 ring-gray-200';
+                        span.innerHTML = '<img src="' + e.target.result + '" alt="" class="h-full w-full object-cover">';
+                        galleryPreview.appendChild(span);
+                    };
+                    reader.readAsDataURL(file);
+                })(files[i]);
+            }
+        });
+    }
 })();
 </script>
 <?php require_once __DIR__ . '/../../includes/admin-layout-bottom.php'; ?>

@@ -243,7 +243,7 @@ require_once '../includes/header.php';
                             <p class="text-sm font-semibold text-slate-700">Want to join the discussion?</p>
                             <p class="mt-1 text-sm leading-6 text-slate-500">Log in as a student to reply, ask a follow-up question or share your own experience.</p>
                             <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700">
-                                Student Login
+                                Login
                             </a>
                         </div>
                     <?php elseif ((string) $ucsDiscussion['status'] === 'closed'): ?>

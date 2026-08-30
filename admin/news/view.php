@@ -42,6 +42,18 @@ $ucsStatusColors = [
     'Expired'   => 'bg-red-50 text-red-700 ring-1 ring-red-200',
 ];
 
+// Fetch gallery images.
+$ucsGalleryImages = [];
+try {
+    $ucsStmt = $pdo->prepare(
+        "SELECT image_path FROM news_images WHERE news_id = :news_id ORDER BY sort_order ASC"
+    );
+    $ucsStmt->execute([':news_id' => $ucsId]);
+    $ucsGalleryImages = $ucsStmt->fetchAll() ?: [];
+} catch (PDOException $e) {
+    $ucsGalleryImages = [];
+}
+
 require_once __DIR__ . '/../../includes/admin-layout-top.php';
 ?>
 
@@ -91,6 +103,22 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
             <div class="prose prose-blue max-w-none text-gray-700">
                 <?php echo nl2br(htmlspecialchars($ucsNews['content'])); ?>
             </div>
+
+            <?php if (!empty($ucsGalleryImages)): ?>
+                <div class="mt-8 border-t border-gray-100 pt-8">
+                    <h2 class="mb-4 text-sm font-semibold uppercase tracking-wide text-gray-500">Gallery Images</h2>
+                    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
+                        <?php foreach ($ucsGalleryImages as $ucsGalImg): ?>
+                            <?php
+                            $ucsGalUrl = ROOT_URL . '/assets/' . ltrim($ucsGalImg['image_path'], '/');
+                            ?>
+                            <div class="overflow-hidden rounded-xl ring-1 ring-gray-200">
+                                <img src="<?php echo htmlspecialchars($ucsGalUrl); ?>" alt="" class="h-32 w-full object-cover sm:h-40">
+                            </div>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            <?php endif; ?>
         </div>
     </article>
 </div>
