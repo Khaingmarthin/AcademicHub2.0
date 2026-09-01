@@ -27,7 +27,7 @@ if ($ucsDiscussionId !== false && $ucsDiscussionId > 0) {
     try {
         $ucsStmt = $pdo->prepare(
             "SELECT d.id, d.title, d.content, d.category_id, d.status,
-                    d.is_pinned, d.created_at,
+                    d.is_pinned, d.created_at, d.author_student_id,
                     c.name AS category_name, c.slug AS category_slug,
                     s.name AS author_name,
                     ap.id AS alumni_profile_id,
@@ -128,6 +128,18 @@ require_once '../includes/header.php';
                             </svg>
                             Closed
                         </span>
+                    <?php endif; ?>
+                    <?php
+                    $ucsIsAuthor = $ucsUser !== null && (int) $ucsDiscussion['author_student_id'] === (int) $ucsUser['id'];
+                    ?>
+                    <?php if ($ucsIsAuthor): ?>
+                        <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussion-edit.php?id=' . (int) $ucsDiscussion['id']); ?>" class="inline-flex items-center gap-1 rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-700 ring-1 ring-amber-100 transition-colors hover:bg-amber-100">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+                                <path d="m15 5 4 4"></path>
+                            </svg>
+                            Edit
+                        </a>
                     <?php endif; ?>
                 </div>
                 <h1 id="career-discussion-details-heading" class="mt-4 text-3xl font-extrabold tracking-[-0.025em] text-slate-900 sm:text-4xl lg:text-[2.5rem] leading-[1.15]">

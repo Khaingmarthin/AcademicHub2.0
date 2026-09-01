@@ -100,7 +100,7 @@ function ucs_avatar_initial($name)
 
                     <?php if (!$ucsShowStudentMenu): ?>
                         <!-- Student Login (all screens) -->
-                        <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="inline-flex h-9 items-center gap-2 rounded-lg bg-sky-600 px-4 text-[0.8125rem] font-semibold text-white transition-colors duration-150 hover:bg-sky-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300">
+                        <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="inline-flex h-9 items-center gap-2 rounded-lg bg-blue-600 px-4 text-[0.8125rem] font-semibold text-white transition-colors duration-150 hover:bg-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-300">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                 <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                                 <circle cx="12" cy="7" r="4"></circle>
@@ -213,7 +213,7 @@ function ucs_avatar_initial($name)
                     <?php if (!$ucsShowStudentMenu): ?>
                         <!-- Student Login (mobile) -->
                         <li class="pt-3">
-                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="flex w-full items-center justify-center gap-2 rounded-lg bg-sky-600 px-4 py-2.5 text-[0.9375rem] font-semibold text-white transition-colors hover:bg-sky-700">
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/student-login.php'); ?>" class="flex w-full items-center justify-center gap-2 rounded-lg bg-blue-600 px-4 py-2.5 text-[0.9375rem] font-semibold text-white transition-colors hover:bg-blue-700">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4.5 w-4.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                                     <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
                                     <circle cx="12" cy="7" r="4"></circle>

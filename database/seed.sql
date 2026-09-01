@@ -248,7 +248,7 @@ VALUES
 -- =========================================================
 (
     2, NULL,
-    'E-1101',
+    'E-1101A',
     'English Proficiency I',
     'First Year',
     NULL,
@@ -310,7 +310,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-2241',
     'Differential Equations and Numerical Analysis',
     'Second Year',
@@ -320,7 +320,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-2212',
     'Artificial Intelligence',
     'Second Year',
@@ -330,7 +330,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-2213',
     'Operating Systems',
     'Second Year',
@@ -340,7 +340,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-2224',
     'Software Analysis and Design',
     'Second Year',
@@ -350,7 +350,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CST-2235',
     'Data Communication and Networking',
     'Second Year',
@@ -360,7 +360,7 @@ VALUES
     TRUE
 ),
 (
-    1, 1,
+    2, 1,
     'CS-2256',
     'Web Technology (JavaScript)',
     'Second Year',
@@ -1479,11 +1479,9 @@ VALUES
 );
 
 INSERT INTO teacher_course_assignments
-(teacher_id, course_id, classroom_id, semester)
+(teacher_id, course_id, classroom_id)
 VALUES
 (1, (SELECT id FROM courses WHERE course_code = 'CST-2212' AND academic_year_id = 2 LIMIT 1),
- (SELECT id FROM classrooms WHERE id = 4 LIMIT 1),
- 'First Semester'),
+ (SELECT id FROM classrooms WHERE id = 4 LIMIT 1)),
 (2, (SELECT id FROM courses WHERE course_code = 'E-2201' AND academic_year_id = 2 AND major_id = 1 LIMIT 1),
- (SELECT id FROM classrooms WHERE id = 4 LIMIT 1),
- 'First Semester');
+ (SELECT id FROM classrooms WHERE id = 4 LIMIT 1));

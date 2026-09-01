@@ -34,6 +34,26 @@ if (!empty($ucsErrors)) {
     exit;
 }
 
+// Double-check: only Fifth Year students can be graduated.
+try {
+    $ucsCheckStmt = $pdo->prepare(
+        "SELECT c.year_level
+         FROM students s
+         JOIN classrooms c ON c.id = s.classroom_id
+         WHERE s.id = :id
+         LIMIT 1"
+    );
+    $ucsCheckStmt->execute([':id' => $ucsClean['student_id']]);
+    $ucsYearLevel = (string) ($ucsCheckStmt->fetchColumn() ?: '');
+    if (trim($ucsYearLevel) !== 'Fifth Year') {
+        student_flash('error', 'Only Fifth Year students can be marked as graduated.');
+        header('Location: ' . $ucsReturnUrl);
+        exit;
+    }
+} catch (PDOException $e) {
+    // If we can't verify, let the validation error from above handle it.
+}
+
 try {
     $ucsStmt = $pdo->prepare(
         "UPDATE students

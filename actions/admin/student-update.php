@@ -39,6 +39,20 @@ $ucsResult = student_validate_input($_POST, $pdo, $ucsId);
 $ucsClean  = $ucsResult['clean'];
 $ucsErrors = $ucsResult['errors'];
 
+// Extra guard: prevent graduation of non-fifth-year students via edit form.
+if ($ucsClean['status'] === 'graduated' && $ucsClean['classroom_id'] > 0) {
+    try {
+        $ucsYrStmt = $pdo->prepare("SELECT c.year_level FROM classrooms c WHERE c.id = :id LIMIT 1");
+        $ucsYrStmt->execute([':id' => $ucsClean['classroom_id']]);
+        $ucsYearLevel = (string) ($ucsYrStmt->fetchColumn() ?: '');
+        if (trim($ucsYearLevel) !== 'Fifth Year') {
+            $ucsErrors[] = 'Only Fifth Year students can be marked as graduated.';
+        }
+    } catch (PDOException $e) {
+        // Let validation handle it.
+    }
+}
+
 if (!empty($ucsErrors)) {
     $_SESSION['student_errors'] = $ucsErrors;
     $_SESSION['student_old']    = $ucsClean;

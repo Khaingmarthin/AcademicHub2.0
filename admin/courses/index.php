@@ -99,7 +99,7 @@ try {
                 c.credit_hours, c.status, c.created_at,
                 m.name AS major_name
          FROM courses c
-         JOIN majors m ON m.id = c.major_id"
+         LEFT JOIN majors m ON m.id = c.major_id"
         . $ucsWhereSql . "
          ORDER BY FIELD(c.year_level, 'First Year', 'Second Year', 'Third Year', 'Fourth Year', 'Fifth Year'), c.course_code ASC"
     );
@@ -123,7 +123,7 @@ $ucsByLevelMajor = [];
 foreach ($ucsByLevel as $ucsLvlName => $ucsLvlItems) {
     $ucsByLevelMajor[$ucsLvlName] = [];
     foreach ($ucsLvlItems as $ucsItem) {
-        $ucsMaj = (string) $ucsItem['major_name'];
+        $ucsMaj = (string) ($ucsItem['major_name'] ?? 'General');
         if (!isset($ucsByLevelMajor[$ucsLvlName][$ucsMaj])) {
             $ucsByLevelMajor[$ucsLvlName][$ucsMaj] = 0;
         }
@@ -308,11 +308,13 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
         $ucsLevelCredits = 0;
         $ucsLevelFirst   = 0;
         $ucsLevelSecond  = 0;
+        $ucsLevelNone    = 0;
         foreach ($ucsLevelItems as $ucsLvlItem) {
             if ((int) $ucsLvlItem['status'] === 1) $ucsLevelActive++;
             $ucsLevelCredits += (int) ($ucsLvlItem['credit_hours'] ?? 0);
             if ($ucsLvlItem['semester'] === 'First Semester') $ucsLevelFirst++;
-            else $ucsLevelSecond++;
+            elseif ($ucsLvlItem['semester'] === 'Second Semester') $ucsLevelSecond++;
+            else $ucsLevelNone++;
         }
         $ucsLevelInactive = $ucsLevelCount - $ucsLevelActive;
         $ucsLevelSlug = preg_replace('/[^a-z0-9]+/', '-', strtolower($ucsLevelName));
@@ -338,14 +340,24 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                 </div>
                 <div class="flex items-center gap-3">
                     <div class="hidden sm:flex items-center gap-4 text-xs font-medium text-slate-500">
+                        <?php if ($ucsLevelFirst > 0): ?>
                         <span class="inline-flex items-center gap-1">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-emerald-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                             <?php echo $ucsLevelFirst; ?> 1st sem
                         </span>
+                        <?php endif; ?>
+                        <?php if ($ucsLevelSecond > 0): ?>
                         <span class="inline-flex items-center gap-1">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-amber-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line><path d="m9 16 2 2 4-4"></path></svg>
                             <?php echo $ucsLevelSecond; ?> 2nd sem
                         </span>
+                        <?php endif; ?>
+                        <?php if ($ucsLevelNone > 0): ?>
+                        <span class="inline-flex items-center gap-1">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                            <?php echo $ucsLevelNone; ?> shared
+                        </span>
+                        <?php endif; ?>
                         <span class="inline-flex items-center gap-1">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-violet-500" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                             <?php echo $ucsLevelCredits; ?> credits
@@ -377,7 +389,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                     $ucsCourseCode = (string) $ucsCourse['course_code'];
                     $ucsCourseName = (string) $ucsCourse['course_name'];
                     $ucsJsLabel    = str_replace(['\\', "'"], ['\\\\', "\\'"], $ucsCourseCode . ' - ' . $ucsCourseName);
-                    $ucsCourseMajor = (string) $ucsCourse['major_name'];
+                    $ucsCourseMajor = (string) ($ucsCourse['major_name'] ?? 'General');
                     $ucsMajorSlug = strtolower(preg_replace('/[^a-z0-9]+/', '-', $ucsCourseMajor));
                     ?>
                     <div data-major="<?php echo htmlspecialchars($ucsMajorSlug); ?>" class="group flex flex-col gap-4 px-6 py-4 transition-colors hover:bg-slate-50/50 sm:flex-row sm:items-center sm:gap-6">
@@ -396,14 +408,18 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                                 <?php endif; ?>
                             </div>
                             <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
+                                <?php if (!empty($ucsCourse['major_name'])): ?>
                                 <span class="inline-flex items-center gap-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="6"></circle><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"></path></svg>
                                     <?php echo htmlspecialchars($ucsCourse['major_name']); ?>
                                 </span>
+                                <?php endif; ?>
+                                <?php if (!empty($ucsCourse['semester'])): ?>
                                 <span class="inline-flex items-center gap-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
                                     <?php echo htmlspecialchars($ucsCourse['semester']); ?>
                                 </span>
+                                <?php endif; ?>
                                 <span class="inline-flex items-center gap-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-violet-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                                     <?php echo htmlspecialchars((string) $ucsCourse['credit_hours']); ?> credits

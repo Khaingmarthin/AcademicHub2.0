@@ -72,7 +72,7 @@ require_once '../includes/header.php';
                     <!-- About the programme -->
                     <div class="rounded-2xl border border-slate-200 bg-white p-8">
                         <p class="text-base leading-relaxed text-slate-700">
-                            UCSMTLA's main offerings are five-year bachelor's programs in computer science and computer technology. The areas of study include artificial intelligence, bio-informatics, computer architecture, control applications, database systems, digital signal processing, image processing, Internet technologies, network security, operating systems, parallel and distributed computing, and software engineering.
+                            UCSMTLA's main offerings are four-year bachelor's programs in computer science and computer technology. The areas of study include artificial intelligence, bio-informatics, computer architecture, control applications, database systems, digital signal processing, image processing, Internet technologies, network security, operating systems, parallel and distributed computing, and software engineering.
                         </p>
                     </div>
 
@@ -124,10 +124,7 @@ require_once '../includes/header.php';
                                     <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-xs font-bold text-blue-700">4</span>
                                     Undergraduate Fourth Year
                                 </li>
-                                <li class="flex items-center gap-3 text-sm text-slate-700">
-                                    <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-blue-50 text-xs font-bold text-blue-700">5</span>
-                                    Undergraduate Fifth Year
-                                </li>
+                                
                             </ul>
                         </div>
                     </div>

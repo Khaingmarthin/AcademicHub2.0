@@ -49,38 +49,60 @@ try {
 
 $ucsCourses = [];
 if ($ucsDetails !== null) {
+    // Try the student's classroom academic year first, then fall back to the active year.
+    $ucsAcademicYearIds = [];
+    if (!empty($ucsDetails['classroom_academic_year_id'])) {
+        $ucsAcademicYearIds[] = (int) $ucsDetails['classroom_academic_year_id'];
+    }
     try {
-        $ucsStmt = $pdo->prepare(
-            "SELECT c.course_code, c.course_name,
-                    t.name AS teacher_name, tca.semester
-             FROM courses c
-             LEFT JOIN teacher_course_assignments tca
-                ON tca.course_id = c.id
-                AND tca.classroom_id = :classroom_id
-             LEFT JOIN teachers t ON t.id = tca.teacher_id
-             WHERE c.academic_year_id = :academic_year_id
-               AND c.major_id = :major_id
-               AND c.year_level = :year_level
-               AND c.status = TRUE
-             ORDER BY c.course_code ASC"
+        $ucsAyStmt = $pdo->query(
+            "SELECT id FROM academic_years WHERE status = 'Active' LIMIT 1"
         );
-        $ucsStmt->execute([
-            ':academic_year_id' => $ucsDetails['classroom_academic_year_id'],
-            ':major_id'         => $ucsDetails['classroom_major_id'],
-            ':year_level'       => $ucsDetails['year_level'],
-            ':classroom_id'     => $ucsDetails['classroom_id'],
-        ]);
-        $ucsCourses = $ucsStmt->fetchAll();
+        $ucsActiveYearId = $ucsAyStmt->fetchColumn();
+        if ($ucsActiveYearId !== false) {
+            $ucsActiveYearId = (int) $ucsActiveYearId;
+            if (!in_array($ucsActiveYearId, $ucsAcademicYearIds, true)) {
+                $ucsAcademicYearIds[] = $ucsActiveYearId;
+            }
+        }
     } catch (PDOException $e) {
-        $ucsCourses = [];
+    }
+
+    if (!empty($ucsAcademicYearIds)) {
+        $ucsNamedPlaceholders = [];
+        foreach ($ucsAcademicYearIds as $ucsIdx => $ucsAyId) {
+            $ucsNamedPlaceholders[] = ':ay_' . $ucsIdx;
+        }
+        $ucsPlaceholderStr = implode(',', $ucsNamedPlaceholders);
+
+        try {
+            $ucsStmt = $pdo->prepare(
+                "SELECT c.course_code, c.course_name,
+                        t.name AS teacher_name
+                 FROM courses c
+                 LEFT JOIN teacher_course_assignments tca
+                    ON tca.course_id = c.id
+                    AND tca.classroom_id = :classroom_id
+                 LEFT JOIN teachers t ON t.id = tca.teacher_id
+                 WHERE c.academic_year_id IN ($ucsPlaceholderStr)
+                   AND c.year_level = 'First Year'
+                   AND c.status = 1
+                 ORDER BY c.course_code ASC"
+            );
+            $ucsParams = [':classroom_id' => $ucsDetails['classroom_id']];
+            foreach ($ucsAcademicYearIds as $ucsIdx => $ucsAyId) {
+                $ucsParams[':ay_' . $ucsIdx] = $ucsAyId;
+            }
+            $ucsStmt->execute($ucsParams);
+            $ucsCourses = $ucsStmt->fetchAll();
+        } catch (PDOException $e) {
+            $ucsCourses = [];
+        }
     }
 }
 
-$ucsCourseContextParts = [];
+$ucsCourseContextParts = ['First Year'];
 if ($ucsDetails !== null) {
-    if (!empty($ucsDetails['year_level'])) {
-        $ucsCourseContextParts[] = $ucsDetails['year_level'];
-    }
     if (!empty($ucsDetails['major_name'])) {
         $ucsCourseContextParts[] = $ucsDetails['major_name'];
     }
@@ -88,7 +110,7 @@ if ($ucsDetails !== null) {
         $ucsCourseContextParts[] = 'Section ' . $ucsDetails['section'];
     }
 }
-$ucsCourseContext = implode(' \u2022 ', $ucsCourseContextParts);
+$ucsCourseContext = implode(' - ', $ucsCourseContextParts);
 
 // Verified alumni get a link to manage their alumni profile.
 $ucsAlumniProfile = null;
@@ -395,7 +417,7 @@ require_once __DIR__ . '/../includes/header.php';
 
                 <?php if ($ucsDetails !== null): ?>
                     <p class="mt-3 text-sm leading-6 text-slate-500">
-                        Courses for your current class and academic year.
+                        First year foundation courses for your academic year.
                         <?php if ($ucsCourseContext !== ''): ?>
                             <span class="font-medium text-slate-700"><?php echo htmlspecialchars($ucsCourseContext); ?></span>
                         <?php endif; ?>
@@ -408,7 +430,6 @@ require_once __DIR__ . '/../includes/header.php';
                             <span class="w-36 shrink-0 text-xs font-bold uppercase tracking-wider text-slate-500">Course Code</span>
                             <span class="flex-1 text-xs font-bold uppercase tracking-wider text-slate-500">Course Name</span>
                             <span class="w-48 text-xs font-bold uppercase tracking-wider text-slate-500">Teacher</span>
-                            <span class="w-36 text-xs font-bold uppercase tracking-wider text-slate-500">Semester</span>
                         </div>
                         <ul class="divide-y divide-slate-200">
                             <?php foreach ($ucsCourses as $ucsCourse): ?>
@@ -416,14 +437,13 @@ require_once __DIR__ . '/../includes/header.php';
                                     <span class="w-36 shrink-0 text-sm font-bold text-blue-600"><?php echo htmlspecialchars($ucsCourse['course_code']); ?></span>
                                     <span class="flex-1 text-sm font-medium text-slate-800"><?php echo htmlspecialchars($ucsCourse['course_name']); ?></span>
                                     <span class="w-48 text-sm text-slate-600"><?php echo htmlspecialchars($ucsCourse['teacher_name'] ?? '—'); ?></span>
-                                    <span class="w-36 text-sm text-slate-500"><?php echo htmlspecialchars($ucsCourse['semester'] ?? '—'); ?></span>
                                 </li>
                             <?php endforeach; ?>
                         </ul>
                     </div>
                 <?php else: ?>
                     <div class="mt-4 rounded-lg border border-slate-200 bg-white px-6 py-10 text-center">
-                        <p class="text-sm leading-6 text-slate-500">No courses are currently available for your class.</p>
+                        <p class="text-sm leading-6 text-slate-500">No first year courses are currently available.</p>
                     </div>
                 <?php endif; ?>
             </section>

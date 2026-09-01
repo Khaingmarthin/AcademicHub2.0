@@ -57,6 +57,12 @@ if ($ucsStudent['student_status'] === 'graduated') {
     exit;
 }
 
+if (trim((string) $ucsStudent['year_level']) !== 'Fifth Year') {
+    student_flash('error', 'Only Fifth Year students can be marked as graduated.');
+    header('Location: ' . ROOT_URL . '/admin/students/index.php');
+    exit;
+}
+
 $ucsErrors = $_SESSION['student_errors'] ?? [];
 unset($_SESSION['student_errors']);
 

@@ -125,6 +125,20 @@ function student_validate_input($input, $pdo, $excludeId = null)
         $errors[] = 'Invalid status selected.';
     }
 
+    // ---- Graduation restriction: only Fifth Year students can be graduated --
+    if ($status === 'graduated' && $classroomId !== false && $classroomId > 0) {
+        try {
+            $ucsYrStmt = $pdo->prepare("SELECT c.year_level FROM classrooms c WHERE c.id = :id LIMIT 1");
+            $ucsYrStmt->execute([':id' => $classroomId]);
+            $ucsYearLevel = (string) ($ucsYrStmt->fetchColumn() ?: '');
+            if (trim($ucsYearLevel) !== 'Fifth Year') {
+                $errors[] = 'Only Fifth Year students can be marked as graduated.';
+            }
+        } catch (PDOException $e) {
+            // If we can't verify, allow it to be caught elsewhere.
+        }
+    }
+
     return [
         'clean' => [
             'student_id'          => $studentId,
@@ -179,9 +193,10 @@ function student_graduation_validate_input($input, $pdo)
     } else {
         try {
             $ucsStmt = $pdo->prepare(
-                "SELECT id, name, status, student_status
-                 FROM students
-                 WHERE id = :id
+                "SELECT s.id, s.name, s.status, s.student_status, c.year_level
+                 FROM students s
+                 JOIN classrooms c ON c.id = s.classroom_id
+                 WHERE s.id = :id
                  LIMIT 1"
             );
             $ucsStmt->execute([':id' => $studentId]);
@@ -193,6 +208,8 @@ function student_graduation_validate_input($input, $pdo)
                 $errors[] = 'Only active student accounts can be marked as graduated.';
             } elseif ($ucsStudent['student_status'] === 'graduated') {
                 $errors[] = 'This student is already marked as graduated.';
+            } elseif (trim((string) $ucsStudent['year_level']) !== 'Fifth Year') {
+                $errors[] = 'Only Fifth Year students can be marked as graduated.';
             }
         } catch (PDOException $e) {
             $errors[] = 'Unable to validate the student. Please try again.';

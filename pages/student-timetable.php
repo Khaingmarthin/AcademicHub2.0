@@ -109,10 +109,10 @@ require_once __DIR__ . '/../includes/header.php';
                     <h1 id="student-timetable-heading" class="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl">My Timetable</h1>
                     <?php if ($ucsDetails !== null): ?>
                         <p class="mt-2 text-sm leading-6 text-slate-500">
-                            <?php echo htmlspecialchars($ucsDetails['classroom_name']); ?>
-                            &mdash; <?php echo htmlspecialchars($ucsDetails['major_name']); ?>, <?php echo htmlspecialchars($ucsDetails['year_level']); ?>
+                            <?php echo htmlspecialchars($ucsDetails['classroom_name'] ?? ''); ?>
+                            &mdash; <?php echo htmlspecialchars($ucsDetails['major_name'] ?? ''); ?>, <?php echo htmlspecialchars($ucsDetails['year_level'] ?? ''); ?>
                             <?php if ($ucsDetails['section'] !== '' && $ucsDetails['section'] !== null): ?>
-                                , Section <?php echo htmlspecialchars($ucsDetails['section']); ?>
+                                , Section <?php echo htmlspecialchars($ucsDetails['section'] ?? ''); ?>
                             <?php endif; ?>
                         </p>
                     <?php endif; ?>
@@ -164,7 +164,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <!-- Timetable toolbar -->
                 <div class="mt-6 flex flex-col gap-4 rounded-lg border border-slate-200 bg-white px-6 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
                     <div class="min-w-0">
-                        <h2 class="truncate text-base font-semibold text-slate-900"><?php echo htmlspecialchars($ucsCurrentTimetable['title']); ?></h2>
+                        <h2 class="truncate text-base font-semibold text-slate-900"><?php echo htmlspecialchars($ucsCurrentTimetable['title'] ?? ''); ?></h2>
                         <p class="mt-0.5 text-sm text-slate-500">
                             <?php echo htmlspecialchars($ucsActiveSemester); ?>
                             &middot; <?php echo htmlspecialchars($ucsDetails['academic_year'] ?? ''); ?>
@@ -194,7 +194,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <div class="mt-4 overflow-hidden rounded-lg border border-slate-200 bg-white">
                     <img
                         src="<?php echo htmlspecialchars($ucsTimetableUrl); ?>"
-                        alt="<?php echo htmlspecialchars($ucsCurrentTimetable['title'] . ' \u2014 ' . $ucsActiveSemester); ?>"
+                        alt="<?php echo htmlspecialchars(($ucsCurrentTimetable['title'] ?? '') . ' \u2014 ' . $ucsActiveSemester); ?>"
                         class="w-full object-contain"
                         loading="lazy"
                     >
@@ -203,7 +203,7 @@ require_once __DIR__ . '/../includes/header.php';
                 <!-- Image footer info -->
                 <div class="mt-3 flex items-center justify-between text-xs text-slate-400">
                     <span>Posted <?php echo htmlspecialchars(date('M j, Y', strtotime($ucsCurrentTimetable['created_at']))); ?></span>
-                    <span><?php echo htmlspecialchars($ucsDetails['classroom_name']); ?></span>
+                    <span><?php echo htmlspecialchars($ucsDetails['classroom_name'] ?? ''); ?></span>
                 </div>
 
             <?php else: ?>

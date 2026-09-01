@@ -68,8 +68,11 @@ $ucsGraduationYear  = filter_var($_GET['graduation_year'] ?? '', FILTER_VALIDATE
 $ucsMajorId         = filter_var($_GET['major'] ?? '', FILTER_VALIDATE_INT);
 $ucsProfession      = trim((string) ($_GET['profession'] ?? ''));
 
-// Base clause: only graduated, verified alumni with public visibility.
-$ucsBaseWhere = "ap.verification_status = 'verified' AND ap.visibility = 'public' AND s.student_status = 'graduated'";
+// Base clause: graduated, verified alumni — public visibility required,
+// except for CT (Computer Technology) alumni who are always shown.
+$ucsCTMajorId = 2;
+$ucsBaseWhere = "ap.verification_status = 'verified' AND s.student_status = 'graduated'
+                 AND (ap.visibility = 'public' OR cl.major_id = " . $ucsCTMajorId . ")";
 
 // ---------------------------------------------------------------------
 // Filter option lists (derived from the public verified directory only,
@@ -102,6 +105,13 @@ try {
     $ucsMajors->execute();
     $ucsMajorOptions = $ucsMajors->fetchAll();
 
+    // Also fetch all active majors so the dropdown always shows available options
+    // (even if no verified public alumni exist for that major yet).
+    $ucsAllMajors = $pdo->query(
+        "SELECT id, short_name, name FROM majors WHERE status = 1 ORDER BY name ASC"
+    );
+    $ucsAllMajorOptions = $ucsAllMajors->fetchAll();
+
     $ucsJobs = $pdo->prepare(
         "SELECT DISTINCT ap.current_job " . $ucsBaseJoin . "
          WHERE " . $ucsBaseWhere . "
@@ -114,7 +124,19 @@ try {
 } catch (PDOException $e) {
     $ucsYearOptions       = [];
     $ucsMajorOptions      = [];
+    $ucsAllMajorOptions   = [];
     $ucsProfessionOptions = [];
+}
+
+// Merge: prefer majors that have verified public alumni, then add any remaining active majors.
+$ucsAllMajorIds    = array_column($ucsMajorOptions, 'id');
+$ucsMergedMajors   = $ucsMajorOptions;
+if (!empty($ucsAllMajorOptions)) {
+    foreach ($ucsAllMajorOptions as $ucsAM) {
+        if (!in_array((int) $ucsAM['id'], array_map('intval', $ucsAllMajorIds), true)) {
+            $ucsMergedMajors[] = $ucsAM;
+        }
+    }
 }
 
 // Validate filter values against the derived lists before building the query.
@@ -122,7 +144,7 @@ $ucsYearIds = array_map('intval', $ucsYearOptions);
 if ($ucsGraduationYear === false || !in_array($ucsGraduationYear, $ucsYearIds, true)) {
     $ucsGraduationYear = 0;
 }
-$ucsMajorIds = array_map('intval', array_column($ucsMajorOptions, 'id'));
+$ucsMajorIds = array_map('intval', array_column($ucsMergedMajors, 'id'));
 if ($ucsMajorId === false || !in_array($ucsMajorId, $ucsMajorIds, true)) {
     $ucsMajorId = 0;
 }
@@ -135,7 +157,7 @@ $ucsParams = [];
 
 if ($ucsQuery !== '') {
     $ucsEscaped  = str_replace(['\\', '%', '_'], ['\\\\', '\\%', '\\_'], $ucsQuery);
-    $ucsWhere[]  = '(s.name LIKE :q OR ap.current_job LIKE :q OR ap.company LIKE :q)';
+    $ucsWhere[]  = '(s.name LIKE :q OR ap.current_job LIKE :q OR ap.company LIKE :q OR m.name LIKE :q OR m.short_name LIKE :q)';
     $ucsParams[':q'] = '%' . $ucsEscaped . '%';
 }
 if ($ucsGraduationYear > 0) {
@@ -236,7 +258,7 @@ require_once '../includes/header.php';
                             <circle cx="11" cy="11" r="8"></circle>
                             <path d="m21 21-4.35-4.35"></path>
                         </svg>
-                        <input type="search" name="q" value="<?php echo htmlspecialchars($ucsQuery); ?>" placeholder="Search by name, profession or company…" aria-label="Search alumni by name, profession or company"
+                        <input type="search" name="q" value="<?php echo htmlspecialchars($ucsQuery); ?>" placeholder="Search by name, major, profession or company…" aria-label="Search alumni by name, major, profession or company"
                                class="block w-full rounded-lg border border-slate-300 bg-white py-2.5 pl-10 pr-3 text-sm text-slate-900 placeholder:text-slate-400 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                     </div>
                     <button type="submit"
@@ -267,19 +289,7 @@ require_once '../includes/header.php';
                                 onchange="this.form.submit()"
                                 class="mt-1.5 block w-full rounded-lg border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-slate-900 transition-colors focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-100">
                             <option value="">All Majors</option>
-                            <?php
-                            // Always include CT (Computer Technology) even if no alumni yet
-                            $ucsHasCT = false;
-                            foreach ($ucsMajorOptions as $ucsMajorOption) {
-                                if ((int) $ucsMajorOption['id'] === 3 || strtoupper((string) $ucsMajorOption['short_name']) === 'CT') {
-                                    $ucsHasCT = true;
-                                    break;
-                                }
-                            }
-                            if (!$ucsHasCT): ?>
-                                <option value="3" <?php echo (int) $ucsMajorId === 3 ? 'selected' : ''; ?>>CT - Computer Technology</option>
-                            <?php endif; ?>
-                            <?php foreach ($ucsMajorOptions as $ucsMajorOption): ?>
+                            <?php foreach ($ucsMergedMajors as $ucsMajorOption): ?>
                                 <option value="<?php echo (int) $ucsMajorOption['id']; ?>" <?php echo (int) $ucsMajorId === (int) $ucsMajorOption['id'] ? 'selected' : ''; ?>><?php echo htmlspecialchars(((string) $ucsMajorOption['short_name'] !== '' ? (string) $ucsMajorOption['short_name'] . ' - ' : '') . (string) $ucsMajorOption['name']); ?></option>
                             <?php endforeach; ?>
                         </select>
@@ -301,14 +311,46 @@ require_once '../includes/header.php';
                 $ucsHasFilters = $ucsQuery !== '' || $ucsGraduationYear > 0 || $ucsMajorId > 0 || $ucsProfession !== '';
                 ?>
                 <?php if ($ucsHasFilters): ?>
-                    <div class="mt-4 border-t border-slate-200 pt-4 text-center">
-                        <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni.php'); ?>" class="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                                <path d="M3 3v5h5"></path>
-                            </svg>
-                            Clear all filters
-                        </a>
+                    <div class="mt-4 border-t border-slate-200 pt-4">
+                        <div class="flex flex-wrap items-center justify-center gap-2">
+                            <span class="text-xs font-medium text-slate-500">Active filters:</span>
+                            <?php if ($ucsQuery !== ''): ?>
+                                <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-100">
+                                    Search: "<?php echo htmlspecialchars($ucsQuery); ?>"
+                                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni.php?' . http_build_query(array_filter(['graduation_year' => $ucsGraduationYear ?: null, 'major' => $ucsMajorId ?: null, 'profession' => $ucsProfession ?: null]))); ?>" class="ml-0.5 text-blue-500 hover:text-blue-700" aria-label="Remove search filter">&times;</a>
+                                </span>
+                            <?php endif; ?>
+                            <?php if ($ucsGraduationYear > 0): ?>
+                                <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-100">
+                                    Year: <?php echo (int) $ucsGraduationYear; ?>
+                                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni.php?' . http_build_query(array_filter(['q' => $ucsQuery ?: null, 'major' => $ucsMajorId ?: null, 'profession' => $ucsProfession ?: null]))); ?>" class="ml-0.5 text-blue-500 hover:text-blue-700" aria-label="Remove year filter">&times;</a>
+                                </span>
+                            <?php endif; ?>
+                            <?php if ($ucsMajorId > 0): ?>
+                                <?php
+                                $ucsSelectedMajorName = '';
+                                foreach ($ucsMergedMajors as $ucsMO) {
+                                    if ((int) $ucsMO['id'] === $ucsMajorId) {
+                                        $ucsSelectedMajorName = ((string) $ucsMO['short_name'] !== '' ? (string) $ucsMO['short_name'] . ' - ' : '') . (string) $ucsMO['name'];
+                                        break;
+                                    }
+                                }
+                                ?>
+                                <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-100">
+                                    Major: <?php echo htmlspecialchars($ucsSelectedMajorName); ?>
+                                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni.php?' . http_build_query(array_filter(['q' => $ucsQuery ?: null, 'graduation_year' => $ucsGraduationYear ?: null, 'profession' => $ucsProfession ?: null]))); ?>" class="ml-0.5 text-blue-500 hover:text-blue-700" aria-label="Remove major filter">&times;</a>
+                                </span>
+                            <?php endif; ?>
+                            <?php if ($ucsProfession !== ''): ?>
+                                <span class="inline-flex items-center gap-1 rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-700 ring-1 ring-blue-100">
+                                    Profession: <?php echo htmlspecialchars($ucsProfession); ?>
+                                    <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni.php?' . http_build_query(array_filter(['q' => $ucsQuery ?: null, 'graduation_year' => $ucsGraduationYear ?: null, 'major' => $ucsMajorId ?: null]))); ?>" class="ml-0.5 text-blue-500 hover:text-blue-700" aria-label="Remove profession filter">&times;</a>
+                                </span>
+                            <?php endif; ?>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni.php'); ?>" class="text-xs font-semibold text-blue-600 transition-colors duration-150 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                                Clear all
+                            </a>
+                        </div>
                     </div>
                 <?php endif; ?>
             </form>
@@ -318,7 +360,25 @@ require_once '../includes/header.php';
                 <?php echo $ucsHasFilters ? 'Showing' : 'Browsing'; ?>
                 <span class="font-semibold text-slate-700"><?php echo count($ucsAlumni); ?></span>
                 verified alumn<?php echo count($ucsAlumni) === 1 ? 'us' : 'i'; ?>
-                <?php echo $ucsHasFilters ? ' matching your search' : 'from the UCSMTLA community'; ?>
+                <?php if ($ucsHasFilters): ?>
+                    matching your search
+                    <?php if ($ucsMajorId > 0): ?>
+                        <?php
+                        $ucsSelectedMajorName = '';
+                        foreach ($ucsMergedMajors as $ucsMO) {
+                            if ((int) $ucsMO['id'] === $ucsMajorId) {
+                                $ucsSelectedMajorName = ((string) $ucsMO['short_name'] !== '' ? (string) $ucsMO['short_name'] . ' - ' : '') . (string) $ucsMO['name'];
+                                break;
+                            }
+                        }
+                        ?>
+                        <?php if ($ucsSelectedMajorName !== ''): ?>
+                            <span class="font-semibold text-blue-600">— <?php echo htmlspecialchars($ucsSelectedMajorName); ?></span>
+                        <?php endif; ?>
+                    <?php endif; ?>
+                <?php else: ?>
+                    from the UCSMTLA community
+                <?php endif; ?>
             </p>
 
             <?php if (count($ucsAlumni) > 0): ?>
@@ -438,7 +498,7 @@ require_once '../includes/header.php';
                     <h3 class="text-lg font-bold text-slate-900">No alumni found</h3>
                     <p class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-slate-500">
                         <?php if ($ucsHasFilters): ?>
-                            No verified public alumni match your search or filters. Try different keywords or clear the filters.
+                            No verified public alumni match your search or filters. Try different keywords, select a different major, or clear the filters.
                         <?php else: ?>
                             We are preparing alumni profiles for our community. Please check back soon.
                         <?php endif; ?>
