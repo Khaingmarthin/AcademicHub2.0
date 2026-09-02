@@ -83,10 +83,11 @@ function alumni_create_validate_input($input, $pdo)
 }
 
 /**
- * Validate a graduated student's self-service alumni profile application.
+ * Validate a graduated (or final-year) student's self-service alumni profile
+ * application.
  *
- * This powers the "Join the Alumni Community" flow: a graduated student who
- * has no alumni profile yet (or whose profile was rejected) may submit their
+ * This powers the "Join the Alumni Community" flow: a graduated or final-year
+ * student who has no alumni profile yet (or whose profile was rejected) may submit their
  * career information. The profile is stored as 'pending' and must then be
  * verified by an authorised admin through the existing verification workflow.
  *
@@ -107,9 +108,10 @@ function alumni_join_validate_input($input, $pdo)
 
     try {
         $ucsStmt = $pdo->prepare(
-            "SELECT s.student_status, ap.id AS alumni_profile_id,
+            "SELECT s.student_status, c.year_level, ap.id AS alumni_profile_id,
                     ap.verification_status AS profile_status
              FROM students s
+             LEFT JOIN classrooms c ON c.id = s.classroom_id
              LEFT JOIN alumni_profiles ap ON ap.student_id = s.id
              WHERE s.id = :id
              LIMIT 1"
@@ -121,8 +123,9 @@ function alumni_join_validate_input($input, $pdo)
             $errors[] = 'Student account not found.';
             return ['clean' => [], 'errors' => $errors];
         }
-        if ($ucsStudent['student_status'] !== 'graduated') {
-            $errors[] = 'Only officially graduated students can join the alumni community.';
+        if ($ucsStudent['student_status'] !== 'graduated'
+            && ($ucsStudent['year_level'] ?? '') !== 'Fifth Year') {
+            $errors[] = 'Only graduated or final-year students can join the alumni community.';
             return ['clean' => [], 'errors' => $errors];
         }
         if ($ucsStudent['alumni_profile_id'] !== null

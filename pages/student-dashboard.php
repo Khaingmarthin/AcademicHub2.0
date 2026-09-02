@@ -85,11 +85,14 @@ if ($ucsDetails !== null) {
                     AND tca.classroom_id = :classroom_id
                  LEFT JOIN teachers t ON t.id = tca.teacher_id
                  WHERE c.academic_year_id IN ($ucsPlaceholderStr)
-                   AND c.year_level = 'First Year'
+                   AND c.year_level = :year_level
                    AND c.status = 1
                  ORDER BY c.course_code ASC"
             );
-            $ucsParams = [':classroom_id' => $ucsDetails['classroom_id']];
+            $ucsParams = [
+                ':classroom_id' => $ucsDetails['classroom_id'],
+                ':year_level'   => (string) $ucsDetails['year_level'],
+            ];
             foreach ($ucsAcademicYearIds as $ucsIdx => $ucsAyId) {
                 $ucsParams[':ay_' . $ucsIdx] = $ucsAyId;
             }
@@ -101,8 +104,9 @@ if ($ucsDetails !== null) {
     }
 }
 
-$ucsCourseContextParts = ['First Year'];
+$ucsCourseContextParts = [];
 if ($ucsDetails !== null) {
+    $ucsCourseContextParts[] = $ucsDetails['year_level'];
     if (!empty($ucsDetails['major_name'])) {
         $ucsCourseContextParts[] = $ucsDetails['major_name'];
     }
@@ -364,7 +368,7 @@ require_once __DIR__ . '/../includes/header.php';
                                 <path d="M9 18l6-6-6-6"></path>
                             </svg>
                         </a>
-                    <?php elseif (($ucsDetails['student_status'] ?? '') === 'graduated'): ?>
+                    <?php elseif (($ucsDetails['student_status'] ?? '') === 'graduated' || ($ucsDetails['year_level'] ?? '') === 'Fifth Year'): ?>
                         <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-join.php'); ?>" class="group flex items-center gap-4 border-t border-slate-200 px-5 py-4 transition-colors duration-150 hover:bg-slate-50 sm:px-6 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
                             <span class="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-slate-100 text-slate-600 transition-colors duration-150 group-hover:bg-blue-600 group-hover:text-white" aria-hidden="true">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -417,7 +421,7 @@ require_once __DIR__ . '/../includes/header.php';
 
                 <?php if ($ucsDetails !== null): ?>
                     <p class="mt-3 text-sm leading-6 text-slate-500">
-                        First year foundation courses for your academic year.
+                        Your <?php echo htmlspecialchars($ucsDetails['year_level']); ?> courses for the academic year.
                         <?php if ($ucsCourseContext !== ''): ?>
                             <span class="font-medium text-slate-700"><?php echo htmlspecialchars($ucsCourseContext); ?></span>
                         <?php endif; ?>
@@ -443,7 +447,7 @@ require_once __DIR__ . '/../includes/header.php';
                     </div>
                 <?php else: ?>
                     <div class="mt-4 rounded-lg border border-slate-200 bg-white px-6 py-10 text-center">
-                        <p class="text-sm leading-6 text-slate-500">No first year courses are currently available.</p>
+                        <p class="text-sm leading-6 text-slate-500">No courses are currently available.</p>
                     </div>
                 <?php endif; ?>
             </section>

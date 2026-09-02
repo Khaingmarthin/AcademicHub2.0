@@ -2,8 +2,8 @@
 /**
  * Alumni self-service - join the alumni community (protected).
  *
- * Lets an officially graduated student apply for an alumni profile by
- * submitting their career information. The application is stored with
+ * Lets an officially graduated or final-year (Fifth Year) student apply for
+ * an alumni profile by submitting their career information. The application is stored with
  * verification_status 'pending' and is reviewed by an authorised admin.
  * A previously rejected application can be resubmitted from this page.
  * Graduated students who already have a pending or verified profile are
@@ -20,10 +20,12 @@ $ucsStudent = student_current_user();
 
 $ucsAcademicStatus = 'active';
 $ucsProfileStatus  = null;
+$ucsYearLevel      = null;
 try {
     $ucsStmt = $pdo->prepare(
-        "SELECT s.student_status, ap.verification_status AS profile_status
+        "SELECT s.student_status, c.year_level, ap.verification_status AS profile_status
          FROM students s
+         LEFT JOIN classrooms c ON c.id = s.classroom_id
          LEFT JOIN alumni_profiles ap ON ap.student_id = s.id
          WHERE s.id = :id
          LIMIT 1"
@@ -33,14 +35,16 @@ try {
     if ($ucsRow !== null) {
         $ucsAcademicStatus = (string) ($ucsRow['student_status'] ?? 'active');
         $ucsProfileStatus  = $ucsRow['profile_status'] ?? null;
+        $ucsYearLevel      = $ucsRow['year_level'] ?? null;
     }
 } catch (PDOException $e) {
     $ucsAcademicStatus = 'active';
     $ucsProfileStatus  = null;
+    $ucsYearLevel      = null;
 }
 
-// Non-graduates are not part of the alumni community.
-if ($ucsAcademicStatus !== 'graduated') {
+// Graduated students and final-year (Fifth Year) students can join the community.
+if ($ucsAcademicStatus !== 'graduated' && $ucsYearLevel !== 'Fifth Year') {
     header('Location: ' . BASE_URL . '/alumni-overview.php');
     exit;
 }
@@ -94,7 +98,7 @@ require_once __DIR__ . '/../includes/header.php';
                     <p class="mt-2 max-w-xl text-sm leading-6 text-slate-600">
                         <?php echo $ucsIsResubmit
                             ? 'Your previous application was not approved. Please review and resubmit your details for another review.'
-                            : 'Congratulations on your graduation! Tell us a little about your career so we can set up your alumni profile.'; ?>
+                            : 'Tell us a little about your career so we can set up your alumni profile.'; ?>
                     </p>
                 </div>
                 <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition-colors hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">

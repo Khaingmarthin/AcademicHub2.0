@@ -134,7 +134,7 @@ try {
                 ay.year_name AS academic_year_name, ay.status AS academic_year_status
          FROM timetables tt
          JOIN classrooms cl ON cl.id = tt.classroom_id
-         JOIN majors m ON m.id = cl.major_id
+         LEFT JOIN majors m ON m.id = cl.major_id
          JOIN academic_years ay ON ay.id = cl.academic_year_id"
         . $ucsWhereSql . "
          ORDER BY ay.start_date DESC, tt.semester ASC, cl.year_level ASC, (cl.section IS NULL) ASC, cl.section ASC, cl.classroom_name ASC"
@@ -457,7 +457,7 @@ require_once __DIR__ . '/../../includes/admin-layout-top.php';
                             <div class="mt-1.5 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-slate-500">
                                 <span class="inline-flex items-center gap-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path></svg>
-                                    <?php echo htmlspecialchars((string) $ucsTimetable['major_name']); ?>
+                                    <?php echo htmlspecialchars((string) ($ucsTimetable['major_name'] !== null && $ucsTimetable['major_name'] !== '' ? $ucsTimetable['major_name'] : 'Foundation')); ?>
                                 </span>
                                 <span class="inline-flex items-center gap-1">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-slate-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>

@@ -82,6 +82,8 @@ $navItems = [
         'label'    => 'Academics',
         'children' => [
             ['label' => 'Degree Programmes', 'url' => BASE_URL . '/degree-programmes.php'],
+            ['label' => 'Courses', 'url' => BASE_URL . '/courses.php', 'match' => ['courses.php']],
+            ['label' => 'Admissions', 'url' => BASE_URL . '/admissions.php', 'match' => ['admissions.php']],
         ],
     ],
     ['label' => 'Faculties', 'url' => BASE_URL . '/faculties.php'],

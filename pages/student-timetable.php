@@ -77,10 +77,10 @@ $ucsTimetableUrl = '';
 $ucsHasTimetable = false;
 
 if ($ucsCurrentTimetable !== null && !empty($ucsCurrentTimetable['image'])) {
-    $ucsTimetableFile = dirname(__DIR__) . '/assets/uploads/' . ltrim($ucsCurrentTimetable['image'], '/');
+    $ucsTimetableFile = dirname(__DIR__) . '/assets/' . ltrim($ucsCurrentTimetable['image'], '/');
     $ucsHasTimetable  = is_file($ucsTimetableFile);
     if ($ucsHasTimetable) {
-        $ucsTimetableUrl = ROOT_URL . '/assets/uploads/' . ltrim($ucsCurrentTimetable['image'], '/');
+        $ucsTimetableUrl = ROOT_URL . '/assets/' . ltrim($ucsCurrentTimetable['image'], '/');
     }
 }
 
