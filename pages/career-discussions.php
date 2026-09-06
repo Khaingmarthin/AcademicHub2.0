@@ -112,12 +112,22 @@ require_once '../includes/header.php';
     <!-- Page header -->
     <section class="border-b border-slate-200 bg-white" aria-labelledby="career-discussions-page-heading">
         <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-12 sm:py-16 lg:py-20">
-            <div class="max-w-3xl">
-                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">UCSMTLA Career Community</p>
-                <h1 id="career-discussions-page-heading" class="mt-3 text-3xl font-extrabold tracking-[-0.025em] text-slate-900 sm:text-4xl lg:text-[2.75rem] leading-[1.1]">Career Discussions</h1>
-                <p class="mt-4 max-w-2xl text-base leading-relaxed text-slate-600">
-                    Career insights, advice and real-world experience from verified UCSMTLA alumni who have been where you are now.
-                </p>
+            <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+                <div class="max-w-3xl">
+                    <p class="text-xs font-semibold uppercase tracking-[0.2em] text-blue-600">UCSMTLA Career Community</p>
+                    <h1 id="career-discussions-page-heading" class="mt-3 text-3xl font-extrabold tracking-[-0.025em] text-slate-900 sm:text-4xl lg:text-[2.75rem] leading-[1.1]">Career Discussions</h1>
+                    <p class="mt-4 max-w-2xl text-base leading-relaxed text-slate-600">
+                        Career insights, advice and real-world experience from verified UCSMTLA alumni who have been where you are now.
+                    </p>
+                </div>
+                <?php if ($ucsCurrentUser !== null): ?>
+                    <a href="<?php echo htmlspecialchars(BASE_URL . ($ucsIsAlumni ? '/alumni-dashboard.php' : '/student-dashboard.php')); ?>" class="inline-flex items-center gap-1 rounded-lg border border-slate-300 bg-white px-3 text-xs font-semibold text-slate-700 transition-colors hover:bg-slate-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M19 12H5M12 19l-7-7 7-7"></path>
+                        </svg>
+                        Back to Dashboard
+                    </a>
+                <?php endif; ?>
             </div>
         </div>
     </section>
@@ -125,35 +135,6 @@ require_once '../includes/header.php';
     <!-- Discussions listing -->
     <section class="bg-slate-50 py-16 sm:py-20" aria-labelledby="career-discussions-listing-heading">
         <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-            <!-- Intro + ask CTA -->
-            <div class="rounded-lg bg-blue-600 px-6 py-8 sm:px-10">
-                <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                        <h2 id="career-discussions-listing-heading" class="text-xl font-extrabold tracking-tight text-white sm:text-2xl">Share your experience</h2>
-                        <p class="mt-2 max-w-xl text-sm leading-6 text-blue-100">
-                            Alumni — start a career discussion to share interview tips, portfolio advice, CV guidance or lessons from your professional journey.
-                        </p>
-                    </div>
-                    <div class="flex shrink-0 items-center gap-3">
-                        <?php if ($ucsIsAlumni): ?>
-                            <a href="<?php echo htmlspecialchars(BASE_URL . '/alumni-dashboard.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-lg border border-white/30 bg-white/10 px-5 py-3 text-sm font-semibold text-white transition-all duration-200 hover:bg-white/20 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                    <path d="M19 12H5M12 19l-7-7 7-7"></path>
-                                </svg>
-                                Back to Dashboard
-                            </a>
-                        <?php endif; ?>
-                        <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussion-create.php'); ?>" class="inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-blue-700 transition-all duration-200 hover:bg-blue-50 focus:outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                                <path d="M12 20h9"></path>
-                                <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
-                            </svg>
-                            Start a Discussion
-                        </a>
-                    </div>
-                </div>
-            </div>
-
             <!-- Search -->
             <form method="get" action="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="mt-8 flex w-full items-stretch" role="search">
                 <div class="relative flex-1">

@@ -446,6 +446,10 @@ require_once __DIR__ . '/../includes/header.php';
                             <span class="inline-flex h-1.5 w-1.5 shrink-0 rounded-full bg-blue-600 ring-4 ring-blue-100" aria-hidden="true"></span>
                             <h2 id="my-discussions-heading" class="text-xs font-semibold uppercase tracking-[0.2em] text-slate-900">My Discussions</h2>
                             <span class="h-px flex-1 bg-blue-100" aria-hidden="true"></span>
+                            <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussion-create.php'); ?>" class="inline-flex shrink-0 items-center gap-1 rounded-lg bg-blue-600 px-2.5 py-1 text-[0.6875rem] font-semibold text-white shadow-sm transition-colors duration-200 hover:bg-blue-700">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg>
+                                Start a Discussion
+                            </a>
                             <a href="<?php echo htmlspecialchars(BASE_URL . '/career-discussions.php'); ?>" class="shrink-0 text-xs font-semibold text-blue-700 transition-colors duration-150 hover:text-blue-800">Browse all</a>
                         </div>
 
